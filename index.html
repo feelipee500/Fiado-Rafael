@@ -1422,7 +1422,14 @@
             letter-spacing: -.5px;
         }
 
-        /* Payment receipt extras */
+        .tl-anexo-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 600; padding: 2px 7px;
+      border-radius: var(--rad999); margin-top: 4px;
+    }
+    .tl-anexo-tag.ok  { background:#00e8a218; color:var(--acc); }
+    .tl-anexo-tag.miss{ background:#ffb54718; color:var(--warn); }
+    .tl-anexo-tag svg { width:10px; height:10px; }
         .rcpt-progress-wrap {
             margin: 12px 0 4px;
         }
@@ -3543,7 +3550,29 @@
         </div>
     </div>
 
-    <div id="toast"></div>
+    <!-- Anexo de pagamento (1 por pagamento) -->
+  <div class="overlay" id="pag-anexo-sheet" data-backdrop="pag-anexo-sheet">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <div class="sh-handle"></div>
+      <div class="sh-hdr">
+        <div class="sh-title">Anexo do Pagamento</div>
+        <div class="sh-close" onclick="closeSheet(document.getElementById('pag-anexo-sheet'))">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>
+      <div class="sh-body">
+        <p class="fs12 tc1 mb12">Adicione o comprovante do pagamento recebido. Somente 1 arquivo por pagamento.</p>
+        <div class="attach-btn" onclick="simulateAnexoPag()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Selecionar arquivo / imagem
+        </div>
+        <div id="pag-anexo-preview" class="mt8"></div>
+        <button class="btn-p mt12" onclick="saveAnexoPag()">Salvar anexo</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
 
     <!-- ===== LOADING SCREEN ===== -->
     <div id="loading-screen">
@@ -4718,10 +4747,110 @@
         }
         function backFromEmpDetalhe() { }
 
-        function renderAttachList(elId, arr) {
+        function renderAttachList(elId, file) {
+            // file = single object or null (compEnvio is now a single object, not array)
             const el = document.getElementById(elId);
-            if (!arr || !arr.length) { el.innerHTML = '<div class="fs12 tc2 mb4">Nenhum arquivo</div>'; return; }
-            el.innerHTML = arr.map((a, i) => `<div class="attach-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg><div class="attach-item-name">${a.name || 'Arquivo ' + i}</div><div class="attach-item-del" onclick="this.closest('.attach-item').remove()">remover</div></div>`).join('');
+            if (!file || (Array.isArray(file) && !file.length)) {
+                el.innerHTML = '<div class="fs12 tc2 mb4">Nenhum arquivo</div>';
+                return;
+            }
+            const f = Array.isArray(file) ? file[0] : file;
+            el.innerHTML = `<div class="attach-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              <div class="attach-item-name">${f.name || 'Arquivo'}</div>
+              <div class="attach-item-del" onclick="removerCompEnvio()">remover</div>
+            </div>`;
+        }
+
+        function removerCompEnvio() {
+            const loan = getLoan(_currentLoanId);
+            if (!loan) return;
+            loan.compEnvio = null;
+            renderCompEnvioCard(loan);
+            showToast('Comprovante removido', 'ok');
+        }
+
+        function renderCompEnvioCard(loan) {
+            const hasFile = loan.compEnvio && loan.compEnvio.name;
+            const listEl  = document.getElementById('ed-comp-envio-list');
+            const btnEl   = document.getElementById('ed-comp-envio-btn');
+            if (hasFile) {
+                listEl.innerHTML = `<div class="attach-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                  <div class="attach-item-name">${loan.compEnvio.name}</div>
+                  <div class="attach-item-del" onclick="removerCompEnvio()">remover</div>
+                </div>`;
+                if (btnEl) btnEl.style.display = 'none';
+            } else {
+                listEl.innerHTML = '<div class="fs12 tc2 mb4">Nenhum comprovante</div>';
+                if (btnEl) btnEl.style.display = '';
+            }
+        }
+
+        function openAttachSheet(mode) {
+            const loan = getLoan(_currentLoanId);
+            if (loan && loan.compEnvio && loan.compEnvio.name) {
+                showToast('Remova o comprovante atual antes de adicionar outro', 'err');
+                return;
+            }
+            _attachMode = mode;
+            _tempAttachFiles = [];
+            document.getElementById('attach-title').textContent = 'Comprovante de Envio (meu PIX)';
+            document.getElementById('attach-files-list').innerHTML = '';
+            openSheet('attach-sheet');
+        }
+
+        function simulateAttach() {
+            const names = ['pix_comprovante.jpg', 'extrato_banco.png', 'foto_transferencia.jpg'];
+            _tempAttachFiles = [{ name: names[Math.floor(Math.random() * names.length)] }]; // only 1
+            document.getElementById('attach-files-list').innerHTML =
+                `<div class="attach-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><div class="attach-item-name">${_tempAttachFiles[0].name}</div></div>`;
+        }
+
+        function saveAttach() {
+            if (!_tempAttachFiles.length) { showToast('Nenhum arquivo selecionado', 'err'); return; }
+            const loan = getLoan(_currentLoanId);
+            if (!loan) return;
+            loan.compEnvio = _tempAttachFiles[0]; // single file
+            closeSheet(document.getElementById('attach-sheet'));
+            renderCompEnvioCard(loan);
+            showToast('Comprovante salvo!', 'ok');
+        }
+
+        // ---- Payment attachment (1 per payment) ----
+        let _anexoPagLid = null, _anexoPagPid = null, _tempAnexoPag = null;
+
+        function openAnexoPagSheet(lid, pid) {
+            _anexoPagLid = lid; _anexoPagPid = pid; _tempAnexoPag = null;
+            document.getElementById('pag-anexo-preview').innerHTML = '';
+            openSheet('pag-anexo-sheet');
+        }
+
+        function simulateAnexoPag() {
+            const names = ['recibo_pag.jpg', 'pix_recebido.png', 'comprovante_cliente.jpg'];
+            _tempAnexoPag = { name: names[Math.floor(Math.random() * names.length)] };
+            document.getElementById('pag-anexo-preview').innerHTML =
+                `<div class="attach-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg><div class="attach-item-name">${_tempAnexoPag.name}</div></div>`;
+        }
+
+        function saveAnexoPag() {
+            if (!_tempAnexoPag) { showToast('Nenhum arquivo selecionado', 'err'); return; }
+            const loan = getLoan(_anexoPagLid);
+            const pag  = loan && loan.pagamentos.find(p => p.id === _anexoPagPid);
+            if (!pag) return;
+            pag.anexos_pag = [_tempAnexoPag]; // enforce single
+            closeSheet(document.getElementById('pag-anexo-sheet'));
+            renderTimeline(loan);
+            showToast('Anexo salvo!', 'ok');
+        }
+
+        function removerAnexoPag(lid, pid) {
+            const loan = getLoan(lid);
+            const pag  = loan && loan.pagamentos.find(p => p.id === pid);
+            if (!pag) return;
+            pag.anexos_pag = [];
+            renderTimeline(loan);
+            showToast('Anexo removido', 'ok');
         }
 
         function renderTimeline(loan) {
@@ -4840,7 +4969,16 @@
                 const quitou = e.saldoDepois <= 0;
                 dotClass = 'td-g';
                 cardClass = quitou ? 'tl-card-done' : 'tl-card-green';
-                title = isPag ? '💵 Pagamento recebido' : '💵 Pagamento recebido';
+                title = 'Pagamento recebido';
+                // Anexo badge — look up payment from loan
+                const anexoBadge = e.pId ? (() => {
+                  const loan = getLoan(loanId);
+                  const pag  = loan && loan.pagamentos.find(p => p.id === e.pId);
+                  const has  = pag && pag.anexos_pag && pag.anexos_pag.length > 0;
+                  return has
+                    ? `<span class="tl-anexo-tag ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Anexo OK</span>`
+                    : `<span class="tl-anexo-tag miss"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Sem anexo</span>`;
+                })() : '';
                 rows = [
                     row('Divida', fmtMoney(e.saldoAntes), false, 'var(--txt1)'),
                     row('Valor pago', fmtMoney(e.valor), false, 'var(--acc)'),
@@ -4848,8 +4986,13 @@
                         ? row('Resultado', 'Dívida quitada ✓', true, 'var(--acc)')
                         : row('Saldo restante', fmtMoney(e.saldoDepois), true, 'var(--txt0)'),
                 ];
+                // Append badge as extra element after rows
+                const badgeExtraRows = anexoBadge
+                  ? rows.concat([`<div class="tl-card-row" style="margin-top:4px">${anexoBadge}</div>`])
+                  : rows;
+                // Override rows with badge included
+                if (anexoBadge) rows.push(`<div style="margin-top:2px">${anexoBadge}</div>`);
 
-                //saldoAntes: saldoCorrente, saldoDepois: saldoCorrente
             } else if (e.tipo === 'vencimento') {
                 dotClass = e.quitouAntes ? 'td-g' : 'td-a';
                 cardClass = e.quitouAntes ? 'tl-card-done' : 'tl-card-venc';
@@ -4918,23 +5061,36 @@
             const loan = getLoan(lid);
             const pag = loan.pagamentos.find(p => p.id === pid);
             if (!pag) return;
-            const hasAnexos = pag.anexos_pag && pag.anexos_pag.length > 0;
+            const hasAnexo      = pag.anexos_pag && pag.anexos_pag.length > 0;
             const hasComprovante = !!pag.comprovante;
+            const anexo          = hasAnexo ? pag.anexos_pag[0] : null;
+
             document.getElementById('tl-event-title').textContent = 'Pagamento — ' + fmtDate(pag.data);
             document.getElementById('tl-event-body').innerHTML = `
     <div class="dr"><div class="dk">Valor pago</div><div class="dv2 c-g fw6">${fmtMoney(pag.valor)}</div></div>
     <div class="dr"><div class="dk">Data</div><div class="dv2">${fmtDate(pag.data)}</div></div>
     ${pag.nota ? `<div class="dr" style="border:none"><div class="dk">Nota</div><div class="dv2">${pag.nota}</div></div>` : ''}
     <div class="dv mt8"></div>
+
     <button class="btn-icon w-full mb8" style="justify-content:center;${!hasComprovante ? 'opacity:.4' : ''}"
       onclick="${hasComprovante ? `closeSheet(document.getElementById('tl-event-sheet'));abrirComprovantePagamento('${lid}','${pid}')` : `showToast('Comprovante indisponível para pagamentos anteriores')`}">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       Ver comprovante${!hasComprovante ? ' (indisponível)' : ''}
     </button>
-    <button class="btn-icon w-full mb8" style="justify-content:center" onclick="showToast('${hasAnexos ? pag.anexos_pag.length + ' anexo(s) disponível(is)' : 'Nenhum anexo'}')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-      Anexos ${hasAnexos ? '(' + pag.anexos_pag.length + ')' : '(nenhum)'}
-    </button>
+
+    ${hasAnexo
+      ? `<div class="attach-item mb8">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+           <div class="attach-item-name">${anexo.name}</div>
+           <div class="attach-item-del" onclick="removerAnexoPag('${lid}','${pid}');closeSheet(document.getElementById('tl-event-sheet'));openEmpDetalhe('${lid}')">remover</div>
+         </div>`
+      : `<button class="btn-icon w-full mb8" style="justify-content:center;color:var(--warn)"
+           onclick="closeSheet(document.getElementById('tl-event-sheet'));openAnexoPagSheet('${lid}','${pid}')">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+           ⚠ Adicionar anexo de pagamento
+         </button>`
+    }
+
     <button class="btn-icon w-full" style="justify-content:center" onclick="closeSheet(document.getElementById('tl-event-sheet'));openEditPag('${lid}','${pid}')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       Editar pagamento
