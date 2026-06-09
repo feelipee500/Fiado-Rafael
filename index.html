@@ -6206,7 +6206,6 @@
         async function loadDB() {
             console.log("Realizando Fetch inicial...");
             try {
-                A
                 DB = await fetch(URL_Coletar_Dados).then(r => r.json());
 
                 showNotif('Dados coletados da planilha', 'ok');
@@ -6276,7 +6275,7 @@
             history.replaceState({ scr: 'dash' }, '', '');
             _navStack.push({ scr: 'dash' });
 
-            abrirComprovantePagamento("C01_E02", "C01_E02_P01");
+            //abrirComprovantePagamento("C01_E02", "C01_E02_P01");
         });
 
 
