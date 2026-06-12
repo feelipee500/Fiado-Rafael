@@ -1423,23 +1423,40 @@
         }
 
         .tl-anexo-tag {
-      display: inline-flex; align-items: center; gap: 4px;
-      font-size: 10px; font-weight: 600; padding: 2px 7px;
-      border-radius: var(--rad999); margin-top: 4px;
-    }
-    .tl-anexo-tag.ok  { background:#00e8a218; color:var(--acc); }
-    .tl-anexo-tag.miss{ background:#ffb54718; color:var(--warn); }
-    .tl-anexo-tag svg { width:10px; height:10px; }
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: var(--rad999);
+            margin-top: 4px;
+        }
+
+        .tl-anexo-tag.ok {
+            background: #00e8a218;
+            color: var(--acc);
+        }
+
+        .tl-anexo-tag.miss {
+            background: #ffb54718;
+            color: var(--warn);
+        }
+
+        .tl-anexo-tag svg {
+            width: 10px;
+            height: 10px;
+        }
+
         .rcpt-progress-wrap {
             margin: 12px 0 4px;
         }
 
         .rcpt-progress-bar {
-            height: 5px;
+            height: 8px;
             background: var(--brd2);
             border-radius: 3px;
             overflow: hidden;
-            margin-top: 6px;
         }
 
         .rcpt-progress-fill {
@@ -3537,8 +3554,8 @@
     <div class="overlay" id="pag-receipt-sheet" data-backdrop="pag-receipt-sheet">
         <div class="sheet" style="max-height:100vh" onclick="event.stopPropagation()">
             <div class="sh-handle"></div>
-            <div class="sh-hdr">
-                <div class="sh-title">Comprovante de Pagamento</div>
+            <div class="sh-hdr" style="text-align:center">
+                <div class="sh-title" style="font-size:11px; color:var(--txt2)">Comprovante de Pagamento</div>
                 <div class="sh-close" onclick="closeSheet(document.getElementById('pag-receipt-sheet'))">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
                         <line x1="18" y1="6" x2="6" y2="18" />
@@ -3551,28 +3568,36 @@
     </div>
 
     <!-- Anexo de pagamento (1 por pagamento) -->
-  <div class="overlay" id="pag-anexo-sheet" data-backdrop="pag-anexo-sheet">
-    <div class="sheet" onclick="event.stopPropagation()">
-      <div class="sh-handle"></div>
-      <div class="sh-hdr">
-        <div class="sh-title">Anexo do Pagamento</div>
-        <div class="sh-close" onclick="closeSheet(document.getElementById('pag-anexo-sheet'))">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    <div class="overlay" id="pag-anexo-sheet" data-backdrop="pag-anexo-sheet">
+        <div class="sheet" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title">Anexo do Pagamento</div>
+                <div class="sh-close" onclick="closeSheet(document.getElementById('pag-anexo-sheet'))">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </div>
+            </div>
+            <div class="sh-body">
+                <p class="fs12 tc1 mb12">Adicione o comprovante do pagamento recebido. Somente 1 arquivo por pagamento.
+                </p>
+                <div class="attach-btn" onclick="simulateAnexoPag()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    Selecionar arquivo / imagem
+                </div>
+                <div id="pag-anexo-preview" class="mt8"></div>
+                <button class="btn-p mt12" onclick="saveAnexoPag()">Salvar anexo</button>
+            </div>
         </div>
-      </div>
-      <div class="sh-body">
-        <p class="fs12 tc1 mb12">Adicione o comprovante do pagamento recebido. Somente 1 arquivo por pagamento.</p>
-        <div class="attach-btn" onclick="simulateAnexoPag()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Selecionar arquivo / imagem
-        </div>
-        <div id="pag-anexo-preview" class="mt8"></div>
-        <button class="btn-p mt12" onclick="saveAnexoPag()">Salvar anexo</button>
-      </div>
     </div>
-  </div>
 
-  <div id="toast"></div>
+    <div id="toast"></div>
 
     <!-- ===== LOADING SCREEN ===== -->
     <div id="loading-screen">
@@ -3623,7 +3648,7 @@
         // { id: "C02_E01", clientId: "C02", valor: 500, prazo: 7, juros_tipo: "fixo", juros_val: 10,
         //   emissao: "2026-05-23", pago: 0, pagamentos: [], compEnvio: [] }
         // Formato dos pagamentos dentro de loan.pagamentos:
-        // { id: "C01_E02_P01", data: "2026-05-21", valor: 230, nota: "...", anexos_pag: [] }
+        // { id: "C01_E02_P01", data: "2026-05-21", valor: 230, status: "PAGAMENTO TOTAL", anexos_pag: [] }
         // compEnvio = comprovante do meu PIX de envio (array no loan)
         // anexos_pag = comprovantes de pagamento recebido (array dentro de cada pagamento)
 
@@ -3732,7 +3757,7 @@
                 events.push({
                     date: parseDate(p.data), tipo: 'pagamento', pId: p.id,
                     label: 'Pagamento recebido',
-                    desc: (p.nota ? p.nota + ' · ' : '') + '⚠ anterior à emissão',
+                    desc: (p.status ? p.status + ' · ' : '') + '⚠ anterior à emissão',
                     valor: p.valor,
                     saldoAntes, saldoDepois: saldoCorrente,
                     color: 'td-g'
@@ -3792,7 +3817,7 @@
                         events.push({
                             date: dia, tipo: 'pagamento', pId: p.id,
                             label: 'Pagamento recebido',
-                            desc: p.nota || '',
+                            desc: p.status || '',
                             valor: p.valor,
                             saldoAntes, saldoDepois: saldoCorrente,
                             color: 'td-g'
@@ -4574,6 +4599,7 @@
         <div class="fs11 tc1">Juros de atraso: <strong>${loan.juros_tipo === 'fixo' ? fmtMoney(loan.juros_val) + '/dia' : loan.juros_val + '%/dia'}</strong></div>
       </div>
     `;
+
         }
         // ==================== CLIENTES ====================
         function renderClientes() {
@@ -4741,7 +4767,6 @@
             };
 
             // Timeline
-            console.log(l);
             renderTimeline(l);
             navTo('emp-detalhe');
         }
@@ -4772,8 +4797,8 @@
 
         function renderCompEnvioCard(loan) {
             const hasFile = loan.compEnvio && loan.compEnvio.name;
-            const listEl  = document.getElementById('ed-comp-envio-list');
-            const btnEl   = document.getElementById('ed-comp-envio-btn');
+            const listEl = document.getElementById('ed-comp-envio-list');
+            const btnEl = document.getElementById('ed-comp-envio-btn');
             if (hasFile) {
                 listEl.innerHTML = `<div class="attach-item">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
@@ -4836,7 +4861,7 @@
         function saveAnexoPag() {
             if (!_tempAnexoPag) { showToast('Nenhum arquivo selecionado', 'err'); return; }
             const loan = getLoan(_anexoPagLid);
-            const pag  = loan && loan.pagamentos.find(p => p.id === _anexoPagPid);
+            const pag = loan && loan.pagamentos.find(p => p.id === _anexoPagPid);
             if (!pag) return;
             pag.anexos_pag = [_tempAnexoPag]; // enforce single
             closeSheet(document.getElementById('pag-anexo-sheet'));
@@ -4846,7 +4871,7 @@
 
         function removerAnexoPag(lid, pid) {
             const loan = getLoan(lid);
-            const pag  = loan && loan.pagamentos.find(p => p.id === pid);
+            const pag = loan && loan.pagamentos.find(p => p.id === pid);
             if (!pag) return;
             pag.anexos_pag = [];
             renderTimeline(loan);
@@ -4972,12 +4997,12 @@
                 title = 'Pagamento recebido';
                 // Anexo badge — look up payment from loan
                 const anexoBadge = e.pId ? (() => {
-                  const loan = getLoan(loanId);
-                  const pag  = loan && loan.pagamentos.find(p => p.id === e.pId);
-                  const has  = pag && pag.anexos_pag && pag.anexos_pag.length > 0;
-                  return has
-                    ? `<span class="tl-anexo-tag ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Anexo OK</span>`
-                    : `<span class="tl-anexo-tag miss"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Sem anexo</span>`;
+                    const loan = getLoan(loanId);
+                    const pag = loan && loan.pagamentos.find(p => p.id === e.pId);
+                    const has = pag && pag.anexos_pag && pag.anexos_pag.length > 0;
+                    return has
+                        ? `<span class="tl-anexo-tag ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Anexo OK</span>`
+                        : `<span class="tl-anexo-tag miss"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Sem anexo</span>`;
                 })() : '';
                 rows = [
                     row('Divida', fmtMoney(e.saldoAntes), false, 'var(--txt1)'),
@@ -4988,8 +5013,8 @@
                 ];
                 // Append badge as extra element after rows
                 const badgeExtraRows = anexoBadge
-                  ? rows.concat([`<div class="tl-card-row" style="margin-top:4px">${anexoBadge}</div>`])
-                  : rows;
+                    ? rows.concat([`<div class="tl-card-row" style="margin-top:4px">${anexoBadge}</div>`])
+                    : rows;
                 // Override rows with badge included
                 if (anexoBadge) rows.push(`<div style="margin-top:2px">${anexoBadge}</div>`);
 
@@ -5061,35 +5086,34 @@
             const loan = getLoan(lid);
             const pag = loan.pagamentos.find(p => p.id === pid);
             if (!pag) return;
-            const hasAnexo      = pag.anexos_pag && pag.anexos_pag.length > 0;
-            const hasComprovante = !!pag.comprovante;
-            const anexo          = hasAnexo ? pag.anexos_pag[0] : null;
+            const hasAnexo = pag.anexos_pag && pag.anexos_pag.length > 0;
+            const anexo = hasAnexo ? pag.anexos_pag[0] : null;
 
             document.getElementById('tl-event-title').textContent = 'Pagamento — ' + fmtDate(pag.data);
             document.getElementById('tl-event-body').innerHTML = `
     <div class="dr"><div class="dk">Valor pago</div><div class="dv2 c-g fw6">${fmtMoney(pag.valor)}</div></div>
     <div class="dr"><div class="dk">Data</div><div class="dv2">${fmtDate(pag.data)}</div></div>
-    ${pag.nota ? `<div class="dr" style="border:none"><div class="dk">Nota</div><div class="dv2">${pag.nota}</div></div>` : ''}
+    ${pag.status ? `<div class="dr" style="border:none"><div class="dk">Status</div><div class="dv2">${pag.status}</div></div>` : ''}
     <div class="dv mt8"></div>
 
-    <button class="btn-icon w-full mb8" style="justify-content:center;${!hasComprovante ? 'opacity:.4' : ''}"
-      onclick="${hasComprovante ? `closeSheet(document.getElementById('tl-event-sheet'));abrirComprovantePagamento('${lid}','${pid}')` : `showToast('Comprovante indisponível para pagamentos anteriores')`}">
+    <button class="btn-icon w-full mb8" style="justify-content:center;"
+      onclick="closeSheet(document.getElementById('tl-event-sheet'));abrirComprovantePagamento('${lid}','${pid}')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      Ver comprovante${!hasComprovante ? ' (indisponível)' : ''}
+      Ver comprovante
     </button>
 
     ${hasAnexo
-      ? `<div class="attach-item mb8">
+                    ? `<div class="attach-item mb8">
            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
            <div class="attach-item-name">${anexo.name}</div>
            <div class="attach-item-del" onclick="removerAnexoPag('${lid}','${pid}');closeSheet(document.getElementById('tl-event-sheet'));openEmpDetalhe('${lid}')">remover</div>
          </div>`
-      : `<button class="btn-icon w-full mb8" style="justify-content:center;color:var(--warn)"
+                    : `<button class="btn-icon w-full mb8" style="justify-content:center;color:var(--warn)"
            onclick="closeSheet(document.getElementById('tl-event-sheet'));openAnexoPagSheet('${lid}','${pid}')">
            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
            ⚠ Adicionar anexo de pagamento
          </button>`
-    }
+                }
 
     <button class="btn-icon w-full" style="justify-content:center" onclick="closeSheet(document.getElementById('tl-event-sheet'));openEditPag('${lid}','${pid}')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -5627,7 +5651,7 @@
         function buildNewPagTimeline(loan, novoValor, novaData) {
             if (!novoValor || !novaData) return '<div class="fs12 tc2">Preencha os dados para ver o histórico</div>';
             const loanSim = JSON.parse(JSON.stringify(loan));
-            loanSim.pagamentos.push({ id: 'tmp_' + Date.now(), data: novaData, valor: novoValor, nota: '', anexos_pag: [] });
+            loanSim.pagamentos.push({ id: 'tmp_' + Date.now(), data: novaData, valor: novoValor, status: '', anexos_pag: [] });
             const events = buildTimeline(loanSim);
             return `<ul class="tl" style="padding-left:0">${renderTimelineHTML(events, null)}</ul>`;
         }
@@ -5659,7 +5683,7 @@
             let bodyHTML = '';
 
             if (isRetro) {
-                bodyHTML += `<div class="warn-box" style="margin-bottom:12px"><div class="wb-t">⚠ Pagamento retroativo</div><div class="wb-d">A data informada é anterior a hoje. O histórico será recalculado a partir deste pagamento.</div></div>`;
+                bodyHTML += `<div class="warn-box" style="margin-bottom:12px"><div class="wb-t">⚠ Pagamento retroativo</div><div class="wb-d">A data informada é anterior a hoje. O histórico será recalculado a partir deste pagamento, E TODOS OS PAGAMENTOS APÓS ESTA DATA SERÃO APAGADOS</div></div>`;
             } else {
                 bodyHTML += `<div class="warn-box" style="background:#3d7fff12;border-color:#3d7fff40;margin-bottom:12px"><div class="wb-t" style="color:var(--acc2)">Confirmar pagamento</div><div class="wb-d">Revise os dados antes de registrar.</div></div>`;
             }
@@ -5728,13 +5752,18 @@
             closeSheet(document.getElementById('pag-confirm-sheet'));
             closeSheet(document.getElementById('retro-final-sheet'));
             const loan = getLoan(lid);
+            const calc = getLoanCalc(loan);
+
+            const totalPagoAntes = calc.totalPago || 0;
+            const totalPagoDepois = totalPagoAntes + valor;
+            const geradoEm = dateStr(TODAY);
+
+            const status = totalPagoDepois >= calc.dividaTotal ? "PAGAMENTO COMPLETO" : "PAGAMENTO PARCIAL";
+
             const pid = loan.id + '_P' + String(loan.pagamentos.length + 1).padStart(2, '0');
             const isRetro = parseDate(data) < TODAY;
 
-            // Snapshot the loan state at payment moment for the receipt
-            const snap = gerarSnapshotPagamento(loan, valor, data, isRetro);
-
-            loan.pagamentos.push({ id: pid, data, valor, nota: '', anexos_pag: [], time: Date.now(), comprovante: snap });
+            loan.pagamentos.push({ id: pid, data, valor, status, anexos_pag: [], time: Date.now(), totalPagoAntes, geradoEm });
             showToast('Pagamento registrado! ✓', 'ok');
             updateNotifBadge();
             // Show receipt immediately
@@ -5744,159 +5773,250 @@
             }, 300);
         }
 
-        // Build a static snapshot at the moment of payment
-        function gerarSnapshotPagamento(loan, valorPago, dataPag, isRetro) {
-            const calcAtual = getLoanCalc(loan); // state BEFORE this payment
-            const emissao = parseDate(loan.emissao);
-            const vencimento = addDays(emissao, loan.prazo);
-            const dtPag = parseDate(dataPag);
-            const client = getClient(loan.clientId);
-            const pr = getProfitRate(loan.prazo);
-            const valorBase = loan.valor * (1 + pr); // valor combinado (principal + lucro)
-            const jDia = loan.juros_tipo === 'fixo' ? loan.juros_val : valorBase * loan.juros_val / 100;
-
-            // Calc saldo and juros on the payment day
-            let saldoNoDia, jurosAcumNoDia, diasAtrasoPag;
-            if (dtPag <= vencimento) {
-                // Within the term — no late interest yet
-                diasAtrasoPag = 0;
-                jurosAcumNoDia = 0;
-                saldoNoDia = Math.max(0, valorBase - calcAtual.totalPago);
-            } else {
-                diasAtrasoPag = diffDays(vencimento, dtPag);
-                jurosAcumNoDia = diasAtrasoPag * jDia;
-                saldoNoDia = Math.max(0, (valorBase - calcAtual.totalPago) + jurosAcumNoDia);
-            }
-
-            const valorApos = Math.max(0, saldoNoDia - valorPago);
-            const totalPagoAgora = calcAtual.totalPago + valorPago;
-            const progressoPct = Math.min(100, Math.round((totalPagoAgora / valorBase) * 100));
-            const quitado = valorApos <= 0;
-
-            // Days remaining / late after payment (as of TODAY)
-            const diasParaVencerHoje = diffDays(TODAY, vencimento);
-            const diasAtrasoHoje = Math.max(0, diffDays(vencimento, TODAY));
-            const isLateHoje = TODAY > vencimento && !quitado;
-            const isWarnHoje = !quitado && !isLateHoje && diasParaVencerHoje <= 2;
-
-            return {
-                // payment info
-                pid_ref: null, // filled after push
-                data: dataPag,
-                valor: valorPago,
-                retroativo: isRetro,
-                // loan state AT payment moment
-                saldoNoDia,
-                jurosAcumNoDia,
-                diasAtrasoPag,
-                valorApos,
-                totalPagoAgora,
-                progressoPct,
-                quitado,
-                // loan static data
-                clienteNome: client.nome,
-                clienteTel: client.tel,
-                loanId: loan.id,
-                valorEmprest: loan.valor,
-                valorBase,
-                profitPct: Math.round(pr * 100),
-                prazo: loan.prazo,
-                emissao: loan.emissao,
-                vencimento: dateStr(vencimento),
-                jurosTipo: loan.juros_tipo,
-                jurosVal: loan.juros_val,
-                jDia,
-                // today's context
-                isLateHoje,
-                isWarnHoje,
-                diasAtrasoHoje,
-                diasParaVencerHoje,
-                geradoEm: dateStr(TODAY),
-            };
-        }
 
         function abrirComprovantePagamento(lid, pid) {
             const loan = getLoan(lid);
             if (!loan) return;
             const pag = loan.pagamentos.find(p => p.id === pid);
             if (!pag) return;
-            const snap = pag.comprovante;
-            if (!snap) { showToast('Comprovante não disponível para este pagamento', 'err'); return; }
-            document.getElementById('pag-receipt-body').innerHTML = renderComprovantePagamento(snap, pid);
+            document.getElementById('pag-receipt-body').innerHTML = renderComprovantePagamento(loan, pag);
             openSheet('pag-receipt-sheet');
         }
 
 
-        function renderComprovantePagamento(s, pid) {
-            const dividaTotal = s.valorBase + s.jurosAcumNoDia;
-            const progressoPct = Math.min(100, Math.round((s.totalPagoAgora / dividaTotal) * 100));
-            const statusPagamento = s.quitado ? 'PAGAMENTO COMPLETO' : 'PAGAMENTO PARCIAL';
+        function renderComprovantePagamento(loan, pag) {
+            const vencimento = addDays(loan.emissao, loan.prazo);
+            const pr = getProfitRate(loan.prazo);
+            const valorBase = loan.valor * (1 + pr); // valor combinado (principal + lucro)
+            const jDia = loan.juros_tipo === 'fixo' ? loan.juros_val : valorBase * loan.juros_val / 100;
 
-            const valorStyle = 'font-size:21px;font-weight:800;font-family:var(--font-d);letter-spacing:-.5px;white-space:nowrap;line-height:1';
+            const totalPagoAgora = pag.totalPagoAntes + pag.valor;
+
+            const juros_dia = loan.juros_tipo == 'fixo' ? fmtMoney(jDia) + '/dia' : loan.juros_val + '%/dia';
+
+            const dtPag = parseDate(pag.data);
+
+            // Calc saldo and juros on the payment day
+            let saldoNoDia, jurosAcumNoDia, diasAtrasoPag;
+            diasAtrasoPag = diffDays(vencimento, dtPag);
+            if (dtPag <= vencimento) {
+                // Within the term — no late interest yet
+                jurosAcumNoDia = 0;
+                saldoNoDia = Math.max(0, valorBase - pag.totalPagoAntes);
+            } else {
+                jurosAcumNoDia = diasAtrasoPag * jDia;
+                saldoNoDia = Math.max(0, (valorBase - pag.totalPagoAntes) + jurosAcumNoDia);
+            }
+
+            const dias_corridos = diasAtrasoPag > 0 ?
+                loan.prazo + Math.abs(diasAtrasoPag) + (loan.prazo + Math.abs(diasAtrasoPag) == 1 ? ' DIA' : ' DIAS') :
+                (Math.max(1, loan.prazo + diasAtrasoPag)) + (Math.max(1, loan.prazo + diasAtrasoPag) == 1 ? ' DIA' : ' DIAS');
+
+            const dividaTotal = valorBase + jurosAcumNoDia;
+            const valorApos = Math.max(0, saldoNoDia - pag.valor);
+            const progressoPct = Math.min(100, Math.round((totalPagoAgora / dividaTotal) * 100));
+            const restantePct = Math.max(0, 100 - progressoPct);
+
+            const retro = pag.geradoEm > pag.data;
+            const diasRetro = diffDays(vencimento, parseDate(pag.geradoEm));
+            const diasRetro_Pag = diffDays(parseDate(pag.data), parseDate(pag.geradoEm));
+            let jurosRetro, saldoFuturo, dividaTotalFuturo;
+            if (parseDate(pag.geradoEm) <= vencimento) {
+                // Within the term — no late interest yet
+                jurosRetro = 0;
+                saldoFuturo = valorApos;
+                dividaTotalFuturo = dividaTotal;
+            } else {
+                jurosRetro = diasRetro * jDia;
+                dividaTotalFuturo = valorBase + jurosRetro;
+                saldoFuturo = Math.max(0, dividaTotalFuturo - totalPagoAgora);
+            }
+
+            const dias_corridos_futuro = diasRetro > 0 ?
+                loan.prazo + Math.abs(diasRetro) + (loan.prazo + Math.abs(diasRetro) == 1 ? ' DIA' : ' DIAS') :
+                (Math.max(1, loan.prazo + diasRetro)) + (Math.max(1, loan.prazo + diasRetro) == 1 ? ' DIA' : ' DIAS');
+            const progressoPct_retro = Math.min(100, Math.round((totalPagoAgora / saldoFuturo) * 100));
+            const restantePct_retro = Math.max(0, 100 - progressoPct_retro);
+
+
+            const valorStyle = 'font-size:19px; font-weight:800; font-family:var(--font-d); letter-spacing:-.5px; white-space:nowrap; line-height:1';
 
             const miniRow = (label, val, color = 'var(--txt0)') => `
-                <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:11px">
+                <div style="display:flex; justify-content:space-between; padding:4px 0; font-size:11px">
                     <span style="color:var(--txt2)">${label}</span>
-                    <span style="font-weight:600;color:${color};white-space:nowrap">${val}</span>
+                    <span style="font-weight:600; color:${color}">${val}</span>
                 </div>`;
 
             return `
               <div style="padding:2px">
-                <div style="text-align:center;padding-bottom:18px">
-                  <div style="font-size:11px;color:var(--txt2);margin-bottom:6px">${fmtDate(s.data)}</div>
-                  <div style="font-size:24px;font-weight:800;letter-spacing:.6px">${statusPagamento}</div>
+                <div style="text-align:center; padding-bottom:10px; margin-top:-20px">
+                    <div style="font-size:10px; color:var(--warn); font-weight:700; white-space:nowrap">${pag.geradoEm > pag.data ? 'RETROATIVO' : ''}</div>
+                    <div style="font-size:24px; font-weight:800; letter-spacing:.6px">${pag.status}</div>
                 </div>
-                <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:20px;text-align:center">
+                <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin-bottom:30px; text-align:center">
                   <div>
-                    <div style="font-size:11px;color:var(--txt2);margin-bottom:6px">DÍVIDA ATUAL</div>
-                    <div style="${valorStyle}">${fmtMoney(s.saldoNoDia)}</div>
+                    <div style="font-size:11px; color:var(--txt2); margin-bottom:6px">${retro ? 'DÍVIDA ANTERIOR' : 'DÍVIDA ATUAL'}</div>
+                    <div style="${valorStyle}">${fmtMoney(saldoNoDia)}${retro ? '*' : ''}</div>
                   </div>
                   <div>
-                    <div style="font-size:11px;color:var(--txt2);margin-bottom:6px">VALOR PAGO</div>
-                    <div style="${valorStyle};color:var(--acc)">${fmtMoney(s.valor)}</div>
+                    <div style="font-size:11px; color:var(--txt2); margin-bottom:6px">VALOR PAGO</div>
+                    <div style="${valorStyle};color:var(--acc)">${fmtMoney(pag.valor)}</div>
                   </div>
                   <div>
-                    <div style="font-size:11px;color:var(--txt2);margin-bottom:6px">SALDO RESTANTE</div>
-                    <div style="${valorStyle};color:${s.quitado ? 'var(--acc)' : 'var(--danger)'}"> ${s.quitado ? 'QUITADO' : fmtMoney(s.valorApos)}</div>
+                    <div style="font-size:11px; color:var(--txt2); margin-bottom:6px">${retro ? 'SALDO PREVISTO' : 'SALDO RESTANTE'}</div>
+                    <div style="${valorStyle};color:${pag.status == "PAGAMENTO COMPLETO" ? 'var(--acc)' : 'var(--danger)'}"> ${pag.status == "PAGAMENTO COMPLETO" ? 'QUITADO' : fmtMoney(valorApos)}${retro ? '*' : ''}</div>
                   </div>
                 </div>
 
-                <div style="margin-bottom:20px">
-                    <div class="flex-sb" style="margin-bottom:6px;font-size:11px">
-                        <span>${progressoPct}% pago</span>
-                        <span>${fmtMoney(dividaTotal)}</span>
+                ${!retro && pag.status != "PAGAMENTO COMPLETO" ? `
+                <div style="margin-bottom:10px">
+                    <div class="flex-sb" style="margin-bottom:2px;font-size:11px">
+                        <span>Total Pago</span>
+                        <span>Restante</span>
                     </div>
                     <div class="rcpt-progress-bar">
-                        <div class="rcpt-progress-fill" style="width:${progressoPct}%;background:${s.quitado ? 'var(--acc)' : 'var(--acc2)'}"></div>
+                        <div class="rcpt-progress-fill" style="width:${progressoPct}%;background:var(--acc)"></div>
+                    </div>
+                    <div class="flex-sb" style="margin-top:2px; font-size:11px">
+                        <span>${fmtMoney(totalPagoAgora)}</span>
+                        <span>${fmtMoney(valorApos)}${retro ? '*' : ''}</span>
+                    </div>
+                    <div class="flex-sb" style="margin-top:-5px; font-size:11px; color:var(--txt2)">
+                        <span>(${progressoPct}%)</span>
+                        <span>(${restantePct}%)${retro ? '*' : ''}</span>
+                    </div>
+                </div>`
+                    : ''}
+
+                <div style="text-align:center; padding-bottom:10px;  ">
+                    ${retro && pag.status != "PAGAMENTO COMPLETO" ? '<div style="font-size:10px; color:var(--txt2); font-weight:1000">* Valores previstos no dia do pagamento</div>' : ''}
+                    <div style="font-size:12px; color:var(--txt2); margin-bottom:6px; font-weight:1000">${fmtDate(pag.data)} - ${pag.id}</div>
+                </div>
+                
+
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px">
+                    <div style="text-align:center; font-size:10px; color:var(--txt2)">EMPRÉSTIMO</div>
+                    <div style="text-align:center; font-size:10px; color:var(--txt2)">${!retro ? 'DÍVIDA TOTAL' :
+                    'DÍVIDA PREVISTA'}</div>
+                    <div style="text-align:center; font-size:10px; color:var(--txt2)">${diasAtrasoPag > 0 && !retro ? 'JUROS ACUMULADO' :
+                    diasAtrasoPag > 0 && retro ? 'JUROS PREVISTO' :
+                        'JUROS DE ATRASO'}</div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:10px">
+                    <div style="text-align:center; font-size:10px; font-weight:100; margin-bottom:12px">${fmtMoney(valorBase)}</div>
+                    <div style="text-align:center; font-size:11px; font-weight:700; letter-spacing:-.2px; font-family:var(--font-d)">${fmtMoney(dividaTotal)}${retro ? '*' : ''}</div>
+                    <div style="text-align:center; font-size:10px; font-weight:100; margin-bottom:12px">${diasAtrasoPag > 0 ? fmtMoney(jurosAcumNoDia) : juros_dia}${retro ? '*' : ''}</div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:50px; max-width:250px; min-width:50px; margin:0 auto">
+                    <div style="text-align:center; font-size:10px; color:var(--txt2)">PRAZO (${loan.prazo} dias)</div>
+                    <div style="text-align:center; font-size:10px"><span style="color:${diasAtrasoPag > 0 ? 'var(--danger)' : 'var(--acc)'};font-weight:700; background:${diasAtrasoPag > 0 ? 'rgba(255,70,70,.12)' : 'rgba(0,255,140,.10)'}; padding:2px 6px; border-radius:999px; white-space:nowrap">${diasAtrasoPag > 0 && !retro ? 'STATUS ATRASADO' :
+                    diasAtrasoPag > 0 && retro ? 'PAGOU ATRASADO*' :
+                        diasAtrasoPag <= 0 && !retro ? 'STATUS EM DIA' :
+                            diasAtrasoPag <= 0 && retro ? 'PAGOU EM DIA*' :
+                                ''}</span></div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:50px; max-width:250px; min-width:50px; margin:0 auto">
+                    <div style="text-align:center; font-size:10px; font-weight:100">${fmtDate(loan.emissao)}</div>
+                        <div style="display:grid; grid-template-columns:60px auto; gap:10px; max-width:220px; min-width:100px; margin:0 auto">
+                            <div style="text-align:start; font-size:10px; color:var(--txt2); white-space: nowrap">EM ABERTO</div>
+                            <div style="text-align:start; font-size:10px; font-weight:100; white-space: nowrap">${dias_corridos}${retro ? '*' : ''}</div>
+                        </div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:50px; max-width:250px; min-width:50px; margin:0 auto; padding-bottom:30px;">
+                    <div style="text-align:center; font-size:10px; font-weight:100">${fmtDate(dateStr(vencimento))}</div>
+                        <div style="display:grid; grid-template-columns:60px auto; gap:10px; max-width:220px; min-width:100px; margin:0 auto">
+                            <div style="text-align:start; font-size:10px; color:var(--txt2); white-space: nowrap ">${diasAtrasoPag > 0 ? 'DE ATRASO' :
+                    diasAtrasoPag == 0 && !retro ? 'VENCE' :
+                        diasAtrasoPag < 0 && retro ? 'VENCIA EM' :
+                            'VENCE EM'}</div>
+                            <div style="text-align:start; font-size:10px; font-weight:100; white-space: nowrap">${diasAtrasoPag > 0 ? diasAtrasoPag + (diasAtrasoPag == 1 ? ' DIA' : ' DIAS') :
+                    diasAtrasoPag == 0 ? 'HOJE' :
+                        Math.abs(diasAtrasoPag) + ((Math.abs(diasAtrasoPag) == 1 ? ' DIA' : ' DIAS'))}${retro ? '*' :
+                            ''}</div>
                     </div>
                 </div>
 
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
 
-                    <div class="card_comp_pag" style="padding:10px;opacity:.82">
-                        <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:var(--txt2)">EMPRÉSTIMO</div>
-                        ${miniRow('Valor emprestado', fmtMoney(s.valorEmprest))}
-                        ${miniRow('Valor combinado', fmtMoney(s.valorBase))}
-                        ${miniRow('Vencimento', fmtDate(s.vencimento))}
-                        ${miniRow('Taxa', s.jurosTipo === 'fixo' ? fmtMoney(s.jDia) + '/dia' : s.jurosVal + '%/dia')}
+                ${retro && pag.status != "PAGAMENTO COMPLETO" ? `
+                <div style="text-align:center; padding-bottom:10px">
+                    <div style="font-size:12px; color:var(--txt2); font-weight:1000">STATUS DO EMPRESTIMO NO DIA ${fmtDate(pag.geradoEm)} (+${diasRetro_Pag + (diasRetro_Pag == 1 ? ' DIA' : ' DIAS')})</div>
+                </div>
+                
+
+                <div style="display:grid; grid-template-columns:1fr auto 1fr; align-items:start; gap:15px; margin-bottom:10px">
+                    <!-- ESQUERDA -->
+                    <div style="text-align:center">
+                        <div style="font-size:10px; color:var(--txt2); white-space: nowrap"">JUROS ACUMULADO</div>
+                        <div style="font-size:8px; color:var(--txt2); white-space: nowrap">▼ ${fmtMoney(jurosAcumNoDia)} ▼</div>
+                        <div style="font-size:10px">${fmtMoney(jurosRetro)}</div>
                     </div>
 
-                <div class="card_comp_pag" style="padding:10px;opacity:.88">
-                    <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:var(--txt2)">ATRASO E JUROS</div>
+                    <!-- CENTRO -->
+                    <div style="text-align:center; min-width:90px">
+                        <div style="font-size:10px; color:var(--txt2); white-space: nowrap">DÍVIDA FINAL</div>
+                        <div style="font-size:8px; color:var(--txt2); white-space: nowrap">▼ ${fmtMoney(dividaTotal)} ▼</div>
+                        <div style="font-size:12px; font-weight:1000">${fmtMoney(dividaTotalFuturo)}</div>
+                    </div>
 
-                        ${miniRow('Dias atraso', s.diasAtrasoPag > 0 ? s.diasAtrasoPag + ' dias' : 'Nenhum', s.diasAtrasoPag > 0 ? 'var(--danger)' : 'var(--txt0)')}
-                        ${miniRow('Juros total', fmtMoney(s.jurosAcumNoDia), 'var(--danger)')}
-                        ${miniRow('Dívida final', fmtMoney(s.saldoNoDia))}
+                    <!-- DIREITA -->
+                    <div style="text-align:center; width:max-content">
+                        <div style="border-center:10px; font-size:10px"><span style="color:${diasRetro > 0 ? 'var(--danger)' : 'var(--acc)'}; font-weight:700; background:${diasRetro > 0 ? 'rgba(255,70,70,.12)' : 'rgba(0,255,140,.10)'}; padding:2px 6px; border-radius:999px; white-space:nowrap">${diasRetro > 0 && diasAtrasoPag > 0 ? 'CONTINUOU ATRASADO' :
+                        diasRetro > 0 && diasAtrasoPag <= 0 ? 'FICOU ATRASADO' :
+                            diasRetro <= 0 ? 'CONTINUOU EM DIA' :
+                                ''}</span></div>
+                        <div style="display:grid; grid-template-columns:70px auto; gap:8px; font-size:10px">
+                            <span style="color:var(--txt2)">EM ABERTO</span>
+                            <span>${dias_corridos_futuro}</span>
+                        </div>
+                        <div style="display:grid; grid-template-columns:70px auto; gap:8px; font-size:10px">
+                            <span style="color:var(--txt2)">
+                                ${diasRetro > 0 ? 'DE ATRASO' : diasRetro == 0 ? 'VENCE' : 'VENCIA EM'}
+                            </span>
+                            <span>
+                                ${diasRetro > 0 ? diasRetro + (diasRetro == 1 ? ' DIA' : ' DIAS') :
+                        diasRetro == 0 ? 'HOJE' :
+                            Math.abs(diasRetro) + (Math.abs(diasRetro) == 1 ? ' DIA' : ' DIAS')}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                ${s.quitado ? `<div class="rcpt-alert ok" style="margin-top:18px">✓ Dívida quitada</div>` : s.isLateHoje
-                    ? `<div class="rcpt-alert late" style="margin-top:18px">Saldo restante acumulando ${fmtMoney(s.jDia)}/dia</div>` : ''
+                <div style="text-align:center; padding-bottom:0px; margin-up:px">
+                    <div style="font-size:12px; color:var(--txt2); font-weight:1000">SALDO RESTANTE FINAL</div>
+                    <div style="${valorStyle};color:${pag.status == "PAGAMENTO COMPLETO" ? 'var(--acc)' : 'var(--danger)'}"> ${pag.status == "PAGAMENTO COMPLETO" ? 'QUITADO' : fmtMoney(saldoFuturo)}</div>
+                </div>
+                
+                
+ 
+                ` : ''}
+
+                ${retro ? `
+                <div style="margin-bottom:10px">
+                    <div class="flex-sb" style="margin-bottom:2px;font-size:11px">
+                        <span>Total Pago</span>
+                        <span>Restante</span>
+                    </div>
+                    <div class="rcpt-progress-bar">
+                        <div class="rcpt-progress-fill" style="width:${progressoPct_retro}%;background:var(--acc)"></div>
+                    </div>
+                    <div class="flex-sb" style="margin-top:2px; font-size:11px">
+                        <span>${fmtMoney(totalPagoAgora)}</span>
+                        <span>${fmtMoney(saldoFuturo)}</span>
+                    </div>
+                    <div class="flex-sb" style="margin-top:-5px; font-size:11px; color:var(--txt2)">
+                        <span>(${progressoPct_retro}%)</span>
+                        <span>(${restantePct_retro}%)</span>
+                    </div>
+                </div>`
+                    : ''}
+
+                ${pag.status == "PAGAMENTO COMPLETO" ? `<div class="rcpt-alert ok" style="text-align:center; margin-top:18px">✓ Dívida quitada</div>` : diasAtrasoPag > 0 ? `<div class="rcpt-alert late" style="text-align:center; margin-top:18px">Saldo restante acumulando ${juros_dia}</div>` : ''
                 }
 
-                <div style="text-align:center;margin-top:16px;padding-top:12px;border-top:1px dashed var(--brd)">
-                    <div style="font-size:10px;color:var(--txt2)">${pid}</div>
-                    <div style="font-size:10px;color:var(--txt2);margin-top:3px">Gerado em ${fmtDate(s.geradoEm)}</div>
+
+                <div style="text-align:center; margin-top:0px; padding-top:10px; border-top:1px dashed var(--brd)">
+                    <div style="font-size:10px; color:var(--txt2); margin-top:3px">Gerado em ${fmtDate(pag.geradoEm)}</div>
                 </div>
             </div>`;
         }
@@ -6362,6 +6482,7 @@
         async function loadDB() {
             console.log("Realizando Fetch inicial...");
             try {
+                
                 DB = await fetch(URL_Coletar_Dados).then(r => r.json());
 
                 showNotif('Dados coletados da planilha', 'ok');
@@ -6394,8 +6515,8 @@
                         { "id": "C02_E01", "clientId": "C02", "valor": 500, "prazo": 7, "juros_tipo": "fixo", "juros_val": 10, "emissao": "2026-05-23", "pago": 0, "pagamentos": [], "compEnvio": [] },
                         { "id": "C01_E01", "clientId": "C01", "valor": 300, "prazo": 5, "juros_tipo": "fixo", "juros_val": 5, "emissao": "2026-06-04", "pago": 0, "pagamentos": [], "compEnvio": [] },
                         { "id": "C03_E01", "clientId": "C03", "valor": 800, "prazo": 14, "juros_tipo": "perc", "juros_val": 2, "emissao": "2026-06-02", "pago": 0, "pagamentos": [], "compEnvio": [] },
-                        { "id": "C01_E02", "clientId": "C01", "valor": 200, "prazo": 3, "juros_tipo": "fixo", "juros_val": 5, "emissao": "2026-05-18", "pago": 1, "pagamentos": [{ "id": "C01_E02_P01", "data": "2026-05-21", "valor": 230, "nota": "Pagou completo", "anexos_pag": [], "comprovante": comprovante_x }], "compEnvio": [] },
-                        { "id": "C04_E01", "clientId": "C04", "valor": 1200, "prazo": 14, "juros_tipo": "fixo", "juros_val": 20, "emissao": "2026-05-08", "pago": 0, "pagamentos": [{ "id": "C04_E01_P01", "data": "2026-05-28", "valor": 500, "nota": "Pagou parcialmente", "anexos_pag": [], "comprovante": [] }], "compEnvio": [] }
+                        { "id": "C01_E02", "clientId": "C01", "valor": 200, "prazo": 3, "juros_tipo": "fixo", "juros_val": 5, "emissao": "2026-05-18", "pago": 1, "pagamentos": [{ "id": "C01_E02_P01", "data": "2026-05-19", "valor": 230, "status": "PAGAMENTO COMPLETO", "anexos_pag": [], "totalPagoAntes": 0, "geradoEm": "2026-05-19" }], "compEnvio": [] },
+                        { "id": "C04_E01", "clientId": "C04", "valor": 1200, "prazo": 14, "juros_tipo": "fixo", "juros_val": 20, "emissao": "2026-05-08", "pago": 0, "pagamentos": [{ "id": "C04_E01_P01", "data": "2026-05-28", "valor": 500, "status": "PAGAMENTO PARCIAL", "anexos_pag": [], "totalPagoAntes": 0, "geradoEm": "2026-06-12" }], "compEnvio": [] }
                     ]
                 };
 
@@ -6430,45 +6551,11 @@
             // Seed initial history state
             history.replaceState({ scr: 'dash' }, '', '');
             _navStack.push({ scr: 'dash' });
-
-            //abrirComprovantePagamento("C01_E02", "C01_E02_P01");
         });
 
 
         setupKeyboardAutoClose();
 
-
-
-        let comprovante_x = {
-            clienteNome: "Felipe Vinicius",
-            clienteTel: "12981614690",
-            data: "2026-06-08",
-            diasAtrasoHoje: 8,
-            diasAtrasoPag: 8,
-            diasParaVencerHoje: -8,
-            emissao: "2026-05-24",
-            geradoEm: "2026-06-08",
-            isLateHoje: true,
-            isWarnHoje: false,
-            jDia: 10,
-            jurosAcumNoDia: 80,
-            jurosTipo: "fixo",
-            jurosVal: 10,
-            loanId: "C02_E01",
-            pid_ref: null,
-            prazo: 7,
-            profitPct: 20,
-            progressoPct: 17,
-            quitado: false,
-            retroativo: false,
-            saldoNoDia: 680,
-            totalPagoAgora: 100,
-            valor: 100,
-            valorApos: 580,
-            valorBase: 600,
-            valorEmprest: 500,
-            vencimento: "2026-05-31",
-        }
 
     </script> <!-- SIDE NOTIFICATION -->
     <div id="side-notif">
