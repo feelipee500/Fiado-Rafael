@@ -5908,12 +5908,7 @@
 
             bodyHTML += `
         <div class="confirm-btns">
-          <button class="cbtn-n" onclick="closeSheet(document.getElementById('pag-confirm-sheet'))">Cancelar</button>
-          ${isRetro
-                    ? `<button class="cbtn-y" onclick="openRetroFinal('${_currentLoanId}',${valor},'${data}')">Continuar →</button>`
-                    : `<button class="cbtn-y" onclick="confirmarPagamento('${_currentLoanId}',${valor},'${data}')">Confirmar ✓</button>`
-                }
-        </div>`;
+          <button class="cbtn-n" onclick="closeSheet(document.getElementById('pag-confirm-sheet'))">Cancelar</button><button class="cbtn-y" onclick="confirmarPagamento('${_currentLoanId}',${valor},'${data}')">Confirmar ✓</button></div>`;
 
             document.getElementById('pag-confirm-body').innerHTML = bodyHTML;
             openSheet('pag-confirm-sheet');
