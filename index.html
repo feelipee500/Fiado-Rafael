@@ -2497,6 +2497,20 @@
             text-transform: uppercase;
             letter-spacing: .5px;
         }
+
+        #debug-back {
+            display: none;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 999999;
+        }
+
+        @media (min-width: 400px) {
+            #debug-back {
+                display: block;
+            }
+        }
     </style>
 </head>
 
@@ -2914,115 +2928,162 @@
 
             <!-- ========== TELA 6: DETALHE EMPRÉSTIMO ========== -->
             <div id="scr-emp-detalhe" class="scr">
-                <div class="pw">
-                    <div class="flex-sb mb4">
-                        <div class="back-btn" id="ed-back-btn" style="margin-bottom:0" onclick="backFromEmpDetalhe()">
+
+                <!-- HERO HEADER — full-width colored banner -->
+                <div id="ed-hero"
+                    style="position:relative;padding:20px 16px 28px;background:var(--bg1);border-bottom:1px solid var(--brd)">
+                    <!-- nav bar -->
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+                        <div class="back-btn" id="ed-back-btn" style="margin-bottom:0;color:var(--txt1)"
+                            onclick="backFromEmpDetalhe()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
                                 <polyline points="15 18 9 12 15 6" />
                             </svg>Voltar
                         </div>
-                        <div class="btn-icon" style="height:34px" onclick="openEmpMenu()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round">
-                                <circle cx="12" cy="5" r="1" fill="currentColor" />
-                                <circle cx="12" cy="12" r="1" fill="currentColor" />
-                                <circle cx="12" cy="19" r="1" fill="currentColor" />
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <div id="ed-status-pill"></div>
+                            <div class="btn-icon" style="height:32px;width:32px" onclick="openEmpMenu()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round">
+                                    <circle cx="12" cy="5" r="1" fill="currentColor" />
+                                    <circle cx="12" cy="12" r="1" fill="currentColor" />
+                                    <circle cx="12" cy="19" r="1" fill="currentColor" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- client + id -->
+                    <div style="margin-bottom:16px">
+                        <div style="font-family:var(--font-d);font-size:20px;font-weight:800;letter-spacing:-.5px;line-height:1.1"
+                            id="ed-client-name"></div>
+                        <div class="fs11 tc2 mt4" id="ed-id"></div>
+                    </div>
+                    <!-- main value display -->
+                    <div id="ed-sit-box" style="position:relative">
+                        <div class="fs11 tc2" style="margin-bottom:2px">Valor a pagar hoje</div>
+                        <div style="font-family:var(--font-d);font-size:34px;font-weight:900;letter-spacing:-1.5px;line-height:1"
+                            id="ed-valor-hoje">R$ 0</div>
+                        <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+                            <div class="fs12" id="ed-dias-label" style="font-weight:500"></div>
+                            <div class="fs11 tc2" id="ed-venc-label"></div>
+                        </div>
+                    </div>
+                    <!-- progress bar -->
+                    <div style="margin-top:16px">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                            <span class="fs11 tc2">Total pago: <span id="ed-total-pago"
+                                    style="color:var(--txt1);font-weight:500"></span></span>
+                            <span class="fs11 tc2">Meta: <span id="ed-valor-comb"
+                                    style="color:var(--txt1);font-weight:500"></span></span>
+                        </div>
+                        <div style="height:4px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden">
+                            <div id="ed-progress-bar"
+                                style="height:100%;border-radius:2px;background:var(--acc);transition:width .4s ease;width:0%">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pw" style="padding-top:14px">
+
+                    <!-- Quick stats grid -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+                        <div class="card-sm" style="display:flex;flex-direction:column;gap:2px">
+                            <span class="fs10 tc2"
+                                style="text-transform:uppercase;letter-spacing:.6px;font-weight:600">Emprestado</span>
+                            <span style="font-family:var(--font-d);font-size:17px;font-weight:700;letter-spacing:-.4px"
+                                id="ed-valor-emp"></span>
+                        </div>
+                        <div class="card-sm" style="display:flex;flex-direction:column;gap:2px">
+                            <span class="fs10 tc2"
+                                style="text-transform:uppercase;letter-spacing:.6px;font-weight:600">Saldo
+                                restante</span>
+                            <span style="font-family:var(--font-d);font-size:17px;font-weight:700;letter-spacing:-.4px"
+                                id="ed-saldo"></span>
+                        </div>
+                        <div class="card-sm" style="display:flex;flex-direction:column;gap:2px">
+                            <span class="fs10 tc2"
+                                style="text-transform:uppercase;letter-spacing:.6px;font-weight:600">Emissão</span>
+                            <span style="font-size:14px;font-weight:500" id="ed-data-emissao"></span>
+                        </div>
+                        <div class="card-sm" style="display:flex;flex-direction:column;gap:2px">
+                            <span class="fs10 tc2"
+                                style="text-transform:uppercase;letter-spacing:.6px;font-weight:600">Vencimento</span>
+                            <span style="font-size:14px;font-weight:500" id="ed-data-venc"></span>
+                        </div>
+                    </div>
+
+                    <!-- Prazo + Juros strip -->
+                    <div
+                        style="background:var(--bg2);border:1px solid var(--brd);border-radius:var(--rad12);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+                        <div style="display:flex;align-items:center;gap:6px">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--txt2)"
+                                stroke-width="2" stroke-linecap="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
                             </svg>
+                            <span class="fs12 tc2">Prazo</span>
+                            <span class="fs12 fw6" id="ed-prazo"></span>
                         </div>
-                    </div>
-                    <div class="flex-sb mb12">
-                        <div>
-                            <div class="fs11 tc2" id="ed-id"></div>
-                            <div style="font-size:16px;font-weight:700;font-family:var(--font-d)" id="ed-client-name">
-                            </div>
-                        </div>
-                        <div id="ed-status-pill"></div>
-                    </div>
-
-                    <!-- Situação atual box -->
-                    <div class="prev-box mb12" id="ed-sit-box">
-                        <div class="sc-lbl">Situação Atual</div>
-                        <div class="flex-sb">
-                            <div>
-                                <div class="fs12 tc1">Valor a pagar hoje</div>
-                                <div class="amt-big" id="ed-valor-hoje">R$ 0</div>
-                            </div>
-                            <div class="text-right">
-                                <div class="fs12 tc1" id="ed-dias-label"></div>
-                                <div class="fs11 tc2 mt4" id="ed-venc-label"></div>
-                            </div>
+                        <div style="width:1px;height:18px;background:var(--brd)"></div>
+                        <div style="display:flex;align-items:center;gap:6px">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--danger)"
+                                stroke-width="2" stroke-linecap="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="8" x2="12" y2="12" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" />
+                            </svg>
+                            <span class="fs12 tc2">Juros/dia</span>
+                            <span class="fs12 fw6 c-r" id="ed-juros-dia"></span>
                         </div>
                     </div>
 
-                    <!-- Resumo -->
-                    <div class="card mb12">
-                        <div class="sc-lbl">Resumo do Empréstimo</div>
-                        <div class="dr">
-                            <div class="dk">Valor emprestado</div>
-                            <div class="dv2" id="ed-valor-emp"></div>
+                    <!-- Comprovante de envio — compact -->
+                    <div
+                        style="background:var(--bg2);border:1px solid var(--brd);border-radius:var(--rad12);padding:12px 14px;margin-bottom:14px">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                            <span class="fs11 tc2"
+                                style="text-transform:uppercase;letter-spacing:.6px;font-weight:600">Meu comprovante
+                                PIX</span>
+                            <div id="ed-comp-envio-btn" class="fs11 fw6" style="color:var(--acc);cursor:pointer"
+                                onclick="openAttachSheet('envio')">+ Anexar</div>
                         </div>
-                        <div class="dr">
-                            <div class="dk">Valor combinado (+ lucro)</div>
-                            <div class="dv2 c-g" id="ed-valor-comb"></div>
-                        </div>
-                        <div class="dr">
-                            <div class="dk">Data de emissão</div>
-                            <div class="dv2" id="ed-data-emissao"></div>
-                        </div>
-                        <div class="dr">
-                            <div class="dk">Prazo</div>
-                            <div class="dv2" id="ed-prazo"></div>
-                        </div>
-                        <div class="dr">
-                            <div class="dk">Data de vencimento</div>
-                            <div class="dv2" id="ed-data-venc"></div>
-                        </div>
-                        <div class="dr">
-                            <div class="dk">Juros por dia de atraso</div>
-                            <div class="dv2 c-r" id="ed-juros-dia"></div>
-                        </div>
-                        <div class="dr">
-                            <div class="dk">Total pago</div>
-                            <div class="dv2 c-g" id="ed-total-pago"></div>
-                        </div>
-                        <div class="dr" style="border:none">
-                            <div class="dk">Saldo restante</div>
-                            <div class="dv2 c-r fw6" id="ed-saldo"></div>
-                        </div>
-                    </div>
-
-                    <!-- Comprovante de envio -->
-                    <div class="card mb12">
-                        <div class="sc-lbl">Comprovante de Envio (meu PIX)</div>
                         <div id="ed-comp-envio-list"></div>
-                        <div class="attach-btn mt8" onclick="openAttachSheet('envio')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
-                                <path
-                                    d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-                            </svg>
-                            Adicionar comprovante
-                        </div>
                     </div>
 
                     <!-- Registrar pagamento -->
-                    <div class="card mb12" id="ed-pag-form-wrap">
-                        <div class="sc-lbl">Registrar Pagamento</div>
-                        <div class="fg">
-                            <div class="fl">Valor pago (R$)</div>
-                            <input class="fi" id="ed-pag-valor" type="text" inputmode="numeric" min="0" step="1"
-                                placeholder="100 R$"
-                                oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, ''); onPagValorChange()">
+                    <div id="ed-pag-form-wrap"
+                        style="background:var(--bg2);border:1px solid var(--brd);border-radius:var(--rad16);padding:14px;margin-bottom:14px">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+                            <div
+                                style="width:30px;height:30px;border-radius:50%;background:#00e8a218;display:flex;align-items:center;justify-content:center">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--acc)"
+                                    stroke-width="2.5" stroke-linecap="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            </div>
+                            <span style="font-size:14px;font-weight:700;font-family:var(--font-d)">Registrar
+                                Pagamento</span>
                         </div>
-                        <div class="fg">
-                            <div class="fl">Data do pagamento</div>
-                            <input class="fi" id="ed-pag-data" type="date" onchange="onPagDataChange()">
+                        <div class="fr">
+                            <div class="fg">
+                                <div class="fl">Valor pago (R$)</div>
+                                <input class="fi" id="ed-pag-valor" type="text" inputmode="numeric" min="0" step="1"
+                                    placeholder="0,00"
+                                    oninput="this.value=this.value.replace(/[^0-9.,]/g,''); onPagValorChange()">
+                            </div>
+                            <div class="fg">
+                                <div class="fl">Data</div>
+                                <input class="fi" id="ed-pag-data" type="date" onchange="onPagDataChange()">
+                            </div>
                         </div>
                         <div id="ed-pag-retro-wrap" style="display:none">
                             <div class="warn-box mt8">
                                 <div class="wb-t">⚠ Pagamento retroativo</div>
-                                <div class="wb-d">A data informada é anterior a hoje. O histórico abaixo mostra o
-                                    impacto desta
-                                    alteração.</div>
+                                <div class="wb-d">A data informada é anterior a hoje, pagamentos após esta data serão
+                                    apagados. O histórico abaixo mostra o impacto desta alteração.</div>
                             </div>
                             <div class="sc-lbl mt12">Histórico recalculado</div>
                             <div class="card-sm mb12" id="novo-pag-tl-preview">
@@ -3037,6 +3098,7 @@
                         <div class="sh-t">Histórico</div>
                     </div>
                     <ul class="tl" id="ed-timeline"></ul>
+
                 </div>
             </div>
 
@@ -3112,6 +3174,9 @@
     </div>
 
     <!-- ============= OVERLAYS / SHEETS ============= -->
+    <button id="debug-back" onclick="history.back()">
+        BACK
+    </button>
 
     <!-- Notificações -->
     <div class="overlay" id="notif-sheet" data-backdrop="notif-sheet">
@@ -3145,6 +3210,13 @@
         </div>
     </div>
 
+    <!-- Visualizador de anexos -->
+    <div class="overlay" id="attach-preview-modal" data-backdrop="attach-preview-modal"
+        onclick="closeSheet(document.getElementById('attach-preview-modal'))" style="z-index:300">
+        <div id="attach-preview-content"
+            style="width:100%; height:100%; display:flex; justify-content:center; align-items:center"></div>
+    </div>
+
     <!-- Attach Sheet -->
     <div class="overlay" id="attach-sheet" data-backdrop="attach-sheet">
         <div class="sheet" onclick="event.stopPropagation()">
@@ -3158,8 +3230,10 @@
                     </svg></div>
             </div>
             <div class="sh-body">
-                <p class="fs12 tc1 mb12">Simule a adição de um arquivo de comprovante.</p>
-                <div class="attach-btn" onclick="simulateAttach()">
+                <p class="fs12 tc1 mb12">Selecione uma imagem ou PDF. Somente 1 arquivo por empréstimo.</p>
+                <input type="file" id="attach-file-input" accept=".pdf,.jpg,.jpeg,.png,.webp" capture="none"
+                    style="display:none" onchange="onAttachFileSelected(this)">
+                <div class="attach-btn" onclick="document.getElementById('attach-file-input').click()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                         <polyline points="17 8 12 3 7 8" />
@@ -3583,7 +3657,9 @@
             <div class="sh-body">
                 <p class="fs12 tc1 mb12">Adicione o comprovante do pagamento recebido. Somente 1 arquivo por pagamento.
                 </p>
-                <div class="attach-btn" onclick="simulateAnexoPag()">
+                <input type="file" id="pag-anexo-file-input" accept="image/*,application/pdf" style="display:none"
+                    onchange="onPagAnexoFileSelected(this)">
+                <div class="attach-btn" onclick="document.getElementById('pag-anexo-file-input').click()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                         <polyline points="17 8 12 3 7 8" />
@@ -3594,6 +3670,23 @@
                 <div id="pag-anexo-preview" class="mt8"></div>
                 <button class="btn-p mt12" onclick="saveAnexoPag()">Salvar anexo</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Apagar pagamento -->
+    <div class="overlay" id="delete-pag-confirm-sheet" data-backdrop="delete-pag-confirm-sheet">
+        <div class="sheet" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title">Apagar Pagamento</div>
+                <div class="sh-close" onclick="closeSheet(document.getElementById('delete-pag-confirm-sheet'))">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </div>
+            </div>
+            <div class="sh-body" id="delete-pag-confirm-body"></div>
         </div>
     </div>
 
@@ -4528,22 +4621,37 @@
 
             closeSheet(document.getElementById('novo-emp-confirm-sheet'));
             const d = _newLoanData;
-            const clientLoans = DB.loans.filter(l => l.clientId === d.clientId).length;
-            const id = d.clientId + '_E' + String(clientLoans + 1).padStart(2, '0');
+
+            // Criar o novo id do emprestimo atual
+            let clientLoans = structuredClone(DB.loans.filter(l => l.clientId === d.clientId));
+            let novo_id = "";
+            if (clientLoans.length > 0) {
+                clientLoans.sort((a, b) => b.id.localeCompare(a.id));
+                let id_max = clientLoans[0].id;
+                const partes = id_max.split('_');
+                const prefixo = 'E';
+                const numeroAtual = parseInt(partes[1].slice(1), 10);
+                const novoNumero = numeroAtual + 1;
+                const novaFormatada = prefixo + String(novoNumero).padStart(2, '0');
+                partes[1] = novaFormatada;
+                novo_id = partes.join('_');
+            } else {
+                novo_id = d.clientId + '_E01';
+            }
+            const id = novo_id;
+
             const loan = { id, clientId: d.clientId, valor: d.valor, prazo: d.prazo, juros_tipo: d.juros_tipo, juros_val: d.juros_val, emissao: d.emissao, pago: 0, pagamentos: [], compEnvio: [] };
             console.log("Novo emprestimo criado");
 
+
             try {
                 console.log("Adicionando empréstimo na planilha...");
-                const res =
-                    await fetch(
-                        URL_Registrar_Pagamentos,
-                        {
-                            method: "POST",
-                            body: JSON.stringify(loan),
-                            headers: { "Content-Type": "text/plain" }
-                        }
-                    );
+                const data_fetch = { data: loan, funcao: 'add_emprestimo' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - add emprestimo") };
 
                 const novoDB = await res.json();
 
@@ -4832,15 +4940,15 @@
                 `<div class="attach-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><div class="attach-item-name">${_tempAttachFiles[0].name}</div></div>`;
         }
 
-        function saveAttach() {
-            if (!_tempAttachFiles.length) { showToast('Nenhum arquivo selecionado', 'err'); return; }
-            const loan = getLoan(_currentLoanId);
-            if (!loan) return;
-            loan.compEnvio = _tempAttachFiles[0]; // single file
-            closeSheet(document.getElementById('attach-sheet'));
-            renderCompEnvioCard(loan);
-            showToast('Comprovante salvo!', 'ok');
-        }
+        // function saveAttach() {
+        //     if (!_tempAttachFiles.length) { showToast('Nenhum arquivo selecionado', 'err'); return; }
+        //     const loan = getLoan(_currentLoanId);
+        //     if (!loan) return;
+        //     loan.compEnvio = _tempAttachFiles[0]; // single file
+        //     closeSheet(document.getElementById('attach-sheet'));
+        //     renderCompEnvioCard(loan);
+        //     showToast('Comprovante salvo!', 'ok');
+        // }
 
         // ---- Payment attachment (1 per payment) ----
         let _anexoPagLid = null, _anexoPagPid = null, _tempAnexoPag = null;
@@ -5115,14 +5223,88 @@
          </button>`
                 }
 
-    <button class="btn-icon w-full" style="justify-content:center" onclick="closeSheet(document.getElementById('tl-event-sheet'));openEditPag('${lid}','${pid}')">
+    <button class="btn-icon w-full mb8" style="justify-content:center" onclick="closeSheet(document.getElementById('tl-event-sheet'));openEditPag('${lid}','${pid}')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       Editar pagamento
+    </button>
+    <button class="btn-icon w-full" style="justify-content:center;color:var(--danger);border-color:#ff4d6d30" onclick="closeSheet(document.getElementById('tl-event-sheet'));openDeletePagConfirm('${lid}','${pid}')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      Apagar pagamento
     </button>
   `;
             openSheet('tl-event-sheet');
         }
         // ==================== EDIÇÃO DO EMPRÉSTIMO ====================
+        function openDeletePagConfirm(lid, pid) {
+            const loan = getLoan(lid);
+            const pag = loan && loan.pagamentos.find(p => p.id === pid);
+            if (!pag) return;
+            const client = getClient(loan.clientId);
+            const dtPag = parseDate(pag.data);
+
+            // Simulate loan WITHOUT this payment to show impact
+            const loanSim = structuredClone(loan);
+            loanSim.pagamentos = loanSim.pagamentos.filter(p => p.id !== pid);
+            loanSim.pagamentos = loanSim.pagamentos.filter(p => parseDate(p.data) <= dtPag);
+            const calcSim = getLoanCalc(loanSim);
+            const calcNow = getLoanCalc(loan);
+
+            const statusLabels = { late: 'Em atraso', warn: 'Vence logo', ok: 'Em dia', done: 'Quitado' };
+            const statusColors = { late: 'var(--danger)', warn: 'var(--warn)', ok: 'var(--acc2)', done: 'var(--acc)' };
+
+            document.getElementById('delete-pag-confirm-body').innerHTML = `
+        <div class="warn-box" style="background:#ff4d6d14;border-color:#ff4d6d40;margin-bottom:12px">
+          <div class="wb-t" style="color:var(--danger)">⚠ Ação irreversível</div>
+          <div class="wb-d">Este pagamento será apagado permanentemente e o histórico será recalculado.</div>
+        </div>
+        <div class="card-sm mb12">
+          <div class="sc-lbl">Pagamento a apagar</div>
+          <div class="dr"><div class="dk">ID</div><div class="dv2 tc1" style="font-size:12px">${pid}</div></div>
+          <div class="dr"><div class="dk">Data</div><div class="dv2">${fmtDate(pag.data)}</div></div>
+          <div class="dr"><div class="dk">Valor</div><div class="dv2 c-g fw6">${fmtMoney(pag.valor)}</div></div>
+          ${pag.nota ? `<div class="dr"><div class="dk">Nota</div><div class="dv2 tc1">${pag.nota}</div></div>` : ''}
+        </div>
+        <div class="card-sm mb12">
+          <div class="sc-lbl">Impacto após apagar</div>
+          <div class="dr">
+            <div class="dk">Situação atual</div>
+            <div class="dv2 fw6" style="color:${statusColors[calcNow.status]}">${statusLabels[calcNow.status]}</div>
+          </div>
+          <div class="dr">
+            <div class="dk">Situação após apagar</div>
+            <div class="dv2 fw6" style="color:${statusColors[calcSim.status]}">${statusLabels[calcSim.status]}</div>
+          </div>
+          <div class="dr">
+            <div class="dk">Valor a pagar hoje (atual)</div>
+            <div class="dv2">${calcNow.isPago ? '✓ Quitado' : fmtMoney(calcNow.valorHoje)}</div>
+          </div>
+          <div class="dr" style="border:none">
+            <div class="dk">Valor a pagar hoje (após apagar)</div>
+            <div class="dv2 fw6" style="color:${calcSim.isPago ? 'var(--acc)' : 'var(--danger)'}">
+              ${calcSim.isPago ? '✓ Quitado' : fmtMoney(calcSim.valorHoje)}
+            </div>
+          </div>
+        </div>
+        <div class="confirm-btns">
+          <button class="cbtn-n" onclick="closeSheet(document.getElementById('delete-pag-confirm-sheet'))">Cancelar</button>
+          <button class="cbtn-y" style="background:var(--danger)" onclick="executarDeletePag('${lid}','${pid}')">Apagar ✗</button>
+        </div>`;
+
+            openSheet('delete-pag-confirm-sheet');
+        }
+
+        function executarDeletePag(lid, pid) {
+            const loan = getLoan(lid);
+            if (!loan) return;
+            // Also remove any stored attachment from localStorage
+            try { localStorage.removeItem(`anexo_pag_${pid}`); } catch (e) { }
+            loan.pagamentos = loan.pagamentos.filter(p => p.id !== pid);
+            closeSheet(document.getElementById('delete-pag-confirm-sheet'));
+            showToast('Pagamento apagado', 'ok');
+            updateNotifBadge();
+            setTimeout(() => openEmpDetalhe(lid), 300);
+        }
+
         function openEmpMenu() {
             const loan = getLoan(_currentLoanId);
             if (!loan) return;
@@ -5173,8 +5355,9 @@
             const novoBase = novoValor * (1 + pr);
             const novaVenc = addDays(parseDate(novaData), novoPrazo);
 
-            // Simulate loan with new values, keeping existing payments
-            const loanSim = JSON.parse(JSON.stringify(loan));
+            // Simulate loan with new values
+            const loanSim = structuredClone(loan);
+            loanSim.pagamentos = [];
             loanSim.valor = novoValor;
             loanSim.prazo = novoPrazo;
             loanSim.emissao = novaData;
@@ -5406,7 +5589,8 @@
 
         function openEditPag(lid, pid) {
             const loan = getLoan(lid);
-            const pag = loan.pagamentos.find(p => p.id === pid);
+            let loan_retro = structuredClone(loan);
+            const pag = loan_retro.pagamentos.find(p => p.id === pid);
             if (!pag) return;
 
             function buildEditBody() {
@@ -5414,13 +5598,16 @@
                 const editData = document.getElementById('epag-data')?.value ?? pag.data;
                 const vValor = parseFloat(editValor) || 0;
                 const vData = editData || pag.data;
+                const dtPag = parseDate(vData);
 
                 // Simulate loan WITHOUT this payment to get base state
-                const loanSim = JSON.parse(JSON.stringify(loan));
+                const loanSim = structuredClone(loan);
                 loanSim.pagamentos = loanSim.pagamentos.filter(p => p.id !== pid);
+                loanSim.pagamentos = loanSim.pagamentos.filter(p => parseDate(p.data) <= dtPag);
+
                 const calcSim = getLoanCalc(loanSim);
                 const venc = addDays(parseDate(loan.emissao), loan.prazo);
-                const dtPag = parseDate(vData);
+
                 const jDia = loan.juros_tipo === 'fixo' ? loan.juros_val : calcSim.valorBase * loan.juros_val / 100;
                 const diasAtrasoNoPag = Math.max(0, diffDays(venc, dtPag));
                 const jurosNoPag = diasAtrasoNoPag * jDia;
@@ -5492,7 +5679,7 @@
 
         function buildEditTimelinePreview(loan, excludePid, novoValor, novaData) {
             if (!novoValor || !novaData) return '<div class="fs12 tc2">Preencha os dados para ver o histórico</div>';
-            const loanSim = JSON.parse(JSON.stringify(loan));
+            const loanSim = structuredClone(loan);
             const idx = loanSim.pagamentos.findIndex(p => p.id === excludePid);
             if (idx >= 0) loanSim.pagamentos[idx] = { ...loanSim.pagamentos[idx], valor: novoValor, data: novaData };
             const events = buildTimeline(loanSim);
@@ -5506,13 +5693,16 @@
             const vValor = parseFloat(document.getElementById('epag-valor')?.value) || 0;
             const vData = document.getElementById('epag-data')?.value || '';
             if (!vData) return;
+            const dtPag = parseDate(vData);
 
             // Rebuild impact summary
-            const loanSim = JSON.parse(JSON.stringify(loan));
-            loanSim.pagamentos = loanSim.pagamentos.filter(p => p.id !== pid);
+            const loanSim = structuredClone(loan);
+            //loanSim.pagamentos = loanSim.pagamentos.filter(p => p.id !== pid);
+            loanSim.pagamentos = loanSim.pagamentos.filter(p => parseDate(p.data) <= dtPag);
+
             const calcSim = getLoanCalc(loanSim);
             const venc = addDays(parseDate(loan.emissao), loan.prazo);
-            const dtPag = parseDate(vData);
+
             const jDia = loan.juros_tipo === 'fixo' ? loan.juros_val : calcSim.valorBase * loan.juros_val / 100;
             const diasAtrasoNoPag = Math.max(0, diffDays(venc, dtPag));
             const jurosNoPag = diasAtrasoNoPag * jDia;
@@ -5541,7 +5731,7 @@
             const tlEl = document.getElementById('epag-tl-preview');
             if (tlEl) {
                 if (vValor > 0) {
-                    tlEl.innerHTML = buildEditTimelinePreview(loan, pid, vValor, vData);
+                    tlEl.innerHTML = buildEditTimelinePreview(loanSim, pid, vValor, vData);
                 } else {
                     tlEl.innerHTML = '<div class="fs12 tc2">Preencha o valor para ver o histórico</div>';
                 }
@@ -5603,17 +5793,10 @@
             const { lid, pid, valor: novoValor, data: novaData } = _pendingEditPag;
             const typed = document.getElementById('edit-pag-id-input')?.value?.trim();
             if (typed !== pid) { showToast('ID incorreto, tente novamente', 'err'); return; }
-            const loan = getLoan(lid);
-            const pag = loan.pagamentos.find(p => p.id === pid);
-            if (!pag) return;
-            pag.valor = novoValor;
-            pag.data = novaData;
-            _pendingEditPag = null;
+
             closeSheet(document.getElementById('edit-pag-confirm-sheet'));
             closeSheet(document.getElementById('edit-pag-sheet'));
-            showToast('Pagamento atualizado! ✓', 'ok');
-            updateNotifBadge();
-            setTimeout(() => openEmpDetalhe(lid), 300);
+            confirmarPagamento(lid, novoValor, novaData, pid)
         }
 
         // ==================== PAGAMENTO ====================
@@ -5625,6 +5808,9 @@
         }
 
         function _updateNovoPagPreview() {
+            const loan = getLoan(_currentLoanId);
+            let loan_retro = structuredClone(loan);
+
             const data = document.getElementById('ed-pag-data').value;
             const valor = parseFloat(document.getElementById('ed-pag-valor').value) || 0;
             const wrap = document.getElementById('ed-pag-retro-wrap');
@@ -5636,6 +5822,10 @@
 
             if (!isRetro) { wrap.style.display = 'none'; return; }
 
+            if (isRetro) {
+                loan_retro.pagamentos = loan_retro.pagamentos.filter(p => parseDate(p.data) <= dt);
+            }
+
             wrap.style.display = '';
 
             const tlEl = document.getElementById('novo-pag-tl-preview');
@@ -5644,28 +5834,29 @@
                 return;
             }
 
-            const loan = getLoan(_currentLoanId);
-            tlEl.innerHTML = buildNewPagTimeline(loan, valor, data);
+            tlEl.innerHTML = buildNewPagTimeline(loan_retro, valor, data);
         }
 
         function buildNewPagTimeline(loan, novoValor, novaData) {
             if (!novoValor || !novaData) return '<div class="fs12 tc2">Preencha os dados para ver o histórico</div>';
-            const loanSim = JSON.parse(JSON.stringify(loan));
+            const loanSim = structuredClone(loan);
             loanSim.pagamentos.push({ id: 'tmp_' + Date.now(), data: novaData, valor: novoValor, status: '', anexos_pag: [] });
             const events = buildTimeline(loanSim);
             return `<ul class="tl" style="padding-left:0">${renderTimelineHTML(events, null)}</ul>`;
         }
 
         function doRegistrarPagamento() {
-            const valor = parseFloat(document.getElementById('ed-pag-valor').value) || 0;
-            const data = document.getElementById('ed-pag-data').value;
+            let valor, data;
+            valor = parseFloat(document.getElementById('ed-pag-valor').value) || 0;
+            data = document.getElementById('ed-pag-data').value;
+
+
             if (!valor || !data) { showToast('Informe valor e data', 'err'); return; }
 
-            const loan = getLoan(_currentLoanId);
-            const calc = getLoanCalc(loan);
-            if (calc.isPago) { showToast('Este empréstimo já está quitado', 'err'); return; }
-
             // Validate date range
+            const loan = getLoan(_currentLoanId);
+            let loan_retro = structuredClone(loan);
+
             const dt = parseDate(data);
             const emissao = parseDate(loan.emissao);
             const todayStr = dateStr(TODAY);
@@ -5675,15 +5866,23 @@
             if (dt > TODAY) {
                 showToast('A data não pode ser no futuro', 'err'); return;
             }
+
+
             const isRetro = dt < TODAY;
-            const client = getClient(loan.clientId);
+
+            loan_retro.pagamentos = loan_retro.pagamentos.filter(p => parseDate(p.data) < dt);
+
+
+            const calc = getLoanCalc(loan_retro);
+
+            const client = getClient(loan_retro.clientId);
             const saldoApos = Math.max(0, calc.valorHoje - valor);
             const quitaria = saldoApos <= 0;
 
             let bodyHTML = '';
 
             if (isRetro) {
-                bodyHTML += `<div class="warn-box" style="margin-bottom:12px"><div class="wb-t">⚠ Pagamento retroativo</div><div class="wb-d">A data informada é anterior a hoje. O histórico será recalculado a partir deste pagamento, E TODOS OS PAGAMENTOS APÓS ESTA DATA SERÃO APAGADOS</div></div>`;
+                bodyHTML += `<div class="warn-box" style="margin-bottom:12px"><div class="wb-t">⚠ Pagamento retroativo</div><div class="wb-d">A data informada é anterior a hoje. O histórico será recalculado a partir deste pagamento<br>E TODOS OS PAGAMENTOS APÓS ESTA DATA SERÃO APAGADOS</div></div>`;
             } else {
                 bodyHTML += `<div class="warn-box" style="background:#3d7fff12;border-color:#3d7fff40;margin-bottom:12px"><div class="wb-t" style="color:var(--acc2)">Confirmar pagamento</div><div class="wb-d">Revise os dados antes de registrar.</div></div>`;
             }
@@ -5691,7 +5890,7 @@
             bodyHTML += `
         <div class="card-sm mb12">
           <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${client.nome}</div></div>
-          <div class="dr"><div class="dk">Contrato</div><div class="dv2">${loan.id}</div></div>
+          <div class="dr"><div class="dk">Contrato</div><div class="dv2">${loan_retro.id}</div></div>
           <div class="dr"><div class="dk">Data</div><div class="dv2 ${isRetro ? 'c-a' : ''}">${fmtDate(data)}${isRetro ? ' · retroativo' : ''}</div></div>
           <div class="dr"><div class="dk">Valor pago</div><div class="dv2 c-g fw6" style="font-size:17px">${fmtMoney(valor)}</div></div>
           <div class="dr" style="border:none"><div class="dk">Saldo após pagamento</div>
@@ -5703,7 +5902,7 @@
                 bodyHTML += `
         <div class="sc-lbl mt8">Histórico recalculado</div>
         <div class="card-sm mb12">
-          ${buildNewPagTimeline(loan, valor, data)}
+          ${buildNewPagTimeline(loan_retro, valor, data)}
         </div>`;
             }
 
@@ -5720,53 +5919,104 @@
             openSheet('pag-confirm-sheet');
         }
 
-        function openRetroFinal(lid, valor, data) {
-            const loan = getLoan(lid);
-            const client = getClient(loan.clientId);
-            const calc = getLoanCalc(loan);
-            const saldoApos = Math.max(0, calc.valorHoje - valor);
-            const quitaria = saldoApos <= 0;
 
-            document.getElementById('retro-final-body').innerHTML = `
-        <div class="warn-box" style="margin-bottom:12px">
-          <div class="wb-t">⚠ Esta ação alterará o histórico</div>
-          <div class="wb-d">Ao confirmar, o pagamento retroativo de <strong>${fmtDate(data)}</strong> será registrado e todos os juros e saldos a partir dessa data serão recalculados.</div>
-        </div>
-        <div class="card-sm mb12">
-          <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${client.nome}</div></div>
-          <div class="dr"><div class="dk">Data do pagamento</div><div class="dv2 c-a fw6">${fmtDate(data)} · retroativo</div></div>
-          <div class="dr"><div class="dk">Valor registrado</div><div class="dv2 c-g fw6" style="font-size:17px">${fmtMoney(valor)}</div></div>
-          <div class="dr" style="border:none"><div class="dk">Saldo após</div>
-            <div class="dv2 fw6 ${quitaria ? 'c-g' : 'c-r'}">${quitaria ? '✓ Dívida quitada' : fmtMoney(saldoApos)}</div>
-          </div>
-        </div>
-        <div class="confirm-btns">
-          <button class="cbtn-n" onclick="closeSheet(document.getElementById('retro-final-sheet'))">← Voltar</button>
-          <button class="cbtn-y" onclick="confirmarPagamento('${lid}',${valor},'${data}')">Confirmar ✓</button>
-        </div>`;
-
-            openSheet('retro-final-sheet');
-        }
-
-        function confirmarPagamento(lid, valor, data) {
+        async function confirmarPagamento(lid, valor, data, pid_old) {
+            showLoading(['REALIZANDO PAGAMENTO...', 'SALVANDO DADOS...', 'COLETANDO NOVOS VALORES...', 'TERMINANDO...']);
             closeSheet(document.getElementById('pag-confirm-sheet'));
             closeSheet(document.getElementById('retro-final-sheet'));
             const loan = getLoan(lid);
-            const calc = getLoanCalc(loan);
+            let loan_retro = structuredClone(loan);
 
+            const pag = loan.pagamentos.find(p => p.id === pid_old);
+            const dtPag = parseDate(data);
+            const isRetro = dtPag < TODAY;
+
+            // Se retroativo: apaga todos os pagamentos com data APÓS a data deste pagamento
+            let removidos_lins = [];
+
+            const removidos = loan.pagamentos.filter(p => parseDate(p.data) > dtPag || p.id === pid_old);
+
+            loan_retro.pagamentos = loan.pagamentos.filter(p => parseDate(p.data) < dtPag);
+
+            removidos.forEach(p => {
+                try { localStorage.removeItem(`anexo_pag_${p.id}`); } catch (e) { }
+            });
+
+            removidos_lins = removidos.map(p => p.lin);
+            console.log(removidos_lins);
+
+            const calc = getLoanCalc(loan_retro);
             const totalPagoAntes = calc.totalPago || 0;
             const totalPagoDepois = totalPagoAntes + valor;
             const geradoEm = dateStr(TODAY);
-
             const status = totalPagoDepois >= calc.dividaTotal ? "PAGAMENTO COMPLETO" : "PAGAMENTO PARCIAL";
 
-            const pid = loan.id + '_P' + String(loan.pagamentos.length + 1).padStart(2, '0');
-            const isRetro = parseDate(data) < TODAY;
+            // Criar o novo id do pagamento atual
+            let novo_id = "";
+            if (loan_retro.pagamentos.length > 0) {
+                let ids_pag = structuredClone(loan_retro.pagamentos);
+                ids_pag.sort((a, b) => b.id.localeCompare(a.id));
+                let id_max = ids_pag[0].id;
+                const partes = id_max.split('_');
+                const prefixo = 'P';
+                const numeroParcelaAtual = parseInt(partes[2].slice(1), 10);
+                const novoNumeroParcela = numeroParcelaAtual + 1;
+                const novaParcelaFormatada = prefixo + String(novoNumeroParcela).padStart(2, '0');
+                partes[2] = novaParcelaFormatada;
+                novo_id = partes.join('_');
+            } else {
+                novo_id = loan.id + '_P01';
+            }
 
-            loan.pagamentos.push({ id: pid, data, valor, status, anexos_pag: [], time: Date.now(), totalPagoAntes, geradoEm });
+            const pid = pid_old ? pid_old : novo_id;
+            const lin_loan = loan.lin;
+
+            const pagamento = { id: pid, data, valor, status, anexos_pag: [], totalPagoAntes, geradoEm, lin_loan, removidos_lins };
+
+            try {
+                console.log("Adicionando pagamento na planilha...");
+                const data_fetch = { data: pagamento, funcao: 'add_pagamento' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - add pagamento") };
+
+                const novoDB = await res.json();
+
+                if (novoDB.error) {
+                    throw new Error(novoDB.error);
+                }
+
+                console.log("Pagamento adicionado com sucesso");
+                DB = novoDB;
+            }
+            catch (err) {
+                console.log("Erro ao adicionar o pagamento");
+                console.log(err);
+
+
+                // Se retroativo: apaga todos os pagamentos com data APÓS a data deste pagamento
+                if (isRetro) {
+                    const removidos = structuredClone(loan.pagamentos.filter(p => parseDate(p.data) > dtPag));
+                    loan.pagamentos = loan_retro.pagamentos.filter(p => parseDate(p.data) <= dtPag);
+
+                    removidos.forEach(p => {
+                        try { localStorage.removeItem(`anexo_pag_${p.id}`); } catch (e) { }
+                    });
+                }
+                loan.pagamentos.push(pagamento);
+                DB.time = Date.now();
+            }
+
+            // Salvar backup local
+            backup_local();
+            hideLoading();
+
+
             showToast('Pagamento registrado! ✓', 'ok');
             updateNotifBadge();
-            // Show receipt immediately
             setTimeout(() => {
                 openEmpDetalhe(lid);
                 setTimeout(() => abrirComprovantePagamento(lid, pid), 350);
@@ -6036,16 +6286,16 @@
             document.getElementById('attach-files-list').innerHTML = _tempAttachFiles.map(f => `<div class="attach-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><div class="attach-item-name">${f.name}</div></div>`).join('');
         }
 
-        function saveAttach() {
-            if (!_tempAttachFiles.length) { showToast('Nenhum arquivo selecionado', 'err'); return; }
-            const loan = getLoan(_currentLoanId);
-            if (!loan) return;
-            // compEnvio = meu comprovante PIX de envio (no loan)
-            loan.compEnvio.push(..._tempAttachFiles);
-            closeSheet(document.getElementById('attach-sheet'));
-            renderAttachList('ed-comp-envio-list', loan.compEnvio);
-            showToast('Arquivo salvo!', 'ok');
-        }
+        // function saveAttach() {
+        //     if (!_tempAttachFiles.length) { showToast('Nenhum arquivo selecionado', 'err'); return; }
+        //     const loan = getLoan(_currentLoanId);
+        //     if (!loan) return;
+        //     // compEnvio = meu comprovante PIX de envio (no loan)
+        //     loan.compEnvio.push(..._tempAttachFiles);
+        //     closeSheet(document.getElementById('attach-sheet'));
+        //     renderAttachList('ed-comp-envio-list', loan.compEnvio);
+        //     showToast('Arquivo salvo!', 'ok');
+        // }
 
         // ==================== NOTIF ====================
         function buildNotif() {
@@ -6411,7 +6661,7 @@
         window.addEventListener('popstate', (e) => {
             // 1. Sheet open — close it first
             if (document.querySelector('.overlay.open')) {
-                document.querySelectorAll('.overlay.open').forEach(o => o.classList.remove('open'));
+                document.querySelector('.overlay.open').classList.remove('open');
                 history.pushState(e.state, '', '');
                 return;
             }
@@ -6465,6 +6715,96 @@
             );
         }
 
+
+
+        // ==================== FUNÇÕES DE ADICIONAR ANEXOS ====================
+        let attachFile = null;
+
+        function onAttachFileSelected(input) {
+            const file = input.files?.[0];
+            if (!file) return;
+
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (file.size > maxSize) {
+                showToast('Arquivo maior que 10MB');
+                input.value = '';
+                return;
+            }
+
+            attachFile = file;
+            const box = document.getElementById('attach-files-list');
+
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    box.innerHTML = `
+                    <div class="card_comp_pag" style="padding:10px;cursor:pointer" onclick="openAttachPreview('image','${e.target.result}')">
+                        <img src="${e.target.result}" style=" width:100%; max-height:220px; object-fit:contain; border-radius:8px">
+                        <div style="margin-top:8px; font-size:12px; text-align:center">${file.name}</div>
+                    </div>
+                    `;
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                const pdfUrl =
+                    URL.createObjectURL(file);
+
+                box.innerHTML = `
+                <div class="card_comp_pag"style="padding:12px; display:flex; align-items:center; gap:10px; cursor:pointer" onclick="openAttachPreview('pdf','${pdfUrl}')">
+                    <div style="font-size:32px">📄</div>
+                    <div>
+                        <div style=" font-size:12px; font-weight:600">${file.name}</div>
+                        <div style=" font-size:11px; color:var(--txt2)">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                    </div>
+                </div>
+                `;
+            }
+        }
+
+        function saveAttach() {
+            if (!attachFile) {
+                showToast('Selecione um arquivo');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64 = reader.result.split(',')[1];
+                const file_name = _currentLoanId;
+
+                localStorage.setItem(file_name, base64);
+
+                // google.script.run.withSuccessHandler(resp => {
+                //     showToast('Anexo salvo');
+                // }).uploadAnexo({
+                //     nome: attachFile.name,
+                //     tipo: attachFile.type,
+                //     base64
+                // });
+                showToast('Anexo Salvo');
+            };
+
+            reader.readAsDataURL(attachFile);
+
+            closeSheet(document.getElementById('attach-sheet'));
+        }
+
+        function openAttachPreview(type, src) {
+            const content = document.getElementById('attach-preview-content');
+
+            if (type === 'image') {
+                content.innerHTML = `<img src="${src}" style="width:100%; height:100%; object-fit:contain;">`;
+
+            } else {
+                content.innerHTML = `<iframe src="${src}" style="width:100%; height:100%; border:none; background:white;"></iframe>`;
+            }
+
+            openSheet('attach-preview-modal');
+        }
+
+
+
         // ==================== NOTIFICATION BADGE ====================
         function updateNotifBadge() {
             const fab = document.getElementById('notif-fab');
@@ -6482,13 +6822,26 @@
         async function loadDB() {
             console.log("Realizando Fetch inicial...");
             try {
-                
-                DB = await fetch(URL_Coletar_Dados).then(r => r.json());
+                const data_fetch = { data: '', funcao: '' };
 
-                showNotif('Dados coletados da planilha', 'ok');
+                const res = await fetch(URL_SCRIPT, {
+                    method: "POST",
+                    body: JSON.stringify(data_fetch),
+                    headers: { "Content-Type": "text/plain" },
+                    redirect: "follow" // Garante que o fetch vai seguir o redirecionamento do Google
+                });
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch inicial") };
+
+                let json_data = await res.json();
+
+                if (json_data) {
+                    DB = json_data;
+                    console.log(DB);
+                    showNotif('Dados coletados da planilha', 'ok');
+                }
 
                 console.log("Fetch inicial - Sucesso");
-                console.log(DB);
             }
             catch (err) {
                 console.error(err);
@@ -6534,8 +6887,13 @@
 
 
         // VARIAVEIS GLOBAIS
-        const URL_Coletar_Dados = "https://script.google.com/macros/s/AKfycbx16etQiZK11uHIhq06xznam8-uWzz8iW5ld3_946yiiYY0C58WAxjeZZHSwyezvEIZ-w/exec";
-        const URL_Registrar_Pagamentos = "https://script.google.com/macros/s/AKfycbyj4v38NaqaaExzA-KZMQ_bsE2-rb3pEEMXQhu71mS-WOF8ntbhpWCYDw1u-Uv5oE7PBA/exec";
+        // const data_fetch = { data: loan, funcao: 'add_emprestimo' };
+        // const res = await fetch(URL_SCRIPT,
+        //     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+        // );
+        // if (!res.ok) { throw new Error("Erro ao realizar fetch inicial") };
+        // let json_data = await res.json();
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxkaD96lCT4ZLN0dDGg8YCdgH9elVCxO3ni2_vQuPEjMCY0OavdL_nwoGLSyUpBN-j-HA/exec";
 
         var DB = {};
 
@@ -6551,6 +6909,7 @@
             // Seed initial history state
             history.replaceState({ scr: 'dash' }, '', '');
             _navStack.push({ scr: 'dash' });
+
         });
 
 
