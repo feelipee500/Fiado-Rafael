@@ -1521,6 +1521,7 @@
             border-radius: var(--rad8);
             padding: 10px 12px;
             margin-top: 6px;
+            cursor: pointer;
         }
 
         .attach-item svg {
@@ -1533,10 +1534,17 @@
             flex: 1;
             font-size: 12px;
             color: var(--txt1);
+            cursor: pointer;
+        }
+
+        .attach-item-ver {
+            font-size: 12px;
+            color: var(--acc);
+            cursor: pointer;
         }
 
         .attach-item-del {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--danger);
             cursor: pointer;
         }
@@ -2881,11 +2889,23 @@
                         </div>
                     </div>
                     <div class="flex-r mb12">
-                        <div class="av" id="cd-av" style="width:48px;height:48px;font-size:16px"></div>
-                        <div>
-                            <div style="font-size:18px;font-weight:700;font-family:var(--font-d)" id="cd-name"></div>
-                            <div class="fs11 tc2" id="cd-tel"></div>
-                            <div class="fs11 tc2" id="cd-email"></div>
+                        <div class="av" id="cd-av" style="width:48px; height:48px; font-size:16px"></div>
+                        <div style="flex:1">
+                            <div style="font-size:18px; font-weight:700; font-family:var(--font-d)" id="cd-name"></div>
+                            <div style="display:flex; align-items:center; justify-content:space-between">
+                                <div class="fs11 tc2" id="cd-tel"></div>
+                                <div id="cd-whatsapp-btn" onclick="openSheet('open-whatsapp')"
+                                    style="display:flex; align-items:center; gap:4px; background:#25D36618; border:1px solid #25D36630; color:#25D366;border-radius:20px; padding:3px 9px; cursor:pointer; font-size:11px; font-weight:600">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                                        <path
+                                            d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.985-1.31A9.955 9.955 0 0011.999 22C17.522 22 22 17.523 22 12S17.522 2 11.999 2zm0 18c-1.66 0-3.207-.45-4.535-1.233l-.323-.192-3.352.88.894-3.266-.21-.337A7.965 7.965 0 014 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8z" />
+                                    </svg>
+                                    WhatsApp
+                                </div>
+                            </div>
+                            <div class="fs11 tc2 mt2" id="cd-email"></div>
                         </div>
                     </div>
                     <div id="cd-desc-wrap" class="card-sm mb12" style="display:none">
@@ -2934,8 +2954,7 @@
                     style="position:relative;padding:20px 16px 28px;background:var(--bg1);border-bottom:1px solid var(--brd)">
                     <!-- nav bar -->
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-                        <div class="back-btn" id="ed-back-btn" style="margin-bottom:0;color:var(--txt1)"
-                            onclick="backFromEmpDetalhe()">
+                        <div class="back-btn" id="ed-back-btn" style="margin-bottom:0;color:var(--txt1)">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
                                 <polyline points="15 18 9 12 15 6" />
                             </svg>Voltar
@@ -2954,8 +2973,20 @@
                     </div>
                     <!-- client + id -->
                     <div style="margin-bottom:16px">
-                        <div style="font-family:var(--font-d);font-size:20px;font-weight:800;letter-spacing:-.5px;line-height:1.1"
-                            id="ed-client-name"></div>
+                        <div style="display:flex; align-items:center; justify-content:space-between">
+                            <div style="font-family:var(--font-d); font-size:20px; font-weight:800; letter-spacing:-.5px; line-height:1.1"
+                                id="ed-client-name"></div>
+                            <div id="ed-whatsapp-btn" onclick="openSheet('open-whatsapp')"
+                                style="display:flex;align-items:center;gap:5px;background:#25D36618;border:1px solid #25D36630;color:#25D366;border-radius:20px;padding:5px 11px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                                    <path
+                                        d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.985-1.31A9.955 9.955 0 0011.999 22C17.522 22 22 17.523 22 12S17.522 2 11.999 2zm0 18c-1.66 0-3.207-.45-4.535-1.233l-.323-.192-3.352.88.894-3.266-.21-.337A7.965 7.965 0 014 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8z" />
+                                </svg>
+                                WhatsApp
+                            </div>
+                        </div>
                         <div class="fs11 tc2 mt4" id="ed-id"></div>
                     </div>
                     <!-- main value display -->
@@ -3042,13 +3073,13 @@
 
                     <!-- Comprovante de envio — compact -->
                     <div
-                        style="background:var(--bg2);border:1px solid var(--brd);border-radius:var(--rad12);padding:12px 14px;margin-bottom:14px">
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                        style="background:var(--bg2); border:1px solid var(--brd); border-radius:var(--rad12); padding:12px 14px; margin-bottom:14px">
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px">
                             <span class="fs11 tc2"
-                                style="text-transform:uppercase;letter-spacing:.6px;font-weight:600">Meu comprovante
+                                style="text-transform:uppercase; letter-spacing:.6px; font-weight:600">Meu comprovante
                                 PIX</span>
-                            <div id="ed-comp-envio-btn" class="fs11 fw6" style="color:var(--acc);cursor:pointer"
-                                onclick="openAttachSheet('envio')">+ Anexar</div>
+                            <div id="ed-comp-envio-btn" class="fs11 fw6" style="color:var(--acc); cursor:pointer"
+                                onclick="openAttachSheet('loan')">+ Anexar</div>
                         </div>
                         <div id="ed-comp-envio-list"></div>
                     </div>
@@ -3210,6 +3241,37 @@
         </div>
     </div>
 
+    <!-- Abrir Whatsapp -->
+    <div class="overlay" id="open-whatsapp" data-backdrop="open-whatsapp">
+        <div class="sheet" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title">Abrir WhatsApp</div>
+                <div class="sh-close" onclick="closeSheet(document.getElementById('open-whatsapp'))"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></div>
+            </div>
+            <div class="sh-body" id="open-whatsapp-body">
+                <div id="cd-whatsapp-btn"
+                    style="display:flex; align-items:center; gap:4px; background:#25D36618; border:1px solid #25D36630;color:#25D366; border-radius: 20px; padding:3px 9px; cursor:pointer; font-size:11px; font-weight:600">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                        <path
+                            d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.985-1.31A9.955 9.955 0 0011.999 22C17.522 22 22 17.523 22 12S17.522 2 11.999 2zm0 18c-1.66 0-3.207-.45-4.535-1.233l-.323-.192-3.352.88.894-3.266-.21-.337A7.965 7.965 0 014 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8z" />
+                    </svg>Você será redirecionado para o Whatsapp do cliente
+                </div>
+                <div class="confirm-btns mt12">
+                    <button class="cbtn-n"
+                        onclick="closeSheet(document.getElementById('open-whatsapp'))">Cancelar</button>
+                    <button class="cbtn-y" onclick="confirmarwhatsapp()">Continuar →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Visualizador de anexos -->
     <div class="overlay" id="attach-preview-modal" data-backdrop="attach-preview-modal"
         onclick="closeSheet(document.getElementById('attach-preview-modal'))" style="z-index:300">
@@ -3230,19 +3292,10 @@
                     </svg></div>
             </div>
             <div class="sh-body">
-                <p class="fs12 tc1 mb12">Selecione uma imagem ou PDF. Somente 1 arquivo por empréstimo.</p>
                 <input type="file" id="attach-file-input" accept=".pdf,.jpg,.jpeg,.png,.webp" capture="none"
                     style="display:none" onchange="onAttachFileSelected(this)">
-                <div class="attach-btn" onclick="document.getElementById('attach-file-input').click()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="17 8 12 3 7 8" />
-                        <line x1="12" y1="3" x2="12" y2="15" />
-                    </svg>
-                    Selecionar arquivo / imagem
-                </div>
                 <div id="attach-files-list" class="mt8"></div>
-                <button class="btn-p mt12" onclick="saveAttach()">Salvar</button>
+                <div id="attach-add" class="mt8"></div>
             </div>
         </div>
     </div>
@@ -3739,11 +3792,11 @@
         // O DB é carregado via loadDB() ao iniciar o app.
         // Formato esperado dos empréstimos:
         // { id: "C02_E01", clientId: "C02", valor: 500, prazo: 7, juros_tipo: "fixo", juros_val: 10,
-        //   emissao: "2026-05-23", pago: 0, pagamentos: [], compEnvio: [] }
+        //   emissao: "2026-05-23", pago: 0, pagamentos: [], anexo_envio: [] }
         // Formato dos pagamentos dentro de loan.pagamentos:
-        // { id: "C01_E02_P01", data: "2026-05-21", valor: 230, status: "PAGAMENTO TOTAL", anexos_pag: [] }
-        // compEnvio = comprovante do meu PIX de envio (array no loan)
-        // anexos_pag = comprovantes de pagamento recebido (array dentro de cada pagamento)
+        // { id: "C01_E02_P01", data: "2026-05-21", valor: 230, status: "PAGAMENTO TOTAL", anexo_pag: [] }
+        // anexo_envio = comprovante do meu PIX de envio (array no loan)
+        // anexo_pag = comprovantes de pagamento recebido (array dentro de cada pagamento)
 
 
         let _currentClientId = null;
@@ -3752,9 +3805,6 @@
         let _prevScreen = null;
         let _newLoanClientId = null;
         let _newLoanData = null;
-        let _attachMode = null;
-        let _attachFiles = [];
-        let _tempAttachFiles = [];
         let _empFilter = 'all';
 
         // ==================== LOAN CALC ====================
@@ -4640,7 +4690,7 @@
             }
             const id = novo_id;
 
-            const loan = { id, clientId: d.clientId, valor: d.valor, prazo: d.prazo, juros_tipo: d.juros_tipo, juros_val: d.juros_val, emissao: d.emissao, pago: 0, pagamentos: [], compEnvio: [] };
+            const loan = { id, clientId: d.clientId, valor: d.valor, prazo: d.prazo, juros_tipo: d.juros_tipo, juros_val: d.juros_val, emissao: d.emissao, pago: 0, pagamentos: [], anexo_envio: [] };
             console.log("Novo emprestimo criado");
 
 
@@ -4832,8 +4882,11 @@
             const l = getLoan(lid);
             if (!l) return;
             const c = getClient(l.clientId);
+            _currentClientId = l.clientId;
             const calc = getLoanCalc(l);
             const venc = addDays(parseDate(l.emissao), l.prazo);
+
+            const loan_anexo = l.anexo_envio[0] ? l.anexo_envio[0].anexo_id : '';
 
             document.getElementById('ed-id').textContent = l.id;
             document.getElementById('ed-client-name').textContent = c.nome;
@@ -4858,7 +4911,8 @@
             document.getElementById('ed-saldo').textContent = calc.isPago ? 'Quitado' : fmtMoney(Math.max(0, calc.valorHoje));
 
             // Comprovantes
-            renderAttachList('ed-comp-envio-list', l.compEnvio);
+            renderAttachList('ed-comp-envio-list', loan_anexo);
+
 
             // Pagamento form
             document.getElementById('ed-pag-form-wrap').style.display = calc.isPago ? 'none' : '';
@@ -4878,113 +4932,102 @@
             renderTimeline(l);
             navTo('emp-detalhe');
         }
-        function backFromEmpDetalhe() { }
 
         function renderAttachList(elId, file) {
-            // file = single object or null (compEnvio is now a single object, not array)
+            // file = id_google_drive
             const el = document.getElementById(elId);
-            if (!file || (Array.isArray(file) && !file.length)) {
+            if (!file) {
                 el.innerHTML = '<div class="fs12 tc2 mb4">Nenhum arquivo</div>';
+
+                document.getElementById('ed-comp-envio-btn').style.display = 'block';
                 return;
             }
+
             const f = Array.isArray(file) ? file[0] : file;
-            el.innerHTML = `<div class="attach-item">
+            document.getElementById('ed-comp-envio-btn').style.display = 'none';
+            el.innerHTML = `<div class="attach-item" onclick="openAttachSheet('loan')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-              <div class="attach-item-name">${f.name || 'Arquivo'}</div>
-              <div class="attach-item-del" onclick="removerCompEnvio()">remover</div>
+              <div class="attach-item-name">Arquivo</div>
+              <div class="attach-item-ver">Ver</div>
             </div>`;
         }
 
-        function removerCompEnvio() {
+        // Função para abrir a janela de anexos
+        function openAttachSheet(mode, pid) {
             const loan = getLoan(_currentLoanId);
-            if (!loan) return;
-            loan.compEnvio = null;
-            renderCompEnvioCard(loan);
-            showToast('Comprovante removido', 'ok');
-        }
+            const pag = loan.pagamentos.find(p => p.id === pid);
+            const pag_id = pag ? pag.id : '';
+            
 
-        function renderCompEnvioCard(loan) {
-            const hasFile = loan.compEnvio && loan.compEnvio.name;
-            const listEl = document.getElementById('ed-comp-envio-list');
-            const btnEl = document.getElementById('ed-comp-envio-btn');
-            if (hasFile) {
-                listEl.innerHTML = `<div class="attach-item">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                  <div class="attach-item-name">${loan.compEnvio.name}</div>
-                  <div class="attach-item-del" onclick="removerCompEnvio()">remover</div>
-                </div>`;
-                if (btnEl) btnEl.style.display = 'none';
+            let anexo_id, anexo_linha, anexo_id_nome;
+
+            if (mode == 'loan') {
+                anexo_id = loan.anexo_envio[0] ? loan.anexo_envio[0].anexo_id : '';
+                anexo_linha = loan.anexo_envio[0] ? loan.anexo_envio[0].lin : '';
+                anexo_id_nome = _currentLoanId;
+                document.getElementById('attach-title').textContent = 'Comprovante de Envio (meu PIX)';
+            } else if (mode == 'pag') {
+                anexo_id = pag.anexo_pag[0] ? pag.anexo_pag[0].anexo_id : '';
+                anexo_linha = pag.anexo_pag[0] ? pag.anexo_pag[0].lin : '';
+                anexo_id_nome = pag_id;                
+                document.getElementById('attach-title').textContent = 'Comprovante de Pagamento';
+            }
+
+
+            const box = document.getElementById('attach-files-list');
+            const box_add = document.getElementById('attach-add');
+            if (anexo_id) {
+                box_add.innerHTML = ``;
+
+                const URL_anexo = "https://lh3.googleusercontent.com/d/" + anexo_id;
+
+                box.innerHTML = `
+                    <div class="card_comp_pag" style="padding:10px; cursor:pointer" onclick="openAttachPreview('image','${URL_anexo}')">
+                        <img src="${URL_anexo}" style="width:100%; max-height:220px; object-fit:contain; border-radius:8px" onerror="this.onerror=null; this.src='https://placehold.co/300x200?text=ERRO+AO+EXIBIR+ANEXO';">
+                        <div style="margin-top:8px; font-size:12px; text-align:center">ANEXO ${anexo_id_nome} 📎</div>
+                    </div>
+                    <div style="margin-top:8px; font-size:12px; color:var(--danger); cursor:pointer; text-align:center" onclick="remover_anexo('${anexo_id}', ${anexo_linha}, '${pag_id ? pag_id : ''}', '${mode}')">Deletar</div>
+                `;
             } else {
-                listEl.innerHTML = '<div class="fs12 tc2 mb4">Nenhum comprovante</div>';
-                if (btnEl) btnEl.style.display = '';
-            }
-        }
+                box.innerHTML = ``;
 
-        function openAttachSheet(mode) {
-            const loan = getLoan(_currentLoanId);
-            if (loan && loan.compEnvio && loan.compEnvio.name) {
-                showToast('Remova o comprovante atual antes de adicionar outro', 'err');
-                return;
+                if (mode == 'loan' && _currentLoanId) {
+                    box_add.innerHTML = `
+                    <p class="fs12 tc1 mb12">Selecione uma imagem ou PDF. Somente 1 arquivo.</p>
+                    <div class="attach-btn" id="btn-add-anexo"
+                        onclick="document.getElementById('attach-file-input').click()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        Selecionar arquivo / imagem
+                    </div>
+                    <button class="btn-p mt12" id="btn-salvar-anexo" onclick="saveAttach('loan', _currentLoanId)">Salvar</button>
+                    `;
+                } else if (mode == 'pag' && pag.id) {
+                    box_add.innerHTML = `
+                    <p class="fs12 tc1 mb12">Selecione uma imagem ou PDF. Somente 1 arquivo.</p>
+                    <div class="attach-btn" id="btn-add-anexo"
+                        onclick="document.getElementById('attach-file-input').click()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        Selecionar arquivo / imagem
+                    </div>
+                    <button class="btn-p mt12" id="btn-salvar-anexo" onclick="saveAttach('pag','${pag.id}')">Salvar</button>
+                    `;
+                }
             }
-            _attachMode = mode;
-            _tempAttachFiles = [];
-            document.getElementById('attach-title').textContent = 'Comprovante de Envio (meu PIX)';
-            document.getElementById('attach-files-list').innerHTML = '';
+
             openSheet('attach-sheet');
         }
 
-        function simulateAttach() {
-            const names = ['pix_comprovante.jpg', 'extrato_banco.png', 'foto_transferencia.jpg'];
-            _tempAttachFiles = [{ name: names[Math.floor(Math.random() * names.length)] }]; // only 1
-            document.getElementById('attach-files-list').innerHTML =
-                `<div class="attach-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><div class="attach-item-name">${_tempAttachFiles[0].name}</div></div>`;
-        }
 
-        // function saveAttach() {
-        //     if (!_tempAttachFiles.length) { showToast('Nenhum arquivo selecionado', 'err'); return; }
-        //     const loan = getLoan(_currentLoanId);
-        //     if (!loan) return;
-        //     loan.compEnvio = _tempAttachFiles[0]; // single file
-        //     closeSheet(document.getElementById('attach-sheet'));
-        //     renderCompEnvioCard(loan);
-        //     showToast('Comprovante salvo!', 'ok');
-        // }
 
-        // ---- Payment attachment (1 per payment) ----
-        let _anexoPagLid = null, _anexoPagPid = null, _tempAnexoPag = null;
 
-        function openAnexoPagSheet(lid, pid) {
-            _anexoPagLid = lid; _anexoPagPid = pid; _tempAnexoPag = null;
-            document.getElementById('pag-anexo-preview').innerHTML = '';
-            openSheet('pag-anexo-sheet');
-        }
-
-        function simulateAnexoPag() {
-            const names = ['recibo_pag.jpg', 'pix_recebido.png', 'comprovante_cliente.jpg'];
-            _tempAnexoPag = { name: names[Math.floor(Math.random() * names.length)] };
-            document.getElementById('pag-anexo-preview').innerHTML =
-                `<div class="attach-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg><div class="attach-item-name">${_tempAnexoPag.name}</div></div>`;
-        }
-
-        function saveAnexoPag() {
-            if (!_tempAnexoPag) { showToast('Nenhum arquivo selecionado', 'err'); return; }
-            const loan = getLoan(_anexoPagLid);
-            const pag = loan && loan.pagamentos.find(p => p.id === _anexoPagPid);
-            if (!pag) return;
-            pag.anexos_pag = [_tempAnexoPag]; // enforce single
-            closeSheet(document.getElementById('pag-anexo-sheet'));
-            renderTimeline(loan);
-            showToast('Anexo salvo!', 'ok');
-        }
-
-        function removerAnexoPag(lid, pid) {
-            const loan = getLoan(lid);
-            const pag = loan && loan.pagamentos.find(p => p.id === pid);
-            if (!pag) return;
-            pag.anexos_pag = [];
-            renderTimeline(loan);
-            showToast('Anexo removido', 'ok');
-        }
 
         function renderTimeline(loan) {
             const events = buildTimeline(loan);
@@ -5107,7 +5150,7 @@
                 const anexoBadge = e.pId ? (() => {
                     const loan = getLoan(loanId);
                     const pag = loan && loan.pagamentos.find(p => p.id === e.pId);
-                    const has = pag && pag.anexos_pag && pag.anexos_pag.length > 0;
+                    const has = pag && pag.anexo_pag[0];
                     return has
                         ? `<span class="tl-anexo-tag ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Anexo OK</span>`
                         : `<span class="tl-anexo-tag miss"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Sem anexo</span>`;
@@ -5194,44 +5237,39 @@
             const loan = getLoan(lid);
             const pag = loan.pagamentos.find(p => p.id === pid);
             if (!pag) return;
-            const hasAnexo = pag.anexos_pag && pag.anexos_pag.length > 0;
-            const anexo = hasAnexo ? pag.anexos_pag[0] : null;
+            const hasAnexo = pag.anexo_pag[0];
+
 
             document.getElementById('tl-event-title').textContent = 'Pagamento — ' + fmtDate(pag.data);
             document.getElementById('tl-event-body').innerHTML = `
-    <div class="dr"><div class="dk">Valor pago</div><div class="dv2 c-g fw6">${fmtMoney(pag.valor)}</div></div>
-    <div class="dr"><div class="dk">Data</div><div class="dv2">${fmtDate(pag.data)}</div></div>
-    ${pag.status ? `<div class="dr" style="border:none"><div class="dk">Status</div><div class="dv2">${pag.status}</div></div>` : ''}
-    <div class="dv mt8"></div>
+            <div class="dr"><div class="dk">Valor pago</div><div class="dv2 c-g fw6">${fmtMoney(pag.valor)}</div></div>
+            <div class="dr"><div class="dk">Data</div><div class="dv2">${fmtDate(pag.data)}</div></div>
+            ${pag.status ? `<div class="dr" style="border:none"><div class="dk">Status</div><div class="dv2">${pag.status}</div></div>` : ''}
+            <div class="dv mt8"></div>
 
-    <button class="btn-icon w-full mb8" style="justify-content:center;"
-      onclick="closeSheet(document.getElementById('tl-event-sheet'));abrirComprovantePagamento('${lid}','${pid}')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      Ver comprovante
-    </button>
+            <button class="btn-icon w-full mb8" style="justify-content:center;"
+            onclick="closeSheet(document.getElementById('tl-event-sheet'));abrirComprovantePagamento('${lid}','${pid}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Ver comprovante
+            </button> ${hasAnexo ? `<div class="attach-item mb8">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                <div class="attach-item-name" onclick="openAttachSheet('pag', '${pid}')"; closeSheet(document.getElementById('tl-event-sheet')); openEmpDetalhe('${lid}')">Comprovante de Pagamento</div>
+                <div class="attach-item-ver">Ver</div>
+                </div>` : `<button class="btn-icon w-full mb8" style="justify-content:center;color:var(--warn)"
+                onclick="closeSheet(document.getElementById('tl-event-sheet')); openAttachSheet('pag', '${pid}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                ⚠ Adicionar anexo de pagamento
+                </button>`}
 
-    ${hasAnexo
-                    ? `<div class="attach-item mb8">
-           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-           <div class="attach-item-name">${anexo.name}</div>
-           <div class="attach-item-del" onclick="removerAnexoPag('${lid}','${pid}');closeSheet(document.getElementById('tl-event-sheet'));openEmpDetalhe('${lid}')">remover</div>
-         </div>`
-                    : `<button class="btn-icon w-full mb8" style="justify-content:center;color:var(--warn)"
-           onclick="closeSheet(document.getElementById('tl-event-sheet'));openAnexoPagSheet('${lid}','${pid}')">
-           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-           ⚠ Adicionar anexo de pagamento
-         </button>`
-                }
-
-    <button class="btn-icon w-full mb8" style="justify-content:center" onclick="closeSheet(document.getElementById('tl-event-sheet'));openEditPag('${lid}','${pid}')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      Editar pagamento
-    </button>
-    <button class="btn-icon w-full" style="justify-content:center;color:var(--danger);border-color:#ff4d6d30" onclick="closeSheet(document.getElementById('tl-event-sheet'));openDeletePagConfirm('${lid}','${pid}')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-      Apagar pagamento
-    </button>
-  `;
+            <button class="btn-icon w-full mb8" style="justify-content:center" onclick="closeSheet(document.getElementById('tl-event-sheet'));openEditPag('${lid}','${pid}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Editar pagamento
+            </button>
+            <button class="btn-icon w-full" style="justify-content:center;color:var(--danger);border-color:#ff4d6d30" onclick="closeSheet(document.getElementById('tl-event-sheet'));openDeletePagConfirm('${lid}','${pid}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            Apagar pagamento
+            </button>
+        `;
             openSheet('tl-event-sheet');
         }
         // ==================== EDIÇÃO DO EMPRÉSTIMO ====================
@@ -5296,8 +5334,7 @@
         function executarDeletePag(lid, pid) {
             const loan = getLoan(lid);
             if (!loan) return;
-            // Also remove any stored attachment from localStorage
-            try { localStorage.removeItem(`anexo_pag_${pid}`); } catch (e) { }
+
             loan.pagamentos = loan.pagamentos.filter(p => p.id !== pid);
             closeSheet(document.getElementById('delete-pag-confirm-sheet'));
             showToast('Pagamento apagado', 'ok');
@@ -5840,7 +5877,7 @@
         function buildNewPagTimeline(loan, novoValor, novaData) {
             if (!novoValor || !novaData) return '<div class="fs12 tc2">Preencha os dados para ver o histórico</div>';
             const loanSim = structuredClone(loan);
-            loanSim.pagamentos.push({ id: 'tmp_' + Date.now(), data: novaData, valor: novoValor, status: '', anexos_pag: [] });
+            loanSim.pagamentos.push({ id: 'tmp_' + Date.now(), data: novaData, valor: novoValor, status: '', anexo_pag: [] });
             const events = buildTimeline(loanSim);
             return `<ul class="tl" style="padding-left:0">${renderTimelineHTML(events, null)}</ul>`;
         }
@@ -5933,10 +5970,6 @@
 
             loan_retro.pagamentos = loan.pagamentos.filter(p => parseDate(p.data) < dtPag);
 
-            removidos.forEach(p => {
-                try { localStorage.removeItem(`anexo_pag_${p.id}`); } catch (e) { }
-            });
-
             removidos_lins = removidos.map(p => p.lin);
             console.log(removidos_lins);
 
@@ -5966,7 +5999,7 @@
             const pid = pid_old ? pid_old : novo_id;
             const lin_loan = loan.lin;
 
-            const pagamento = { id: pid, data, valor, status, anexos_pag: [], totalPagoAntes, geradoEm, lin_loan, removidos_lins };
+            const pagamento = { id: pid, data, valor, status, anexo_pag: [], totalPagoAntes, geradoEm, lin_loan, removidos_lins };
 
             try {
                 console.log("Adicionando pagamento na planilha...");
@@ -5996,10 +6029,6 @@
                 if (isRetro) {
                     const removidos = structuredClone(loan.pagamentos.filter(p => parseDate(p.data) > dtPag));
                     loan.pagamentos = loan_retro.pagamentos.filter(p => parseDate(p.data) <= dtPag);
-
-                    removidos.forEach(p => {
-                        try { localStorage.removeItem(`anexo_pag_${p.id}`); } catch (e) { }
-                    });
                 }
                 loan.pagamentos.push(pagamento);
                 DB.time = Date.now();
@@ -6266,31 +6295,6 @@
             </div>`;
         }
 
-        function openAttachSheet(mode) {
-            _attachMode = mode;
-            _tempAttachFiles = [];
-            document.getElementById('attach-title').textContent = 'Comprovante de Envio (meu PIX)';
-            document.getElementById('attach-files-list').innerHTML = '';
-            openSheet('attach-sheet');
-        }
-
-        function simulateAttach() {
-            const names = ['pix_comprovante.jpg', 'extrato_banco.png', 'foto_transferencia.jpg'];
-            const name = names[Math.floor(Math.random() * names.length)];
-            _tempAttachFiles.push({ name });
-            document.getElementById('attach-files-list').innerHTML = _tempAttachFiles.map(f => `<div class="attach-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><div class="attach-item-name">${f.name}</div></div>`).join('');
-        }
-
-        // function saveAttach() {
-        //     if (!_tempAttachFiles.length) { showToast('Nenhum arquivo selecionado', 'err'); return; }
-        //     const loan = getLoan(_currentLoanId);
-        //     if (!loan) return;
-        //     // compEnvio = meu comprovante PIX de envio (no loan)
-        //     loan.compEnvio.push(..._tempAttachFiles);
-        //     closeSheet(document.getElementById('attach-sheet'));
-        //     renderAttachList('ed-comp-envio-list', loan.compEnvio);
-        //     showToast('Arquivo salvo!', 'ok');
-        // }
 
         // ==================== NOTIF ====================
         function buildNotif() {
@@ -6715,6 +6719,7 @@
         // ==================== FUNÇÕES DE ADICIONAR ANEXOS ====================
         let attachFile = null;
 
+        // Função para escolher (input) os anexos
         function onAttachFileSelected(input) {
             const file = input.files?.[0];
             if (!file) return;
@@ -6757,34 +6762,143 @@
             }
         }
 
-        function saveAttach() {
+        // Função para enviar o anexo
+        async function saveAttach(mode, anexo_id) {
             if (!attachFile) {
                 showToast('Selecione um arquivo');
                 return;
             }
 
+            if (!anexo_id) {
+                showToast('Erro no id do anexo!');
+                return;
+            }
+
+            const file_name = anexo_id;
+            showLoading(['CONVERTENDO ANEXO...', 'ENVIANDO PARA O DRIVE...', 'SALVANDO NA PASTA...', 'SINCRONIZANDO...', 'TERMINANDO...']);
+
             const reader = new FileReader();
-            reader.onload = () => {
+            reader.onload = async function () {
                 const base64 = reader.result.split(',')[1];
-                const file_name = _currentLoanId;
 
-                localStorage.setItem(file_name, base64);
+                const dadosParaEnvio = {
+                    nome: file_name,
+                    tipo: attachFile.type,
+                    base64: base64
+                };
 
-                // google.script.run.withSuccessHandler(resp => {
-                //     showToast('Anexo salvo');
-                // }).uploadAnexo({
-                //     nome: attachFile.name,
-                //     tipo: attachFile.type,
-                //     base64
-                // });
-                showToast('Anexo Salvo');
+
+                try {
+                    console.log("Enviando anexo para planilha...");
+                    const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexo' };
+                    const res = await fetch(URL_SCRIPT,
+                        { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                    );
+
+                    if (!res.ok) { throw new Error("Erro ao realizar fetch - add anexo") };
+
+                    const novoDB = await res.json();
+
+                    if (novoDB.error) {
+                        throw new Error(novoDB.error);
+                    }
+
+                    console.log("Anexo adicionado com sucesso");
+                    DB = novoDB;
+                    //console.log(DB);
+
+                    closeSheet(document.getElementById('attach-sheet'));
+
+                    const loan = getLoan(_currentLoanId);
+                    if (mode == 'loan') {
+                        const loan_anexo = loan.anexo_envio[0] ? loan.anexo_envio[0].anexo_id : '';
+                        renderAttachList('ed-comp-envio-list', loan_anexo);
+
+                        openAttachSheet('loan', _currentLoanId);
+                    } else {
+                        renderTimeline(loan);
+
+                        openTlEvent(loan.id, anexo_id)
+                        openAttachSheet('pag', anexo_id);
+                    }
+
+
+                    hideLoading();
+                    showToast('Anexo Salvo');
+                }
+                catch (err) {
+                    console.log("Erro ao adicionar o Anexo");
+                    console.log(err);
+
+                    hideLoading();
+                    showToast('Erro ao salvar anexo!');
+                }
             };
 
             reader.readAsDataURL(attachFile);
-
-            closeSheet(document.getElementById('attach-sheet'));
         }
 
+        // Função para remover anexos
+        async function remover_anexo(anexo_id, linha, pid, mode) {
+            if (!anexo_id || !linha) { return showToast('Erro ao apagar anexo!'); }
+
+            showLoading(['APAGANDO ANEXO...', 'APAGANDO NO DRIVE...', 'APAGANDO NA PLANILHA...', 'SINCRONIZANDO...', 'TERMINANDO...']);
+            const dadosParaEnvio = {
+                id_anexo: anexo_id,
+                lin: linha
+            }
+
+            try {
+                console.log("Apagando anexo...");
+                const data_fetch = { data: dadosParaEnvio, funcao: 'del_anexo' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - del anexo") };
+
+                const novoDB = await res.json();
+
+                if (novoDB.error) {
+                    throw new Error(novoDB.error);
+                }
+
+                console.log("Anexo apagado com sucesso");
+                DB = novoDB;
+                console.log(DB);
+
+                closeSheet(document.getElementById('attach-sheet'));
+
+                const loan = getLoan(_currentLoanId);
+                if (mode == 'loan') {
+                    const loan_anexo = loan.anexo_envio[0] ? loan.anexo_envio[0].anexo_id : '';
+                    renderAttachList('ed-comp-envio-list', loan_anexo);
+
+                    openAttachSheet('loan', _currentLoanId);
+                } else {
+                    renderTimeline(loan);
+
+                    if (pid) {
+                        openTlEvent(loan.id, pid)
+                        openAttachSheet('pag', pid);
+                    }
+                }
+
+                hideLoading();
+                showToast('Anexo apagado');
+               
+            }
+            catch (err) {
+                console.log("Erro ao apagar o Anexo");
+                console.log(err);
+
+                hideLoading();
+                showToast('Erro ao apagar anexo!');
+            }
+
+        }
+
+        // Função para abrir o anexo em tela cheia
         function openAttachPreview(type, src) {
             const content = document.getElementById('attach-preview-content');
 
@@ -6798,6 +6912,46 @@
             openSheet('attach-preview-modal');
         }
 
+
+        // Função para abrir o whatsapp do cliente
+        async function confirmarwhatsapp() {
+            showLoading(['ABRINDO WHATSAPP...', 'REDIRECIONANDO...']);
+            const cliente_telefone = getClient(_currentClientId).tel;
+            const url_whatsapp = 'whatsapp://send?phone=' + cliente_telefone;
+
+            let processou = false;
+
+            // Função única para limpar tudo e fechar a tela
+            const finalizarAcao = () => {
+                if (processou) return; // Evita rodar duas vezes
+                processou = true;
+
+                closeSheet(document.getElementById('open-whatsapp'));
+                hideLoading();
+
+                // Limpa os listeners por segurança
+                window.removeEventListener('focus', finalizarAcao);
+                window.removeEventListener('blur', registrarBlur);
+            };
+
+            // Se o usuário clicar em "Abrir", a tela vai dar um 'blur' (perder foco)
+            const registrarBlur = () => {
+                // Quando ele voltar do app, o 'focus' vai disparar e finalizar
+                window.addEventListener('focus', finalizarAcao);
+            };
+
+            window.addEventListener('blur', registrarBlur);
+
+            // Disparamos o WhatsApp (abre a caixinha do navegador)
+            setTimeout(() => {
+                window.location.href = url_whatsapp;
+            }, 500);
+
+            // Cancelar 3 segundos
+            setTimeout(() => {
+                finalizarAcao();
+            }, 3000);
+        }
 
 
         // ==================== NOTIFICATION BADGE ====================
@@ -6860,11 +7014,11 @@
                         { "id": "C04", "nome": "Neide Gomes", "tel": "12981228269", "email": "neidegomes@hotmail.com", "desc": "Mãe pobre, nunca me paga", "initials": "NG", "color": "av-r" }
                     ],
                     "loans": [
-                        { "id": "C02_E01", "clientId": "C02", "valor": 500, "prazo": 7, "juros_tipo": "fixo", "juros_val": 10, "emissao": "2026-05-23", "pago": 0, "pagamentos": [], "compEnvio": [] },
-                        { "id": "C01_E01", "clientId": "C01", "valor": 300, "prazo": 5, "juros_tipo": "fixo", "juros_val": 5, "emissao": "2026-06-04", "pago": 0, "pagamentos": [], "compEnvio": [] },
-                        { "id": "C03_E01", "clientId": "C03", "valor": 800, "prazo": 14, "juros_tipo": "perc", "juros_val": 2, "emissao": "2026-06-02", "pago": 0, "pagamentos": [], "compEnvio": [] },
-                        { "id": "C01_E02", "clientId": "C01", "valor": 200, "prazo": 3, "juros_tipo": "fixo", "juros_val": 5, "emissao": "2026-05-18", "pago": 1, "pagamentos": [{ "id": "C01_E02_P01", "data": "2026-05-19", "valor": 230, "status": "PAGAMENTO COMPLETO", "anexos_pag": [], "totalPagoAntes": 0, "geradoEm": "2026-05-19" }], "compEnvio": [] },
-                        { "id": "C04_E01", "clientId": "C04", "valor": 1200, "prazo": 14, "juros_tipo": "fixo", "juros_val": 20, "emissao": "2026-05-08", "pago": 0, "pagamentos": [{ "id": "C04_E01_P01", "data": "2026-05-28", "valor": 500, "status": "PAGAMENTO PARCIAL", "anexos_pag": [], "totalPagoAntes": 0, "geradoEm": "2026-06-12" }], "compEnvio": [] }
+                        { "id": "C02_E01", "clientId": "C02", "valor": 500, "prazo": 7, "juros_tipo": "fixo", "juros_val": 10, "emissao": "2026-05-23", "pago": 0, "pagamentos": [], "anexo_envio": [] },
+                        { "id": "C01_E01", "clientId": "C01", "valor": 300, "prazo": 5, "juros_tipo": "fixo", "juros_val": 5, "emissao": "2026-06-04", "pago": 0, "pagamentos": [], "anexo_envio": [] },
+                        { "id": "C03_E01", "clientId": "C03", "valor": 800, "prazo": 14, "juros_tipo": "perc", "juros_val": 2, "emissao": "2026-06-02", "pago": 0, "pagamentos": [], "anexo_envio": [] },
+                        { "id": "C01_E02", "clientId": "C01", "valor": 200, "prazo": 3, "juros_tipo": "fixo", "juros_val": 5, "emissao": "2026-05-18", "pago": 1, "pagamentos": [{ "id": "C01_E02_P01", "data": "2026-05-19", "valor": 230, "status": "PAGAMENTO COMPLETO", "anexo_pag": [], "totalPagoAntes": 0, "geradoEm": "2026-05-19" }], "anexo_envio": [] },
+                        { "id": "C04_E01", "clientId": "C04", "valor": 1200, "prazo": 14, "juros_tipo": "fixo", "juros_val": 20, "emissao": "2026-05-08", "pago": 0, "pagamentos": [{ "id": "C04_E01_P01", "data": "2026-05-28", "valor": 500, "status": "PAGAMENTO PARCIAL", "anexo_pag": [], "totalPagoAntes": 0, "geradoEm": "2026-06-12" }], "anexo_envio": [] }
                     ]
                 };
 
@@ -6888,7 +7042,7 @@
         // );
         // if (!res.ok) { throw new Error("Erro ao realizar fetch inicial") };
         // let json_data = await res.json();
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxkaD96lCT4ZLN0dDGg8YCdgH9elVCxO3ni2_vQuPEjMCY0OavdL_nwoGLSyUpBN-j-HA/exec";
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
 
         var DB = {};
 
