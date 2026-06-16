@@ -797,7 +797,7 @@
             color: var(--txt0);
         }
 
-        /* MODAL / BOTTOM SHEET */
+        /* MODAL / BOTTOM SHEET (Apenas o fundo escuro) */
         .overlay {
             display: none;
             position: fixed;
@@ -807,12 +807,31 @@
             align-items: flex-end;
         }
 
+        /* Entrada continua rápida (.3s) */
         .overlay.open {
             display: flex;
-            animation: ovIn .2s ease;
+            animation: fadeBgIn .3s ease forwards;
         }
 
-        @keyframes ovIn {
+        /* Saída agora é mais lenta (.5s) */
+        .overlay.open.closing {
+            animation: fadeBgOut .5s ease forwards;
+        }
+
+        /* --- ANIMAÇÃO DA FOLHA INTERNA (.sheet) --- */
+        /* Entrada (.3s) */
+        .overlay.open .sheet {
+            animation: sheetUp .3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        /* Saída agora é mais lenta (.5s) */
+        .overlay.open.closing .sheet {
+            animation: sheetDown .5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+
+        /* --- KEYFRAMES DO FUNDO --- */
+        @keyframes fadeBgIn {
             from {
                 opacity: 0;
             }
@@ -822,26 +841,49 @@
             }
         }
 
+        @keyframes fadeBgOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* --- KEYFRAMES DA FOLHA --- */
+        @keyframes sheetUp {
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes sheetDown {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(100%);
+            }
+        }
+
+        /* Classe utilitária para desativar animações instantaneamente */
+        .overlay.no-animation,
+        .overlay.no-animation .sheet {
+            animation: none !important;
+        }
+
         .sheet {
             background: var(--bg1);
             border-radius: var(--rad24) var(--rad24) 0 0;
             width: 100%;
             margin-top: 0px;
             margin-bottom: 0px;
-            max-height: 85vh;
-            overflow-y: auto;
-            animation: shUp .28s cubic-bezier(.32, .72, 0, 1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .sheetnot {
-            background: var(--bg1);
-            border-radius: var(--rad24) var(--rad24) 0 0;
-            width: 100%;
-            margin-top: 0px;
-            margin-bottom: -100px;
             max-height: 85vh;
             overflow-y: auto;
             animation: shUp .28s cubic-bezier(.32, .72, 0, 1);
@@ -1597,6 +1639,18 @@
             font-family: var(--font-b);
             font-size: 13px;
             font-weight: 500;
+            border: 1px solid var(--brd2);
+            border-radius: var(--rad12);
+            padding: 13px;
+            cursor: pointer;
+        }
+
+        .cbtn-r {
+            background: var(--bg3);
+            color: var(--danger);
+            font-family: var(--font-b);
+            font-size: 13px;
+            font-weight: 700;
             border: 1px solid var(--brd2);
             border-radius: var(--rad12);
             padding: 13px;
@@ -2519,6 +2573,45 @@
                 display: block;
             }
         }
+
+
+        /* BOTÃO DE FECHAR ANEXO (VISUALIZADOR DE ANEXO) */
+        .sh-close-anexo {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 55px;
+            /* Tamanho excelente para clique no celular */
+            height: 55px;
+            background: rgba(0, 0, 0, 0.5);
+            /* Fundo semi-transparente para dar contraste */
+            color: #ffffff;
+            border-radius: 50%;
+            /* Deixa o fundo redondo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 310;
+            /* Fica acima do overlay (300) e do conteúdo da imagem */
+            pointer-events: auto;
+            /* Garante que o clique funcione mesmo com os eventos de toque da imagem */
+            transition: background 0.2s, transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
+            /* Remove aquele quadrado cinza nativo do Android/iOS ao clicar */
+        }
+
+        /* Tamanho do ícone SVG dentro do botão */
+        .sh-close-anexo svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        /* Efeito sutil ao tocar/passar o mouse */
+        .sh-close-anexo:active {
+            transform: scale(0.9);
+            background: rgba(0, 0, 0, 0.8);
+        }
     </style>
 </head>
 
@@ -3211,7 +3304,7 @@
 
     <!-- Notificações -->
     <div class="overlay" id="notif-sheet" data-backdrop="notif-sheet">
-        <div class="sheetnot" onclick="event.stopPropagation()">
+        <div class="sheet" style="max-height:90vh; margin-bottom:-120px" onclick="event.stopPropagation()">
             <div class="sh-handle"></div>
             <div class="sh-hdr">
                 <div class="sh-title">Notificações</div>
@@ -3273,8 +3366,14 @@
     </div>
 
     <!-- Visualizador de anexos -->
-    <div class="overlay" id="attach-preview-modal" data-backdrop="attach-preview-modal"
-        onclick="closeSheet(document.getElementById('attach-preview-modal'))" style="z-index:300">
+    <div class="overlay" id="attach-preview-modal" data-backdrop="attach-preview-modal" style="z-index:300">
+        <div class="sh-close-anexo" onclick="closeSheet(document.getElementById('attach-preview-modal'))">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+        </div>
         <div id="attach-preview-content"
             style="width:100%; height:100%; display:flex; justify-content:center; align-items:center"></div>
     </div>
@@ -3296,6 +3395,23 @@
                     style="display:none" onchange="onAttachFileSelected(this)">
                 <div id="attach-files-list" class="mt8"></div>
                 <div id="attach-add" class="mt8"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remove Attach Sheet -->
+    <div class="overlay" id="remove-attach" data-backdrop="remove-attach">
+        <div class="sheet" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title">Remover Anexo</div>
+                <div class="sh-close" onclick="closeSheet(document.getElementById('remove-attach'))"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></div>
+            </div>
+            <div class="sh-body" id="remove-sh-body">
             </div>
         </div>
     </div>
@@ -3691,38 +3807,6 @@
                 </div>
             </div>
             <div class="sh-body" id="pag-receipt-body"></div>
-        </div>
-    </div>
-
-    <!-- Anexo de pagamento (1 por pagamento) -->
-    <div class="overlay" id="pag-anexo-sheet" data-backdrop="pag-anexo-sheet">
-        <div class="sheet" onclick="event.stopPropagation()">
-            <div class="sh-handle"></div>
-            <div class="sh-hdr">
-                <div class="sh-title">Anexo do Pagamento</div>
-                <div class="sh-close" onclick="closeSheet(document.getElementById('pag-anexo-sheet'))">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                </div>
-            </div>
-            <div class="sh-body">
-                <p class="fs12 tc1 mb12">Adicione o comprovante do pagamento recebido. Somente 1 arquivo por pagamento.
-                </p>
-                <input type="file" id="pag-anexo-file-input" accept="image/*,application/pdf" style="display:none"
-                    onchange="onPagAnexoFileSelected(this)">
-                <div class="attach-btn" onclick="document.getElementById('pag-anexo-file-input').click()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="17 8 12 3 7 8" />
-                        <line x1="12" y1="3" x2="12" y2="15" />
-                    </svg>
-                    Selecionar arquivo / imagem
-                </div>
-                <div id="pag-anexo-preview" class="mt8"></div>
-                <button class="btn-p mt12" onclick="saveAnexoPag()">Salvar anexo</button>
-            </div>
         </div>
     </div>
 
@@ -4953,11 +5037,11 @@
         }
 
         // Função para abrir a janela de anexos
-        function openAttachSheet(mode, pid) {
+        function openAttachSheet(mode, pid, animate = true) {
             const loan = getLoan(_currentLoanId);
             const pag = loan.pagamentos.find(p => p.id === pid);
             const pag_id = pag ? pag.id : '';
-            
+
 
             let anexo_id, anexo_linha, anexo_id_nome;
 
@@ -4969,7 +5053,7 @@
             } else if (mode == 'pag') {
                 anexo_id = pag.anexo_pag[0] ? pag.anexo_pag[0].anexo_id : '';
                 anexo_linha = pag.anexo_pag[0] ? pag.anexo_pag[0].lin : '';
-                anexo_id_nome = pag_id;                
+                anexo_id_nome = pag_id;
                 document.getElementById('attach-title').textContent = 'Comprovante de Pagamento';
             }
 
@@ -4986,7 +5070,7 @@
                         <img src="${URL_anexo}" style="width:100%; max-height:220px; object-fit:contain; border-radius:8px" onerror="this.onerror=null; this.src='https://placehold.co/300x200?text=ERRO+AO+EXIBIR+ANEXO';">
                         <div style="margin-top:8px; font-size:12px; text-align:center">ANEXO ${anexo_id_nome} 📎</div>
                     </div>
-                    <div style="margin-top:8px; font-size:12px; color:var(--danger); cursor:pointer; text-align:center" onclick="remover_anexo('${anexo_id}', ${anexo_linha}, '${pag_id ? pag_id : ''}', '${mode}')">Deletar</div>
+                    <div style="margin-top:8px; font-size:12px; color:var(--danger); cursor:pointer; text-align:center" onclick="openRemoveAttach('${anexo_id}', ${anexo_linha}, '${pag_id ? pag_id : ''}', '${mode}')">Deletar</div>
                 `;
             } else {
                 box.innerHTML = ``;
@@ -5022,10 +5106,27 @@
                 }
             }
 
-            openSheet('attach-sheet');
+            openSheet('attach-sheet', animate);
         }
 
+        function openRemoveAttach(anexo_id, linha, pid, mode) {
 
+            const box_remove = document.getElementById('remove-sh-body');
+            if (!anexo_id || !linha) {
+                return showToast('Erro ao remover anexo!');
+            } else {
+                box_remove.innerHTML = `
+                    <div class="sh-body">Tem certeza que deseja remover o anexo '${mode == 'loan' ? _currentLoanId : pid}'?</div>
+                    <div class="confirm-btns mt12">
+                        <button class="cbtn-n"
+                            onclick="closeSheet(document.getElementById('remove-attach'))">Cancelar</button>
+                        <button class="cbtn-r" onclick="remover_anexo('${anexo_id}', ${linha}, '${pid}', '${mode}')">Remover →</button>
+                    </div>
+                `;
+            }
+
+            openSheet('remove-attach');
+        }
 
 
 
@@ -5233,7 +5334,7 @@
       </li>`;
         }
 
-        function openTlEvent(lid, pid) {
+        function openTlEvent(lid, pid, animate = true) {
             const loan = getLoan(lid);
             const pag = loan.pagamentos.find(p => p.id === pid);
             if (!pag) return;
@@ -5270,7 +5371,7 @@
             Apagar pagamento
             </button>
         `;
-            openSheet('tl-event-sheet');
+            openSheet('tl-event-sheet', animate);
         }
         // ==================== EDIÇÃO DO EMPRÉSTIMO ====================
         function openDeletePagConfirm(lid, pid) {
@@ -6312,20 +6413,54 @@
         }
 
         // ==================== SHEETS / OVERLAYS ====================
-        function openSheet(id) {
+        function openSheet(id, animate = true) {
             if (id === 'notif-sheet') buildNotif();
-            document.getElementById(id).classList.add('open');
+
+            const el = document.getElementById(id);
+
+            // Se animate for false, adiciona a classe que desativa a animação
+            if (!animate) {
+                el.classList.add('no-animation');
+            } else {
+                el.classList.remove('no-animation');
+            }
+
+            el.classList.remove('closing');
+            el.classList.add('open');
+
             history.pushState({ sheet: id }, '', '');
         }
-        function closeSheet(el) { el.classList.remove('open'); }
+
+        function closeSheet(el, animate = true) {
+            if (el.classList.contains('closing')) return;
+
+            // SE O MODAL QUE ESTÁ FECHANDO FOR O DE PREVIEW, DESLIGA O ZOOM IMEDIATAMENTE
+            if (el.id === 'attach-preview-modal') {
+                destroyZoom();
+            }
+
+            if (!animate) {
+                el.classList.add('no-animation');
+                el.classList.remove('open', 'closing', 'no-animation');
+                return;
+            }
+
+            el.classList.remove('no-animation');
+            el.classList.add('closing');
+
+            setTimeout(() => {
+                el.classList.remove('open', 'closing');
+            }, 500);
+        }
 
         // Backdrop click: only close if clicking directly on the overlay (not the sheet inside)
         document.addEventListener('click', (e) => {
             const overlay = e.target.closest('.overlay');
             if (!overlay) return;
-            // If the click target IS the overlay itself (backdrop area), close it
+
             if (e.target === overlay) {
-                overlay.classList.remove('open');
+                // Fecha com animação normalmente (assume o padrão true)
+                closeSheet(overlay);
             }
         });
 
@@ -6807,22 +6942,21 @@
                     DB = novoDB;
                     //console.log(DB);
 
-                    closeSheet(document.getElementById('attach-sheet'));
-
                     const loan = getLoan(_currentLoanId);
                     if (mode == 'loan') {
                         const loan_anexo = loan.anexo_envio[0] ? loan.anexo_envio[0].anexo_id : '';
                         renderAttachList('ed-comp-envio-list', loan_anexo);
 
-                        openAttachSheet('loan', _currentLoanId);
+                        openAttachSheet('loan', _currentLoanId, false);
                     } else {
                         renderTimeline(loan);
 
-                        openTlEvent(loan.id, anexo_id)
-                        openAttachSheet('pag', anexo_id);
+                        openTlEvent(loan.id, anexo_id, false);
+                        openAttachSheet('pag', anexo_id, false);
                     }
 
 
+                    attachFile = null;
                     hideLoading();
                     showToast('Anexo Salvo');
                 }
@@ -6843,6 +6977,9 @@
             if (!anexo_id || !linha) { return showToast('Erro ao apagar anexo!'); }
 
             showLoading(['APAGANDO ANEXO...', 'APAGANDO NO DRIVE...', 'APAGANDO NA PLANILHA...', 'SINCRONIZANDO...', 'TERMINANDO...']);
+
+            attachFile = null;
+
             const dadosParaEnvio = {
                 id_anexo: anexo_id,
                 lin: linha
@@ -6867,26 +7004,26 @@
                 DB = novoDB;
                 console.log(DB);
 
-                closeSheet(document.getElementById('attach-sheet'));
+                closeSheet(document.getElementById('remove-attach'), false);
 
                 const loan = getLoan(_currentLoanId);
                 if (mode == 'loan') {
                     const loan_anexo = loan.anexo_envio[0] ? loan.anexo_envio[0].anexo_id : '';
                     renderAttachList('ed-comp-envio-list', loan_anexo);
 
-                    openAttachSheet('loan', _currentLoanId);
+                    openAttachSheet('loan', _currentLoanId, false);
                 } else {
                     renderTimeline(loan);
 
                     if (pid) {
-                        openTlEvent(loan.id, pid)
-                        openAttachSheet('pag', pid);
+                        openTlEvent(loan.id, pid, false);
+                        openAttachSheet('pag', pid, false);
                     }
                 }
 
                 hideLoading();
                 showToast('Anexo apagado');
-               
+
             }
             catch (err) {
                 console.log("Erro ao apagar o Anexo");
@@ -6899,17 +7036,220 @@
         }
 
         // Função para abrir o anexo em tela cheia
+        // Variáveis globais para controle do estado do zoom
+        let zoomState = {
+            scale: 1,
+            pointX: 0,
+            pointY: 0,
+            startX: 0,
+            startY: 0,
+            isPanning: false,
+            initialDist: 0,
+            lastTap: 0,
+            targetEl: null
+        };
+
         function openAttachPreview(type, src) {
             const content = document.getElementById('attach-preview-content');
 
             if (type === 'image') {
-                content.innerHTML = `<img src="${src}" style="width:100%; height:100%; object-fit:contain;">`;
+                // Adicionamos uma classe .zoom-target para o JS monitorar o toque nela
+                content.innerHTML = `<img id="preview-img" class="zoom-target" src="${src}" style="width:100%; height:100%; object-fit:contain; transform-origin: center; transition: transform 0.1s ease-out; will-change: transform;">`;
 
+                // Ativa os eventos de zoom na imagem criada
+                setTimeout(() => {
+                    const img = document.getElementById('preview-img');
+                    initZoom(img);
+                }, 50);
             } else {
                 content.innerHTML = `<iframe src="${src}" style="width:100%; height:100%; border:none; background:white;"></iframe>`;
             }
 
             openSheet('attach-preview-modal');
+        }
+
+        // Função para inicializar os eventos de toque na imagem
+        function initZoom(imgEl) {
+            zoomState.targetEl = imgEl;
+            resetZoom(); // Garante que começa zerado
+
+            imgEl.addEventListener('touchstart', handleTouchStart, { passive: false });
+            imgEl.addEventListener('touchmove', handleTouchMove, { passive: false });
+            imgEl.addEventListener('touchend', handleTouchEnd);
+        }
+
+        // Função para destruir os eventos (Evita que o zoom funcione após fechar)
+        function destroyZoom() {
+            if (zoomState.targetEl) {
+                zoomState.targetEl.removeEventListener('touchstart', handleTouchStart);
+                zoomState.targetEl.removeEventListener('touchmove', handleTouchMove);
+                zoomState.targetEl.removeEventListener('touchend', handleTouchEnd);
+                zoomState.targetEl = null;
+            }
+            resetZoom();
+        }
+
+        function resetZoom() {
+            zoomState.scale = 1;
+            zoomState.pointX = 0;
+            zoomState.pointY = 0;
+            if (zoomState.targetEl) {
+                zoomState.targetEl.style.transform = `translate(0px, 0px) scale(1)`;
+            }
+        }
+
+        function handleTouchStart(e) {
+            e.preventDefault(); // Impede o scroll nativo da página por trás
+
+            // --- LÓGICA DE DOUBLE TAP (Dois cliques rápidos no ponto do toque) ---
+            if (e.touches.length === 1) {
+                const now = Date.now();
+                if (now - zoomState.lastTap < 300) {
+                    // Se já tiver zoom, reseta para o estado original
+                    if (zoomState.scale > 1) {
+                        resetZoom();
+                    } else {
+                        // 1. Define o novo nível de zoom desejado (ex: 4x)
+                        const targetScale = 4.0;
+
+                        // 2. Captura onde o dedo tocou na tela
+                        const touchX = e.touches[0].clientX;
+                        const touchY = e.touches[0].clientY;
+
+                        // 3. Pega o centro da tela do celular
+                        const centerX = window.innerWidth / 2;
+                        const centerY = window.innerHeight / 2;
+
+                        // 4. Calcula o deslocamento necessário para trazer o ponto tocado para o centro.
+                        // Multiplicamos pela diferença da escala (targetScale - 1) para compensar o crescimento da imagem.
+                        zoomState.scale = targetScale;
+                        zoomState.pointX = (centerX - touchX) * (targetScale - 1);
+                        zoomState.pointY = (centerY - touchY) * (targetScale - 1);
+
+                        // 5. Aplica as travas de borda e renderiza o zoom na posição correta
+                        updateTransform();
+                    }
+                    zoomState.lastTap = 0;
+                    return;
+                }
+                zoomState.lastTap = now;
+
+                // Configura início do arrasto (Pan) caso o usuário queira apenas arrastar
+                zoomState.isPanning = true;
+                zoomState.startX = e.touches[0].clientX - zoomState.pointX;
+                zoomState.startY = e.touches[0].clientY - zoomState.pointY;
+            }
+            // --- LÓGICA DE INÍCIO DA PINÇA (Dois dedos) ---
+            // --- LÓGICA DE INÍCIO DA PINÇA (Dois dedos) ---
+            else if (e.touches.length === 2) {
+                zoomState.isPanning = false;
+
+                // 1. Calcula a distância inicial entre os dois dedos
+                zoomState.initialDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+
+                // 2. Salva o ponto central inicial entre os dois dedos
+                zoomState.pinchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                zoomState.pinchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+            }
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!zoomState.targetEl) return;
+
+            // --- MOVIMENTANDO A IMAGEM COM ZOOM (Arrastar com 1 dedo) ---
+            if (e.touches.length === 1 && zoomState.isPanning && zoomState.scale > 1) {
+                zoomState.pointX = e.touches[0].clientX - zoomState.startX;
+                zoomState.pointY = e.touches[0].clientY - zoomState.startY;
+                updateTransform();
+            }
+            // --- FAZENDO O MOVIMENTO DE PINÇA (2 dedos) ---
+            else if (e.touches.length === 2) {
+                const dist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                if (dist === 0) return;
+
+                // 1. Calcula o novo fator de escala
+                const factor = dist / zoomState.initialDist;
+                const oldScale = zoomState.scale;
+                const newScale = Math.max(1, Math.min(oldScale * factor, 8)); // Limite de 8x que definimos antes
+
+                // 2. Calcula o centro atual dos dedos neste frame do movimento
+                const currentCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                const currentCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+
+                // 3. A MÁGICA: Ajusta o pointX e pointY para manter o ponto sob os dedos fixo na tela.
+                // Pegamos a distância do centro dos dedos em relação ao centro do visor,
+                // e compensamos a diferença gerada pela mudança de tamanho (newScale / oldScale).
+                const viewCenterX = window.innerWidth / 2;
+                const viewCenterY = window.innerHeight / 2;
+
+                // Deslocamento relativo ao crescimento do zoom baseado no ponto focal atual
+                zoomState.pointX = currentCenterX - viewCenterX - (currentCenterX - viewCenterX - zoomState.pointX) * (newScale / oldScale);
+                zoomState.pointY = currentCenterY - viewCenterY - (currentCenterY - viewCenterY - zoomState.pointY) * (newScale / oldScale);
+
+                // 4. Atualiza os estados globais para o próximo movimento
+                zoomState.scale = newScale;
+                zoomState.initialDist = dist;
+
+                // 5. Aplica as travas perfeitas de borda que você já tem
+                updateTransform();
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (e.touches.length === 0) {
+                zoomState.isPanning = false;
+
+                // Se o usuário tirou os dedos e a escala voltou para 1, centraliza a imagem automaticamente
+                if (zoomState.scale <= 1) {
+                    resetZoom();
+                }
+            }
+        }
+
+
+        // Aplica as transformações de CSS travando TODAS as bordas de forma idêntica
+        function updateTransform() {
+            if (!zoomState.targetEl) return;
+
+            const img = zoomState.targetEl;
+
+            // 1. Pegamos as dimensões reais que a imagem ocupa na tela (desconsiderando o espaço vazio do container)
+            const viewWidth = window.innerWidth;
+            const viewHeight = window.innerHeight;
+
+            const imgRatio = img.naturalWidth / img.naturalHeight;
+            const screenRatio = viewWidth / viewHeight;
+
+            let renderWidth = viewWidth;
+            let renderHeight = viewHeight;
+
+            // Se a imagem for Retrato (Vertical), ela limita pela altura da tela
+            if (imgRatio < screenRatio) {
+                renderWidth = viewHeight * imgRatio;
+            }
+            // Se a imagem for Paisagem (Horizontal), ela limita pela largura da tela
+            else {
+                renderHeight = viewWidth / imgRatio;
+            }
+
+            // 2. Agora o cálculo do Delta usa o tamanho real renderizado da imagem!
+            // Isso remove a folga da borda maior automaticamente.
+            const maxDeltaX = Math.max(0, (renderWidth * zoomState.scale - viewWidth) / 2);
+            const maxDeltaY = Math.max(0, (renderHeight * zoomState.scale - viewHeight) / 2);
+
+            // 3. Trava o arrasto nas extremidades calculadas
+            zoomState.pointX = Math.max(-maxDeltaX, Math.min(zoomState.pointX, maxDeltaX));
+            zoomState.pointY = Math.max(-maxDeltaY, Math.min(zoomState.pointY, maxDeltaY));
+
+            // 4. Aplica no CSS
+            img.style.transform = `translate(${zoomState.pointX}px, ${zoomState.pointY}px) scale(${zoomState.scale})`;
         }
 
 
