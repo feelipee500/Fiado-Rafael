@@ -2836,7 +2836,7 @@
                                 <div class="fl">Descrição (opcional)</div><textarea class="fi fi-ta" id="nc-desc"
                                     placeholder="Observações sobre o cliente…"></textarea>
                             </div>
-                            <button class="btn-p" onclick="saveNewClient()">Salvar e continuar</button>
+                            <button class="btn-p" onclick="add_cliente()">Salvar e continuar</button>
                             <button class="btn-s" onclick="cancelNovoCliente()">Cancelar</button>
                         </div>
                     </div>
@@ -3630,19 +3630,6 @@
                     </svg></div>
             </div>
             <div class="sh-body" style="padding-bottom:8px">
-                <div class="menu-item" onclick="closeSheet(document.getElementById('emp-menu-sheet'));openEditEmp()">
-                    <div class="menu-item-left">
-                        <div class="menu-icon mi-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="1.8" stroke-linecap="round">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                            </svg></div>
-                        <div>
-                            <div class="menu-label">Editar empréstimo</div>
-                            <div class="fs11 tc2">Alterar valor, prazo, data, juros</div>
-                        </div>
-                    </div>
-                </div>
                 <div class="menu-item" id="emp-menu-mark-paid"
                     onclick="closeSheet(document.getElementById('emp-menu-sheet'));openMarkPaidConfirm()">
                     <div class="menu-item-left">
@@ -3654,6 +3641,19 @@
                         <div>
                             <div class="menu-label" id="emp-menu-mark-lbl">Marcar como pago</div>
                             <div class="fs11 tc2" id="emp-menu-mark-sub">Quita manualmente sem registrar pagamento</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="closeSheet(document.getElementById('emp-menu-sheet'));openEditEmp()">
+                    <div class="menu-item-left">
+                        <div class="menu-icon mi-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg></div>
+                        <div>
+                            <div class="menu-label">Editar empréstimo</div>
+                            <div class="fs11 tc2">Alterar valor, prazo, data, juros</div>
                         </div>
                     </div>
                 </div>
@@ -3690,18 +3690,22 @@
                     </svg></div>
             </div>
             <div class="sh-body">
+                <div class="fl" style="text-align:center; font-size:14px; color:var(--danger)">AO EDITAR, O EMPRESTIMO
+                    SERÁ REINICIADO<br>E TODOS OS PAGAMENTOS E ANEXOS<br>SERÃO PERDIDOS</div>
                 <div class="fg">
-                    <div class="fl">Valor emprestado (R$) *</div><input class="fi" id="ee-valor" type="number" min="1"
-                        step="0.01" placeholder="0,00" oninput="refreshEditEmpPreview()">
+                    <div class="fl">Valor emprestado (R$) *</div>
+                    <input class="fi" id="ee-valor" type="number" min="1" step="0.01" placeholder="0,00"
+                        oninput="refreshEditEmpPreview()">
                 </div>
                 <div class="fr">
                     <div class="fg">
-                        <div class="fl">Data de emissão *</div><input class="fi" id="ee-data" type="date"
-                            onchange="refreshEditEmpPreview()">
+                        <div class="fl">Data de emissão *</div>
+                        <input class="fi" id="ee-data" type="date" onchange="refreshEditEmpPreview()">
                     </div>
                     <div class="fg">
-                        <div class="fl">Prazo (dias) *</div><input class="fi" id="ee-prazo" type="number" min="1"
-                            placeholder="Ex: 7" oninput="refreshEditEmpPreview()">
+                        <div class="fl">Prazo (dias) *</div>
+                        <input class="fi" id="ee-prazo" type="number" min="1" placeholder="Ex: 7"
+                            oninput="refreshEditEmpPreview()">
                     </div>
                 </div>
                 <div class="fr">
@@ -4245,13 +4249,11 @@
                 { count: done, color: '#00e8a2', label: 'Pago', filter: 'done' },
             ];
 
-            // helper: polar to cartesian
             function polar(cx, cy, r, angleDeg) {
                 const rad = (angleDeg - 90) * Math.PI / 180;
                 return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
             }
 
-            // helper: arc path between two angles
             function arcPath(cx, cy, r, startDeg, endDeg) {
                 const start = polar(cx, cy, r, startDeg);
                 const end = polar(cx, cy, r, endDeg);
@@ -4261,10 +4263,8 @@
 
             let svgHTML = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#ffffff08" stroke-width="${stroke}"/>`;
 
-            if (total === 0) {
-                // empty state — single grey ring
-            } else {
-                const GAP_DEG = total > 1 ? 3 : 0; // gap in degrees between segments
+            if (total > 0) {
+                const GAP_DEG = total > 1 ? 3 : 0;
                 let startDeg = 0;
 
                 segments.forEach(seg => {
@@ -4272,19 +4272,29 @@
                     const sliceDeg = (seg.count / total) * 360;
                     const endDeg = startDeg + sliceDeg;
 
-                    // apply gap: shrink each segment by half a gap on each side
+                    // Segmento único (100%) — arco de 0→360 degenera, usar <circle> completo
+                    if (seg.count === total) {
+                        svgHTML += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
+                            stroke="${seg.color}" stroke-width="${stroke}"
+                            style="cursor:pointer;transition:opacity .15s"
+                            onclick="navTo('emprestimos','${seg.filter}')"
+                            onmouseenter="this.style.opacity='.65'" onmouseleave="this.style.opacity='1'"
+                        />`;
+                        startDeg = endDeg;
+                        return;
+                    }
+
                     const s = startDeg + GAP_DEG / 2;
                     const e = endDeg - GAP_DEG / 2;
 
-                    // only draw if there's enough arc left after gap
                     if (e - s > 0.5) {
                         const d = arcPath(cx, cy, r, s, e);
                         svgHTML += `<path d="${d}" fill="none"
-          stroke="${seg.color}" stroke-width="${stroke}" stroke-linecap="butt"
-          style="cursor:pointer;transition:opacity .15s"
-          onclick="navTo('emprestimos','${seg.filter}')"
-          onmouseenter="this.style.opacity='.65'" onmouseleave="this.style.opacity='1'"
-        />`;
+                            stroke="${seg.color}" stroke-width="${stroke}" stroke-linecap="butt"
+                            style="cursor:pointer;transition:opacity .15s"
+                            onclick="navTo('emprestimos','${seg.filter}')"
+                            onmouseenter="this.style.opacity='.65'" onmouseleave="this.style.opacity='1'"
+                        />`;
                     }
 
                     startDeg = endDeg;
@@ -4473,7 +4483,11 @@
             document.getElementById('novo-client-list').style.display = '';
             renderNovoClientList();
         }
-        function saveNewClient() {
+
+        // FUNÇÃO PARA ADICIONAR NOVOS CLIENTES
+        async function add_cliente() {
+            showLoading(['CRIANDO NOVO CLIENTE...', 'VERIFICANDO DADOS...', 'ENVIANDO PARA PLANILHA...', 'SINCRONIZANDO...', 'ATUALIZANDO LISTA...', 'TERMINANDO...']);
+
             const nome = document.getElementById('nc-nome').value.trim();
             const tel = document.getElementById('nc-tel').value.trim();
             const email = document.getElementById('nc-email').value.trim();
@@ -4482,15 +4496,205 @@
             const initials = nome.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase();
             const colors = ['av-g', 'av-b', 'av-a', 'av-r', 'av-p'];
             const color = colors[DB.clients.length % colors.length];
-            const id = 'C' + String(DB.clients.length + 1).padStart(2, '0');
-            DB.clients.push({ id, nome, tel, email, desc, initials, color });
+            const qtd_emps = 0;
+
+            // Criar o novo id do Cliente atual
+            const ids_total_c = DB.ids_total_c;
+            let novo_id = "C" + String(ids_total_c + 1).padStart(2, '0');
+            const id = novo_id;
+
+            const cliente = { ids_total_c, id, nome, tel, email, desc, initials, color, qtd_emps };
+
+            try {
+                console.log("Adicionando novo cliente na planilha...");
+                const data_fetch = { data: cliente, funcao: 'add_cliente' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - add cliente") };
+
+                const novoDB = await res.json();
+
+                if (novoDB.error) {
+                    throw new Error(novoDB.error);
+                }
+
+                console.log("Novo Cliente adicionado com sucesso");
+                DB = novoDB;
+            }
+            catch (err) {
+                console.log("Erro ao adicionar o novo Cliente");
+                console.log(err);
+
+                DB.clients.push({ id, nome, tel, email, desc, initials, color });
+                DB.time = Date.now();
+            }
+
+            // Salvar backup local
+            backup_local();
+
             document.getElementById('nc-nome').value = ''; document.getElementById('nc-tel').value = ''; document.getElementById('nc-email').value = ''; document.getElementById('nc-desc').value = '';
             cancelNovoCliente();
             _novoSelectedClientId = id;
             renderNovoClientList();
+
+            hideLoading();
             setTimeout(() => goToStep2(), 100);
             showToast('Cliente salvo!', 'ok');
         }
+
+        function openEditCliente() {
+            const c = getClient(_currentClientId);
+            if (!c) return;
+            document.getElementById('ec-nome').value = c.nome || '';
+            document.getElementById('ec-tel').value = c.tel || '';
+            document.getElementById('ec-email').value = c.email || '';
+            document.getElementById('ec-desc').value = c.desc || '';
+            openSheet('edit-client-sheet');
+        }
+
+        function preConfirmarEditCliente() {
+            const nome = document.getElementById('ec-nome').value.trim();
+            const tel = document.getElementById('ec-tel').value.trim();
+            const email = document.getElementById('ec-email').value.trim();
+            const desc = document.getElementById('ec-desc').value.trim();
+            if (!nome || !tel) { showToast('Nome e telefone são obrigatórios', 'err'); return; }
+
+            const c = getClient(_currentClientId);
+            const mudou = (field, novo) => novo !== (c[field] || '') ?
+                `<div class="dr"><div class="dk">${field === 'nome' ? 'Nome' : field === 'tel' ? 'Telefone' : field === 'email' ? 'E-mail' : 'Notas'}</div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                    <div class="dv2 tc2" style="text-decoration:line-through;font-size:11px">${c[field] || '—'}</div>
+                    <div class="dv2 c-g fw6">${novo || '—'}</div>
+                </div>
+                </div>` : '';
+
+            const alteracoes = [mudou('nome', nome), mudou('tel', tel), mudou('email', email), mudou('desc', desc)].filter(Boolean).join('');
+
+            document.getElementById('edit-client-confirm-body').innerHTML = `
+                <div class="warn-box" style="background:#3d7fff12;border-color:#3d7fff40;margin-bottom:12px">
+                <div class="wb-t" style="color:var(--acc2)">Revisar alterações</div>
+                <div class="wb-d">Confirme as mudanças abaixo antes de salvar.</div>
+                </div>
+                <div class="card-sm mb12">
+                ${alteracoes || '<div class="fs12 tc2 text-center" style="padding:8px 0">Nenhuma alteração detectada.</div>'}
+                </div>
+                <div class="confirm-btns">
+                <button class="cbtn-n" onclick="closeSheet(document.getElementById('edit-client-confirm-sheet'))">← Rever</button>
+                <button class="cbtn-y" ${!alteracoes ? 'disabled style="opacity:.4"' : ''} onclick="add_cliente_edit('${nome.replace(/'/g, "\\'")}','${tel.replace(/'/g, "\\'")}','${email.replace(/'/g, "\\'")}','${desc.replace(/'/g, "\\'").replace(/\n/g, ' ')}')">Salvar ✓</button>
+                </div>`;
+
+            openSheet('edit-client-confirm-sheet');
+        }
+
+        // Função para editar os dados do cliente
+        async function add_cliente_edit(nome_edit, tel_edit, email_edit, desc_edit) {
+            const c = getClient(_currentClientId);
+            if (!c) return;
+
+            showLoading(['EDITANDO CLIENTE...', 'VERIFICANDO DADOS...', 'ENVIANDO PARA PLANILHA...', 'SINCRONIZANDO...', 'ATUALIZANDO LISTA...', 'TERMINANDO...']);
+
+            const id = _currentClientId;
+            const nome = nome_edit;
+            const tel = tel_edit;
+            const email = email_edit;
+            const desc = desc_edit;
+            const initials = nome_edit.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase();
+            const color = c.color;
+            const lin = c.lin;
+            const qtd_emps = c.qtd_emps;
+            const ids_total_c = DB.ids_total_c;
+
+            const cliente = { ids_total_c, id, nome, tel, email, desc, initials, color, qtd_emps, lin };
+
+            try {
+                console.log("Editando o cliente na planilha...");
+                const data_fetch = { data: cliente, funcao: 'add_cliente' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - add cliente") };
+
+                const novoDB = await res.json();
+
+                if (novoDB.error) {
+                    throw new Error(novoDB.error);
+                }
+
+                console.log("Cliente editado com sucesso");
+                DB = novoDB;
+            }
+            catch (err) {
+                console.log("Erro ao editar o Cliente");
+                console.log(err);
+
+                c = { id, nome, tel, email, desc, initials, color, qtd_emps, lin };
+                DB.time = Date.now();
+            }
+
+            // Salvar backup local
+            backup_local();
+
+            closeSheet(document.getElementById('edit-client-confirm-sheet'));
+            closeSheet(document.getElementById('edit-client-sheet'));
+            hideLoading();
+
+            showToast('Cliente atualizado! ✓', 'ok');
+            // Re-render the detail screen with updated data
+            setTimeout(() => openClienteDetalhe(_currentClientId), 300);
+        }
+
+        // FUNÇÃO PARA ADICIONAR NOVOS CLIENTES
+        async function del_cliente(completo) {
+            showLoading(['DELETANDO CLIENTE...', 'APAGANDO DADOS...', 'REMOVENDO EMPRESTIMOS...', 'ATUALIZANDO PLANILHA...', 'REMOVENDO ANEXOS...', 'SINCRONIZANDO...', 'ATUALIZANDO LISTA...', 'TERMINANDO...']);
+
+            const c = getClient(_currentClientId);
+            const id = c.id;
+            const lin = c.lin;
+            const lins_emps = c.lins_emps;
+            const lins_pags = c.lins_pags;
+            const completo_x = completo ? true : false;
+
+            const dados_apagar = { id, lin, lins_emps, lins_pags, completo_x };
+
+            try {
+                console.log("DELETANDO cliente da planilha...");
+                const data_fetch = { data: dados_apagar, funcao: 'del_cliente' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - del cliente") };
+
+                const novoDB = await res.json();
+
+                if (novoDB.error) {
+                    throw new Error(novoDB.error);
+                }
+
+                console.log("Cliente deletado com sucesso");
+                DB = novoDB;
+            }
+            catch (err) {
+                console.log("Erro ao deletar Cliente");
+                console.log(err);
+
+            }
+
+            // Salvar backup local
+            backup_local();
+
+            //renderClientes();
+            backFromClienteDetalhe();
+
+            hideLoading();
+            setTimeout(() => goToStep2(), 100);
+            showToast('Cliente deletado!', 'ok');
+        }
+
+
         function backToStep1() {
             document.getElementById('novo-step-1').style.display = '';
             document.getElementById('novo-step-2').style.display = 'none';
@@ -4604,7 +4808,8 @@
             if (parseDate(dataEmissao) > TODAY) { showToast('A data de emissão não pode ser no futuro', 'err'); return; }
             // Validate valor
             if (valor <= 0) { showToast('O valor presisa ser maior que 0', 'err'); return; }
-            _newLoanData = { clientId: _novoSelectedClientId, valor, prazo: prazoRaw, emissao: dataEmissao, juros_tipo: jurosTipo, juros_val: jurosVal };
+            const c = getClient(_novoSelectedClientId);
+            _newLoanData = { clientId: c.id, lin_cliente: c.lin, qtd_emps: c.qtd_emps, valor, prazo: prazoRaw, emissao: dataEmissao, juros_tipo: jurosTipo, juros_val: jurosVal };
             renderPreview();
             // Show preview screen directly without touching navStack (stays on 'novo')
             document.querySelectorAll('.scr').forEach(s => s.classList.remove('act'));
@@ -4680,42 +4885,42 @@
                 if (!isPastVenc) {
                     const diasRestantes = diffDays(TODAY, venc);
                     situacaoRetroHTML = `<div class="prev-box ok-bdr mb12"><div class="sc-lbl">Situação se tivesse sido emitido naquela data</div>
-        <div class="dr"><div class="dk">Status hoje</div><div class="dv2">${statusPill('ok')}</div></div>
-        <div class="dr"><div class="dk">Dias passados</div><div class="dv2">${diasPassados} dias</div></div>
-        <div class="dr" style="border:none"><div class="dk">Dias até vencer</div><div class="dv2 c-g">${diasRestantes} dias restantes</div></div>
-      </div>`;
+                    <div class="dr"><div class="dk">Status hoje</div><div class="dv2">${statusPill('ok')}</div></div>
+                    <div class="dr"><div class="dk">Dias passados</div><div class="dv2">${diasPassados} dias</div></div>
+                    <div class="dr" style="border:none"><div class="dk">Dias até vencer</div><div class="dv2 c-g">${diasRestantes} dias restantes</div></div>
+                </div>`;
                 } else {
                     situacaoRetroHTML = `<div class="prev-box err-bdr mb12"><div class="sc-lbl">Situação se tivesse sido emitido naquela data</div>
-        <div class="dr"><div class="dk">Status hoje</div><div class="dv2">${statusPill('late')}</div></div>
-        <div class="dr"><div class="dk">Dias de atraso</div><div class="dv2 c-r">${diasAtraso} dias</div></div>
-        <div class="dr"><div class="dk">Juros acumulados</div><div class="dv2 c-r">${fmtMoney(totalJuros)}</div></div>
-        <div class="dr" style="border:none"><div class="dk">Valor a pagar HOJE</div><div class="dv2 c-r fw6 fs12">${fmtMoney(valorHoje)}</div></div>
-      </div>`;
+                    <div class="dr"><div class="dk">Status hoje</div><div class="dv2">${statusPill('late')}</div></div>
+                    <div class="dr"><div class="dk">Dias de atraso</div><div class="dv2 c-r">${diasAtraso} dias</div></div>
+                    <div class="dr"><div class="dk">Juros acumulados</div><div class="dv2 c-r">${fmtMoney(totalJuros)}</div></div>
+                    <div class="dr" style="border:none"><div class="dk">Valor a pagar HOJE</div><div class="dv2 c-r fw6 fs12">${fmtMoney(valorHoje)}</div></div>
+                </div>`;
                 }
             }
 
             document.getElementById('preview-content').innerHTML = `
-    <div class="prev-box ok-bdr mb12">
-      <div class="text-center mb12">
-        <div class="fs12 tc2">Para</div>
-        <div style="font-size:16px;font-weight:700;font-family:var(--font-d)">${c.nome}</div>
-        <div class="fs11 tc2">${c.tel}</div>
-      </div>
-      <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2 fw6">${fmtMoney(d.valor)}</div></div>
-      <div class="dr"><div class="dk">Lucro (${Math.round(pr * 100)}% — ${d.prazo} dias)</div><div class="dv2 c-g">+ ${fmtMoney(valorBase - d.valor)}</div></div>
-      <div class="dr"><div class="dk">Valor a pagar (prazo)</div><div class="dv2 fw6 c-g" style="font-size:16px">${fmtMoney(valorBase)}</div></div>
-      <div class="dr"><div class="dk">Data de emissão</div><div class="dv2">${fmtDate(d.emissao)}</div></div>
-      <div class="dr"><div class="dk">Prazo de pagamento</div><div class="dv2">${d.prazo} dias</div></div>
-      <div class="dr" style="border:none"><div class="dk">Data de vencimento</div><div class="dv2 fw6">${fmtDate(dateStr(venc))}</div></div>
-    </div>
-    ${situacaoRetroHTML}
-    <div class="card mb12">
-      <div class="sc-lbl">Previsão de juros por atraso — ${d.juros_tipo === 'fixo' ? fmtMoney(d.juros_val) + '/dia' : `${d.juros_val}%/dia`}</div>
-      <div style="overflow-x:auto">
-        <table class="ptbl"><thead><tr><th>Data</th><th>Dia</th><th>Juros</th><th>Total</th></tr></thead><tbody>${tblRows}</tbody></table>
-      </div>
-    </div>
-  `;
+                <div class="prev-box ok-bdr mb12">
+                <div class="text-center mb12">
+                    <div class="fs12 tc2">Para</div>
+                    <div style="font-size:16px;font-weight:700;font-family:var(--font-d)">${c.nome}</div>
+                    <div class="fs11 tc2">${c.tel}</div>
+                </div>
+                <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2 fw6">${fmtMoney(d.valor)}</div></div>
+                <div class="dr"><div class="dk">Lucro (${Math.round(pr * 100)}% — ${d.prazo} dias)</div><div class="dv2 c-g">+ ${fmtMoney(valorBase - d.valor)}</div></div>
+                <div class="dr"><div class="dk">Valor a pagar (prazo)</div><div class="dv2 fw6 c-g" style="font-size:16px">${fmtMoney(valorBase)}</div></div>
+                <div class="dr"><div class="dk">Data de emissão</div><div class="dv2">${fmtDate(d.emissao)}</div></div>
+                <div class="dr"><div class="dk">Prazo de pagamento</div><div class="dv2">${d.prazo} dias</div></div>
+                <div class="dr" style="border:none"><div class="dk">Data de vencimento</div><div class="dv2 fw6">${fmtDate(dateStr(venc))}</div></div>
+                </div>
+                ${situacaoRetroHTML}
+                <div class="card mb12">
+                <div class="sc-lbl">Previsão de juros por atraso — ${d.juros_tipo === 'fixo' ? fmtMoney(d.juros_val) + '/dia' : `${d.juros_val}%/dia`}</div>
+                <div style="overflow-x:auto">
+                    <table class="ptbl"><thead><tr><th>Data</th><th>Dia</th><th>Juros</th><th>Total</th></tr></thead><tbody>${tblRows}</tbody></table>
+                </div>
+                </div>
+            `;
         }
         function irParaEmprestimoAposCriar() { openEmpDetalhe(_currentLoanId); }
         function confirmarEmprestimo() {
@@ -4728,55 +4933,53 @@
             const jurosTxt = d.juros_tipo === 'fixo' ? fmtMoney(d.juros_val) + '/dia' : d.juros_val + '%/dia';
 
             document.getElementById('novo-emp-confirm-body').innerHTML = `
-        <div class="warn-box" style="background:#3d7fff12;border-color:#3d7fff40;margin-bottom:12px">
-          <div class="wb-t" style="color:var(--acc2)">Você tem certeza?</div>
-          <div class="wb-d">Revise os dados abaixo antes de confirmar. Esta ação não pode ser desfeita.</div>
-        </div>
-        <div class="card-sm mb12">
-          <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${c.nome}</div></div>
-          <div class="dr"><div class="dk">Data de emissão</div><div class="dv2">${fmtDate(d.emissao)}</div></div>
-          <div class="dr"><div class="dk">Prazo</div><div class="dv2">${d.prazo} dias</div></div>
-          <div class="dr"><div class="dk">Vencimento</div><div class="dv2 fw6">${fmtDate(dateStr(venc))}</div></div>
-          <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(d.valor)}</div></div>
-          <div class="dr"><div class="dk">Valor a receber (+${Math.round(pr * 100)}%)</div><div class="dv2 c-g fw6" style="font-size:16px">${fmtMoney(valorBase)}</div></div>
-          <div class="dr" style="border:none"><div class="dk">Juros de atraso</div><div class="dv2 c-r">${jurosTxt}</div></div>
-        </div>
-        <div class="confirm-btns">
-          <button class="cbtn-n" onclick="closeSheet(document.getElementById('novo-emp-confirm-sheet'))">← Rever</button>
-          <button class="cbtn-y" onclick="executarCriarEmprestimo()">Criar empréstimo ✓</button>
-        </div>`;
+                <div class="warn-box" style="background:#3d7fff12;border-color:#3d7fff40;margin-bottom:12px">
+                <div class="wb-t" style="color:var(--acc2)">Você tem certeza?</div>
+                <div class="wb-d">Revise os dados abaixo antes de confirmar. Esta ação não pode ser desfeita.</div>
+                </div>
+                <div class="card-sm mb12">
+                <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${c.nome}</div></div>
+                <div class="dr"><div class="dk">Data de emissão</div><div class="dv2">${fmtDate(d.emissao)}</div></div>
+                <div class="dr"><div class="dk">Prazo</div><div class="dv2">${d.prazo} dias</div></div>
+                <div class="dr"><div class="dk">Vencimento</div><div class="dv2 fw6">${fmtDate(dateStr(venc))}</div></div>
+                <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(d.valor)}</div></div>
+                <div class="dr"><div class="dk">Valor a receber (+${Math.round(pr * 100)}%)</div><div class="dv2 c-g fw6" style="font-size:16px">${fmtMoney(valorBase)}</div></div>
+                <div class="dr" style="border:none"><div class="dk">Juros de atraso</div><div class="dv2 c-r">${jurosTxt}</div></div>
+                </div>
+                <div class="confirm-btns">
+                <button class="cbtn-n" onclick="closeSheet(document.getElementById('novo-emp-confirm-sheet'))">← Rever</button>
+                <button class="cbtn-y" onclick="add_emprestimo()">Criar empréstimo ✓</button>
+                </div>`;
 
             openSheet('novo-emp-confirm-sheet');
         }
 
-        async function executarCriarEmprestimo() {
+        async function add_emprestimo() {
             console.log("Gerando novo emprestimo...");
             showLoading(['Adicionando Novo Emprestimo...', 'Atualizando Dados...', 'Aguarde...', 'Gerando Comprovante...', 'Finalizando...']);
 
             closeSheet(document.getElementById('novo-emp-confirm-sheet'));
             const d = _newLoanData;
 
+            const clientId = d.clientId;
+            const valor = d.valor;
+            const prazo = d.prazo;
+            const juros_tipo = d.juros_tipo;
+            const juros_val = d.juros_val;
+            const emissao = d.emissao;
+            const lin_cliente = d.lin_cliente;
+            const novo_qtd_emps = d.qtd_emps + 1;
+
             // Criar o novo id do emprestimo atual
-            let clientLoans = structuredClone(DB.loans.filter(l => l.clientId === d.clientId));
-            let novo_id = "";
-            if (clientLoans.length > 0) {
-                clientLoans.sort((a, b) => b.id.localeCompare(a.id));
-                let id_max = clientLoans[0].id;
-                const partes = id_max.split('_');
-                const prefixo = 'E';
-                const numeroAtual = parseInt(partes[1].slice(1), 10);
-                const novoNumero = numeroAtual + 1;
-                const novaFormatada = prefixo + String(novoNumero).padStart(2, '0');
-                partes[1] = novaFormatada;
-                novo_id = partes.join('_');
-            } else {
-                novo_id = d.clientId + '_E01';
-            }
+            let novo_id = clientId + "_E" + String(novo_qtd_emps).padStart(2, '0');
+
             const id = novo_id;
+            const pago = 0;
+            const qtd_pags = 0;
 
-            const loan = { id, clientId: d.clientId, valor: d.valor, prazo: d.prazo, juros_tipo: d.juros_tipo, juros_val: d.juros_val, emissao: d.emissao, pago: 0, pagamentos: [], anexo_envio: [] };
-            console.log("Novo emprestimo criado");
+            const qtd_emps = d.qtd_emps + 1;
 
+            const loan = { id, clientId, valor, prazo, juros_tipo, juros_val, emissao, pago, qtd_pags, lin_cliente, novo_qtd_emps };
 
             try {
                 console.log("Adicionando empréstimo na planilha...");
@@ -4789,7 +4992,9 @@
 
                 const novoDB = await res.json();
 
-                if (novoDB.success === false) {
+                if (!novoDB.time || novoDB.time <= DB.time) {
+                    console.log('novoDB');
+                    console.log(novoDB);
                     throw new Error(novoDB.error);
                 }
 
@@ -4799,9 +5004,6 @@
             catch (err) {
                 console.log("Erro ao adicionar novo emprestimo");
                 console.log(err);
-
-                DB.loans.push(loan);
-                DB.time = Date.now();
             }
 
 
@@ -4811,7 +5013,8 @@
             _currentLoanId = id;
             hideLoading();
 
-            renderComprovante(loan);
+            const newloan = getLoan(id);
+            renderComprovante(newloan);
             navTo('comprovante');
         }
 
@@ -4822,25 +5025,25 @@
             const venc = addDays(parseDate(loan.emissao), loan.prazo);
             const pr = getProfitRate(loan.prazo);
             document.getElementById('comp-content').innerHTML = `
-      <div class="receipt-head">
-        <div class="receipt-logo">EMPRÉS<span>TIMOS</span></div>
-        <div class="receipt-title">Comprovante de Empréstimo</div>
-        <div class="receipt-id">${loan.id}</div>
-      </div>
-      <div class="dv"></div>
-      <div class="dr"><div class="dk">Cliente</div><div class="dv2">${c.nome}</div></div>
-      <div class="dr"><div class="dk">Telefone</div><div class="dv2">${c.tel}</div></div>
-      <div class="dr"><div class="dk">Emissão</div><div class="dv2">${fmtDate(loan.emissao)}</div></div>
-      <div class="dr"><div class="dk">Prazo</div><div class="dv2">${loan.prazo} dias</div></div>
-      <div class="dr"><div class="dk">Vencimento</div><div class="dv2 fw6">${fmtDate(dateStr(venc))}</div></div>
-      <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(loan.valor)}</div></div>
-      <div class="dr"><div class="dk">Lucro (${Math.round(pr * 100)}%)</div><div class="dv2 c-g">+ ${fmtMoney(calc.valorBase - loan.valor)}</div></div>
-      <div class="dr" style="border:none"><div class="dk">Valor a pagar no prazo</div><div class="dv2 c-g fw6" style="font-size:16px">${fmtMoney(calc.valorBase)}</div></div>
-      <div class="dv"></div>
-      <div style="background:#00e8a210;border-radius:var(--rad8);padding:10px;text-align:center;margin-top:8px">
-        <div class="fs11 tc1">Juros de atraso: <strong>${loan.juros_tipo === 'fixo' ? fmtMoney(loan.juros_val) + '/dia' : loan.juros_val + '%/dia'}</strong></div>
-      </div>
-    `;
+            <div class="receipt-head">
+                <div class="receipt-logo">EMPRÉS<span>TIMOS</span></div>
+                <div class="receipt-title">Comprovante de Empréstimo</div>
+                <div class="receipt-id">${loan.id}</div>
+            </div>
+            <div class="dv"></div>
+            <div class="dr"><div class="dk">Cliente</div><div class="dv2">${c.nome}</div></div>
+            <div class="dr"><div class="dk">Telefone</div><div class="dv2">${c.tel}</div></div>
+            <div class="dr"><div class="dk">Emissão</div><div class="dv2">${fmtDate(loan.emissao)}</div></div>
+            <div class="dr"><div class="dk">Prazo</div><div class="dv2">${loan.prazo} dias</div></div>
+            <div class="dr"><div class="dk">Vencimento</div><div class="dv2 fw6">${fmtDate(dateStr(venc))}</div></div>
+            <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(loan.valor)}</div></div>
+            <div class="dr"><div class="dk">Lucro (${Math.round(pr * 100)}%)</div><div class="dv2 c-g">+ ${fmtMoney(calc.valorBase - loan.valor)}</div></div>
+            <div class="dr" style="border:none"><div class="dk">Valor a pagar no prazo</div><div class="dv2 c-g fw6" style="font-size:16px">${fmtMoney(calc.valorBase)}</div></div>
+            <div class="dv"></div>
+            <div style="background:#00e8a210;border-radius:var(--rad8);padding:10px;text-align:center;margin-top:8px">
+                <div class="fs11 tc1">Juros de atraso: <strong>${loan.juros_tipo === 'fixo' ? fmtMoney(loan.juros_val) + '/dia' : loan.juros_val + '%/dia'}</strong></div>
+            </div>
+            `;
 
         }
         // ==================== CLIENTES ====================
@@ -5157,45 +5360,45 @@
             const chevSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>';
 
             return `<div class="tl-juros-group">
-        <li class="tl-item" style="cursor:pointer" onclick="(function(){
-          var el=document.getElementById('${itemsId}');
-          var ch=document.getElementById('${chevId}');
-          var open=el.classList.toggle('open');
-          ch.classList.toggle('open',open);
-        })()">
-          <div class="tl-dot td-r" style="margin-top:10px">${iconSvg}</div>
-          <div class="tl-card tl-card-late">
-            <div class="tl-card-top">
-              <div class="tl-card-title">${rangeLabel}</div>
-              <div style="display:flex;align-items:center;gap:6px">
-                <div class="tl-card-date">${dateLabel}</div>
-                <div class="tl-juros-chevron" id="${chevId}">${chevSvg}</div>
-              </div>
-            </div>
-            <div class="tl-card-rows">
-              <div class="tl-card-row">
-                <span class="tl-row-lbl">Juros/dia</span>
-                <span class="tl-row-val" style="color:var(--danger)">+ ${fmtMoney(jDia)}</span>
-              </div>
-              <div class="tl-card-row">
-                <span class="tl-row-lbl">Dívida inicial do período</span>
-                <span class="tl-row-val" style="color:var(--txt1)">${fmtMoney(saldoIni)}</span>
-              </div>
-              <div class="tl-card-row">
-                <span class="tl-row-lbl">Juros acumulados (${n}d)</span>
-                <span class="tl-row-val" style="color:var(--danger)">+ ${fmtMoney(totalJuros)}</span>
-              </div>
-              <div class="tl-card-row">
-                <span class="tl-row-lbl">Dívida acumulada</span>
-                <span class="tl-row-val tl-highlight" style="color:var(--danger)">${fmtMoney(saldoFim)}</span>
-              </div>
-            </div>
-          </div>
-        </li>
-        <div class="tl-juros-items" id="${itemsId}">
-          <ul class="tl" style="padding:4px 0 0">${itemsHTML}</ul>
-        </div>
-      </div>`;
+                <li class="tl-item" style="cursor:pointer" onclick="(function(){
+                var el=document.getElementById('${itemsId}');
+                var ch=document.getElementById('${chevId}');
+                var open=el.classList.toggle('open');
+                ch.classList.toggle('open',open);
+                })()">
+                <div class="tl-dot td-r" style="margin-top:10px">${iconSvg}</div>
+                <div class="tl-card tl-card-late">
+                    <div class="tl-card-top">
+                    <div class="tl-card-title">${rangeLabel}</div>
+                    <div style="display:flex;align-items:center;gap:6px">
+                        <div class="tl-card-date">${dateLabel}</div>
+                        <div class="tl-juros-chevron" id="${chevId}">${chevSvg}</div>
+                    </div>
+                    </div>
+                    <div class="tl-card-rows">
+                    <div class="tl-card-row">
+                        <span class="tl-row-lbl">Juros/dia</span>
+                        <span class="tl-row-val" style="color:var(--danger)">+ ${fmtMoney(jDia)}</span>
+                    </div>
+                    <div class="tl-card-row">
+                        <span class="tl-row-lbl">Dívida inicial do período</span>
+                        <span class="tl-row-val" style="color:var(--txt1)">${fmtMoney(saldoIni)}</span>
+                    </div>
+                    <div class="tl-card-row">
+                        <span class="tl-row-lbl">Juros acumulados (${n}d)</span>
+                        <span class="tl-row-val" style="color:var(--danger)">+ ${fmtMoney(totalJuros)}</span>
+                    </div>
+                    <div class="tl-card-row">
+                        <span class="tl-row-lbl">Dívida acumulada</span>
+                        <span class="tl-row-val tl-highlight" style="color:var(--danger)">${fmtMoney(saldoFim)}</span>
+                    </div>
+                    </div>
+                </div>
+                </li>
+                <div class="tl-juros-items" id="${itemsId}">
+                <ul class="tl" style="padding:4px 0 0">${itemsHTML}</ul>
+                </div>
+            </div>`;
         }
 
         function tlEventHTML(e, loanId) {
@@ -5217,9 +5420,9 @@
             // Helper to build a row
             const row = (lbl, val, highlight, color) =>
                 `<div class="tl-card-row">
-          <span class="tl-row-lbl">${lbl}</span>
-          <span class="tl-row-val${highlight ? ' tl-highlight' : ''}" style="${color ? 'color:' + color : ''}">${val}</span>
-        </div>`;
+                    <span class="tl-row-lbl">${lbl}</span>
+                    <span class="tl-row-val${highlight ? ' tl-highlight' : ''}" style="${color ? 'color:' + color : ''}">${val}</span>
+                </div>`;
 
             let dotClass, cardClass, title, rows;
 
@@ -5323,15 +5526,15 @@
             }
 
             return `<li class="tl-item${isPag ? ' clickable' : ''}" ${clickAttr}>
-        <div class="tl-dot ${dotClass}" style="margin-top:10px">${iconSvg}</div>
-        <div class="tl-card ${cardClass}">
-          <div class="tl-card-top">
-            <div class="tl-card-title">${title}</div>
-            <div class="tl-card-date">${dateLbl}</div>
-          </div>
-          <div class="tl-card-rows">${rows.join('')}</div>
-        </div>
-      </li>`;
+                <div class="tl-dot ${dotClass}" style="margin-top:10px">${iconSvg}</div>
+                <div class="tl-card ${cardClass}">
+                <div class="tl-card-top">
+                    <div class="tl-card-title">${title}</div>
+                    <div class="tl-card-date">${dateLbl}</div>
+                </div>
+                <div class="tl-card-rows">${rows.join('')}</div>
+                </div>
+            </li>`;
         }
 
         function openTlEvent(lid, pid, animate = true) {
@@ -5343,34 +5546,34 @@
 
             document.getElementById('tl-event-title').textContent = 'Pagamento — ' + fmtDate(pag.data);
             document.getElementById('tl-event-body').innerHTML = `
-            <div class="dr"><div class="dk">Valor pago</div><div class="dv2 c-g fw6">${fmtMoney(pag.valor)}</div></div>
-            <div class="dr"><div class="dk">Data</div><div class="dv2">${fmtDate(pag.data)}</div></div>
-            ${pag.status ? `<div class="dr" style="border:none"><div class="dk">Status</div><div class="dv2">${pag.status}</div></div>` : ''}
-            <div class="dv mt8"></div>
+                <div class="dr"><div class="dk">Valor pago</div><div class="dv2 c-g fw6">${fmtMoney(pag.valor)}</div></div>
+                <div class="dr"><div class="dk">Data</div><div class="dv2">${fmtDate(pag.data)}</div></div>
+                ${pag.status ? `<div class="dr" style="border:none"><div class="dk">Status</div><div class="dv2">${pag.status}</div></div>` : ''}
+                <div class="dv mt8"></div>
 
-            <button class="btn-icon w-full mb8" style="justify-content:center;"
-            onclick="closeSheet(document.getElementById('tl-event-sheet'));abrirComprovantePagamento('${lid}','${pid}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            Ver comprovante
-            </button> ${hasAnexo ? `<div class="attach-item mb8">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                <div class="attach-item-name" onclick="openAttachSheet('pag', '${pid}')"; closeSheet(document.getElementById('tl-event-sheet')); openEmpDetalhe('${lid}')">Comprovante de Pagamento</div>
-                <div class="attach-item-ver">Ver</div>
-                </div>` : `<button class="btn-icon w-full mb8" style="justify-content:center;color:var(--warn)"
-                onclick="closeSheet(document.getElementById('tl-event-sheet')); openAttachSheet('pag', '${pid}')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                ⚠ Adicionar anexo de pagamento
-                </button>`}
+                <button class="btn-icon w-full mb8" style="justify-content:center;"
+                onclick="closeSheet(document.getElementById('tl-event-sheet'));abrirComprovantePagamento('${lid}','${pid}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Ver comprovante
+                </button> ${hasAnexo ? `<div class="attach-item mb8">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                    <div class="attach-item-name" onclick="openAttachSheet('pag', '${pid}')"; closeSheet(document.getElementById('tl-event-sheet')); openEmpDetalhe('${lid}')">Comprovante de Pagamento</div>
+                    <div class="attach-item-ver">Ver</div>
+                    </div>` : `<button class="btn-icon w-full mb8" style="justify-content:center;color:var(--warn)"
+                    onclick="closeSheet(document.getElementById('tl-event-sheet')); openAttachSheet('pag', '${pid}')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                    ⚠ Adicionar anexo de pagamento
+                    </button>`}
 
-            <button class="btn-icon w-full mb8" style="justify-content:center" onclick="closeSheet(document.getElementById('tl-event-sheet'));openEditPag('${lid}','${pid}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Editar pagamento
-            </button>
-            <button class="btn-icon w-full" style="justify-content:center;color:var(--danger);border-color:#ff4d6d30" onclick="closeSheet(document.getElementById('tl-event-sheet'));openDeletePagConfirm('${lid}','${pid}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-            Apagar pagamento
-            </button>
-        `;
+                <button class="btn-icon w-full mb8" style="justify-content:center" onclick="closeSheet(document.getElementById('tl-event-sheet'));openEditPag('${lid}','${pid}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Editar pagamento
+                </button>
+                <button class="btn-icon w-full" style="justify-content:center;color:var(--danger);border-color:#ff4d6d30" onclick="closeSheet(document.getElementById('tl-event-sheet'));openDeletePagConfirm('${lid}','${pid}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                Apagar pagamento
+                </button>
+            `;
             openSheet('tl-event-sheet', animate);
         }
         // ==================== EDIÇÃO DO EMPRÉSTIMO ====================
@@ -5392,42 +5595,42 @@
             const statusColors = { late: 'var(--danger)', warn: 'var(--warn)', ok: 'var(--acc2)', done: 'var(--acc)' };
 
             document.getElementById('delete-pag-confirm-body').innerHTML = `
-        <div class="warn-box" style="background:#ff4d6d14;border-color:#ff4d6d40;margin-bottom:12px">
-          <div class="wb-t" style="color:var(--danger)">⚠ Ação irreversível</div>
-          <div class="wb-d">Este pagamento será apagado permanentemente e o histórico será recalculado.</div>
-        </div>
-        <div class="card-sm mb12">
-          <div class="sc-lbl">Pagamento a apagar</div>
-          <div class="dr"><div class="dk">ID</div><div class="dv2 tc1" style="font-size:12px">${pid}</div></div>
-          <div class="dr"><div class="dk">Data</div><div class="dv2">${fmtDate(pag.data)}</div></div>
-          <div class="dr"><div class="dk">Valor</div><div class="dv2 c-g fw6">${fmtMoney(pag.valor)}</div></div>
-          ${pag.nota ? `<div class="dr"><div class="dk">Nota</div><div class="dv2 tc1">${pag.nota}</div></div>` : ''}
-        </div>
-        <div class="card-sm mb12">
-          <div class="sc-lbl">Impacto após apagar</div>
-          <div class="dr">
-            <div class="dk">Situação atual</div>
-            <div class="dv2 fw6" style="color:${statusColors[calcNow.status]}">${statusLabels[calcNow.status]}</div>
-          </div>
-          <div class="dr">
-            <div class="dk">Situação após apagar</div>
-            <div class="dv2 fw6" style="color:${statusColors[calcSim.status]}">${statusLabels[calcSim.status]}</div>
-          </div>
-          <div class="dr">
-            <div class="dk">Valor a pagar hoje (atual)</div>
-            <div class="dv2">${calcNow.isPago ? '✓ Quitado' : fmtMoney(calcNow.valorHoje)}</div>
-          </div>
-          <div class="dr" style="border:none">
-            <div class="dk">Valor a pagar hoje (após apagar)</div>
-            <div class="dv2 fw6" style="color:${calcSim.isPago ? 'var(--acc)' : 'var(--danger)'}">
-              ${calcSim.isPago ? '✓ Quitado' : fmtMoney(calcSim.valorHoje)}
-            </div>
-          </div>
-        </div>
-        <div class="confirm-btns">
-          <button class="cbtn-n" onclick="closeSheet(document.getElementById('delete-pag-confirm-sheet'))">Cancelar</button>
-          <button class="cbtn-y" style="background:var(--danger)" onclick="executarDeletePag('${lid}','${pid}')">Apagar ✗</button>
-        </div>`;
+                <div class="warn-box" style="background:#ff4d6d14;border-color:#ff4d6d40;margin-bottom:12px">
+                <div class="wb-t" style="color:var(--danger)">⚠ Ação irreversível</div>
+                <div class="wb-d">Este pagamento será apagado permanentemente e o histórico será recalculado.</div>
+                </div>
+                <div class="card-sm mb12">
+                <div class="sc-lbl">Pagamento a apagar</div>
+                <div class="dr"><div class="dk">ID</div><div class="dv2 tc1" style="font-size:12px">${pid}</div></div>
+                <div class="dr"><div class="dk">Data</div><div class="dv2">${fmtDate(pag.data)}</div></div>
+                <div class="dr"><div class="dk">Valor</div><div class="dv2 c-g fw6">${fmtMoney(pag.valor)}</div></div>
+                ${pag.nota ? `<div class="dr"><div class="dk">Nota</div><div class="dv2 tc1">${pag.nota}</div></div>` : ''}
+                </div>
+                <div class="card-sm mb12">
+                <div class="sc-lbl">Impacto após apagar</div>
+                <div class="dr">
+                    <div class="dk">Situação atual</div>
+                    <div class="dv2 fw6" style="color:${statusColors[calcNow.status]}">${statusLabels[calcNow.status]}</div>
+                </div>
+                <div class="dr">
+                    <div class="dk">Situação após apagar</div>
+                    <div class="dv2 fw6" style="color:${statusColors[calcSim.status]}">${statusLabels[calcSim.status]}</div>
+                </div>
+                <div class="dr">
+                    <div class="dk">Valor a pagar hoje (atual)</div>
+                    <div class="dv2">${calcNow.isPago ? '✓ Quitado' : fmtMoney(calcNow.valorHoje)}</div>
+                </div>
+                <div class="dr" style="border:none">
+                    <div class="dk">Valor a pagar hoje (após apagar)</div>
+                    <div class="dv2 fw6" style="color:${calcSim.isPago ? 'var(--acc)' : 'var(--danger)'}">
+                    ${calcSim.isPago ? '✓ Quitado' : fmtMoney(calcSim.valorHoje)}
+                    </div>
+                </div>
+                </div>
+                <div class="confirm-btns">
+                <button class="cbtn-n" onclick="closeSheet(document.getElementById('delete-pag-confirm-sheet'))">Cancelar</button>
+                <button class="cbtn-y" style="background:var(--danger)" onclick="executarDeletePag('${lid}','${pid}')">Apagar ✗</button>
+                </div>`;
 
             openSheet('delete-pag-confirm-sheet');
         }
@@ -5508,10 +5711,10 @@
             const row = (lbl, antes, depois, color) => {
                 const changed = String(antes) !== String(depois);
                 return `<div class="dr"><div class="dk">${lbl}</div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-            ${changed ? `<div class="dv2 tc2" style="text-decoration:line-through;font-size:11px">${antes}</div>` : ''}
-            <div class="dv2 fw6" style="color:${color || 'var(--txt0)'}">${depois}</div>
-          </div></div>`;
+                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                        ${changed ? `<div class="dv2 tc2" style="text-decoration:line-through;font-size:11px">${antes}</div>` : ''}
+                        <div class="dv2 fw6" style="color:${color || 'var(--txt0)'}">${depois}</div>
+                    </div></div>`;
             };
             const jAntTxt = (loan.juros_tipo === 'fixo' ? fmtMoney(loan.juros_val) : loan.juros_val + '%') + '/dia';
             const jTxt = (novoTipo === 'fixo' ? fmtMoney(novoJuros) : novoJuros + '%') + '/dia';
@@ -5538,6 +5741,8 @@
             tlWrap.innerHTML = `<ul class="tl" style="padding-left:0">${renderTimelineHTML(events, null)}</ul>`;
         }
 
+        let _pendingEditEmp_pago = null;
+        let _pendingEditEmp = null;
         function preConfirmarEditEmp() {
             const novoValor = parseFloat(document.getElementById('ee-valor').value) || 0;
             const novaData = document.getElementById('ee-data').value;
@@ -5550,29 +5755,85 @@
             _pendingEditEmp = { valor: novoValor, emissao: novaData, prazo: novoPrazo, juros_tipo: novoTipo, juros_val: novoJuros, pago: _pendingEditEmp_pago };
 
             document.getElementById('edit-emp-confirm-body').innerHTML = `
-        <div class="warn-box" style="background:#f5a62312;border-color:#f5a62340;margin-bottom:12px">
-          <div class="wb-t" style="color:var(--acc3)">⚠ Atenção</div>
-          <div class="wb-d">Esta edição vai recalcular todos os juros, vencimentos e saldos do histórico.</div>
-        </div>
-        ${document.getElementById('ee-impact').innerHTML}
-        <div class="confirm-btns mt12">
-          <button class="cbtn-n" onclick="closeSheet(document.getElementById('edit-emp-confirm-sheet'))">← Rever</button>
-          <button class="cbtn-y" onclick="executarEditEmp()">Salvar ✓</button>
-        </div>`;
+                <div class="warn-box" style="background:#f5a62312;border-color:#f5a62340;margin-bottom:12px">
+                <div class="wb-t" style="color:var(--acc3)">⚠ Atenção</div>
+                <div class="wb-d">Esta edição vai recalcular todos os juros, vencimentos e saldos do histórico.</div>
+                </div>
+                ${document.getElementById('ee-impact').innerHTML}
+                <div class="confirm-btns mt12">
+                <button class="cbtn-n" onclick="closeSheet(document.getElementById('edit-emp-confirm-sheet'))">← Rever</button>
+                <button class="cbtn-y" onclick="edit_emprestimo()">Salvar ✓</button>
+                </div>`;
             openSheet('edit-emp-confirm-sheet');
         }
-        let _pendingEditEmp_pago = null;
-        let _pendingEditEmp = null;
 
-        function executarEditEmp() {
+
+        async function edit_emprestimo() {
             if (!_pendingEditEmp) return;
             const loan = getLoan(_currentLoanId);
             if (!loan) return;
-            Object.assign(loan, _pendingEditEmp);
-            _pendingEditEmp = null;
-            _pendingEditEmp_pago = null;
+
+            console.log("Editando Emprestimo...");
+            showLoading(['Editando Emprestimo...', 'Atualizando Dados...', 'Apagando Pagamentos...', 'Apagando Anexos...', 'Salvando Novos Dados...', 'Finalizando...']);
+
             closeSheet(document.getElementById('edit-emp-confirm-sheet'));
             closeSheet(document.getElementById('edit-emp-sheet'));
+
+            const valor = _pendingEditEmp.valor;
+            const prazo = _pendingEditEmp.prazo;
+            const juros_val = _pendingEditEmp.juros_val;
+            const juros_tipo = _pendingEditEmp.juros_tipo;
+            const emissao = _pendingEditEmp.emissao;
+
+            const pago = 0;
+            const qtd_pags = 0;
+
+            const id = loan.id;
+            const clientId = loan.clientId;
+            const lin = loan.lin;
+            const lins_pags = loan.lins_pags;
+
+            const new_loan = { id, clientId, valor, prazo, juros_tipo, juros_val, emissao, pago, qtd_pags, lin };
+
+            if (lins_pags.length > 0) {
+                new_loan.lins_pags = lins_pags;
+            }
+
+            try {
+                const data_fetch = { data: new_loan, funcao: 'add_emprestimo' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - add emprestimo") };
+
+                const novoDB = await res.json();
+
+                if (!novoDB.time || novoDB.time <= DB.time) {
+                    console.log('novoDB');
+                    console.log(novoDB);
+                    throw new Error(novoDB.error);
+                }
+
+                console.log("Emprestimo editado com sucesso");
+                DB = novoDB;
+            }
+            catch (err) {
+                console.log("Erro ao editar emprestimo");
+                console.log(err);
+
+            }
+
+
+            // Salvar backup local
+            backup_local();
+
+
+            Object.assign(loan, _pendingEditEmp);
+
+
+            _pendingEditEmp = null;
+            _pendingEditEmp_pago = null;
             showToast('Empréstimo atualizado! ✓', 'ok');
             updateNotifBadge();
             setTimeout(() => openEmpDetalhe(_currentLoanId), 300);
@@ -5589,38 +5850,78 @@
 
             document.getElementById('mark-paid-title').textContent = isPago ? 'Desmarcar como Pago' : 'Marcar como Pago';
             document.getElementById('mark-paid-body').innerHTML = `
-        <div class="warn-box" style="background:${isPago ? '#ffb54714' : '#00e8a214'};border-color:${isPago ? '#ffb54740' : '#00e8a240'};margin-bottom:12px">
-          <div class="wb-t" style="color:${isPago ? 'var(--warn)' : 'var(--acc)'}">
-            ${isPago ? '⚠ Remover quitação manual?' : '✓ Marcar como quitado?'}
-          </div>
-          <div class="wb-d">${isPago
+                <div class="warn-box" style="background:${isPago ? '#ffb54714' : '#00e8a214'};border-color:${isPago ? '#ffb54740' : '#00e8a240'};margin-bottom:12px">
+                <div class="wb-t" style="color:${isPago ? 'var(--warn)' : 'var(--acc)'}">
+                    ${isPago ? '⚠ Remover quitação manual?' : '✓ Marcar como quitado?'}
+                </div>
+                <div class="wb-d">${isPago
                     ? 'O empréstimo voltará ao status calculado com base nos pagamentos registrados.'
                     : 'O empréstimo será marcado como quitado independente do saldo restante.'}</div>
-        </div>
-        <div class="card-sm mb12">
-          <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${client.nome}</div></div>
-          <div class="dr"><div class="dk">Contrato</div><div class="dv2">${loan.id}</div></div>
-          <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(loan.valor)}</div></div>
-          <div class="dr"><div class="dk">Total pago (registrado)</div><div class="dv2 c-g">${fmtMoney(c.totalPago)}</div></div>
-          ${!isPago && c.saldoRestante > 0 ? `<div class="dr"><div class="dk">Saldo que será ignorado</div><div class="dv2 c-a">${fmtMoney(c.saldoRestante)}</div></div>` : ''}
-          <div class="dr" style="border:none"><div class="dk">Novo status</div><div class="dv2 fw6 ${novoEstado ? 'c-g' : 'c-b'}">${novoEstado ? '✓ Pago' : 'Recalculado'}</div></div>
-        </div>
-        <div class="confirm-btns">
-          <button class="cbtn-n" onclick="closeSheet(document.getElementById('mark-paid-confirm-sheet'))">Cancelar</button>
-          <button class="cbtn-y" onclick="executarMarkPaid(${novoEstado})">${isPago ? 'Desmarcar' : 'Confirmar ✓'}</button>
-        </div>`;
+                </div>
+                <div class="card-sm mb12">
+                <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${client.nome}</div></div>
+                <div class="dr"><div class="dk">Contrato</div><div class="dv2">${loan.id}</div></div>
+                <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(loan.valor)}</div></div>
+                <div class="dr"><div class="dk">Total pago (registrado)</div><div class="dv2 c-g">${fmtMoney(c.totalPago)}</div></div>
+                ${!isPago && c.saldoRestante > 0 ? `<div class="dr"><div class="dk">Saldo que será ignorado</div><div class="dv2 c-a">${fmtMoney(c.saldoRestante)}</div></div>` : ''}
+                <div class="dr" style="border:none"><div class="dk">Novo status</div><div class="dv2 fw6 ${novoEstado ? 'c-g' : 'c-b'}">${novoEstado ? '✓ Pago' : 'Recalculado'}</div></div>
+                </div>
+                <div class="confirm-btns">
+                <button class="cbtn-n" onclick="closeSheet(document.getElementById('mark-paid-confirm-sheet'))">Cancelar</button>
+                <button class="cbtn-y" onclick="edit_pago(${novoEstado})">${isPago ? 'Desmarcar' : 'Confirmar ✓'}</button>
+                </div>`;
             openSheet('mark-paid-confirm-sheet');
         }
 
-        function executarMarkPaid(novoEstado) {
+        async function edit_pago(novoEstado) {
             const loan = getLoan(_currentLoanId);
             if (!loan) return;
-            loan.pago = novoEstado;
+
+            showLoading(['ALTERANDO PAGO...', 'IGNORANDO PAGAMENTOS...', 'SALVANDO NA PLANILHA...', 'FINALIZANDO...']);
+
+            const id = loan.id;
+            const lin = loan.lin;
+            const novo_pago = novoEstado;
+
+            const novo_pago_x = { id, lin, novo_pago };
+
+            try {
+                console.log("ALTERANDO SE PAGO...");
+                const data_fetch = { data: novo_pago_x, funcao: 'edit_pago' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - edit pago") };
+
+                const novoDB = await res.json();
+
+                if (novoDB.error) {
+                    throw new Error(novoDB.error);
+                }
+
+                console.log("PAGO ALTERADO com sucesso");
+                DB = novoDB;
+            }
+            catch (err) {
+                console.log("Erro ao ALTERAR PAGO");
+                console.log(err);
+
+            }
+
+            // Salvar backup local
+            backup_local();
+
+
             closeSheet(document.getElementById('mark-paid-confirm-sheet'));
-            showToast(novoEstado ? 'Marcado como pago! ✓' : 'Quitação removida', 'ok');
             updateNotifBadge();
-            setTimeout(() => openEmpDetalhe(_currentLoanId), 300);
+            openEmpDetalhe(_currentLoanId)
+
+            hideLoading();
+
+            showToast(novoEstado ? 'Marcado como pago! ✓' : 'Quitação removida', 'ok');
         }
+
 
         // ---- Excluir empréstimo ----
         function openDeleteEmpConfirm() {
@@ -5630,100 +5931,84 @@
             const c = getLoanCalc(loan);
 
             document.getElementById('delete-emp-body').innerHTML = `
-        <div class="warn-box" style="background:#ff4d6d14;border-color:#ff4d6d40;margin-bottom:12px">
-          <div class="wb-t" style="color:var(--danger)">⚠ Ação irreversível</div>
-          <div class="wb-d">Este empréstimo e todos os seus pagamentos serão apagados permanentemente.</div>
-        </div>
-        <div class="card-sm mb12">
-          <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${client.nome}</div></div>
-          <div class="dr"><div class="dk">Contrato</div><div class="dv2">${loan.id}</div></div>
-          <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(loan.valor)}</div></div>
-          <div class="dr"><div class="dk">Pagamentos registrados</div><div class="dv2">${loan.pagamentos.length}</div></div>
-          <div class="dr" style="border:none"><div class="dk">Saldo em aberto</div><div class="dv2 c-r">${c.isPago ? '—' : fmtMoney(c.valorHoje)}</div></div>
-        </div>
-        <div style="background:var(--bg2);border:1px solid var(--danger);border-radius:var(--rad12);padding:12px;margin-bottom:12px">
-          <div class="fl" style="color:var(--danger)">Digite o ID do contrato para confirmar</div>
-          <input class="fi" id="delete-confirm-input" type="text" placeholder="${loan.id}" style="border-color:var(--danger)">
-        </div>
-        <div class="confirm-btns">
-          <button class="cbtn-n" onclick="closeSheet(document.getElementById('delete-emp-confirm-sheet'))">Cancelar</button>
-          <button class="cbtn-y" style="background:var(--danger)" onclick="executarDeleteEmp('${loan.id}')">Excluir ✗</button>
-        </div>`;
+                <div class="warn-box" style="background:#ff4d6d14;border-color:#ff4d6d40;margin-bottom:12px">
+                <div class="wb-t" style="color:var(--danger)">⚠ Ação irreversível</div>
+                <div class="wb-d">Este empréstimo e todos os seus pagamentos serão apagados permanentemente.</div>
+                </div>
+                <div class="card-sm mb12">
+                <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${client.nome}</div></div>
+                <div class="dr"><div class="dk">Contrato</div><div class="dv2">${loan.id}</div></div>
+                <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(loan.valor)}</div></div>
+                <div class="dr"><div class="dk">Pagamentos registrados</div><div class="dv2">${loan.pagamentos.length}</div></div>
+                <div class="dr" style="border:none"><div class="dk">Saldo em aberto</div><div class="dv2 c-r">${c.isPago ? '—' : fmtMoney(c.valorHoje)}</div></div>
+                </div>
+                <div style="background:var(--bg2);border:1px solid var(--danger);border-radius:var(--rad12);padding:12px;margin-bottom:12px">
+                <div class="fl" style="color:var(--danger)">Digite o ID do contrato para confirmar</div>
+                <input class="fi" id="delete-confirm-input" type="text" placeholder="${loan.id}" style="border-color:var(--danger)">
+                </div>
+                <div class="confirm-btns">
+                <button class="cbtn-n" onclick="closeSheet(document.getElementById('delete-emp-confirm-sheet'))">Cancelar</button>
+                <button class="cbtn-y" style="background:var(--danger)" onclick="del_emprestimo('${loan.id}')">Excluir ✗</button>
+                </div>`;
             openSheet('delete-emp-confirm-sheet');
         }
 
-        function executarDeleteEmp(expectedId) {
+        // FUNÇÃO PARA APAGAR EMPRESTIMOS
+        async function del_emprestimo(expectedId) {
             const typed = document.getElementById('delete-confirm-input')?.value?.trim();
             if (typed !== expectedId) { showToast('ID incorreto, tente novamente', 'err'); return; }
-            DB.loans = DB.loans.filter(l => l.id !== expectedId);
-            closeSheet(document.getElementById('delete-emp-confirm-sheet'));
-            showToast('Empréstimo excluído', 'ok');
+
+            showLoading(['DELETANDO EMPRESTIMO...', 'APAGANDO DADOS...', 'REMOVENDO PAGAMENTOS...', 'ATUALIZANDO PLANILHA...', 'REMOVENDO ANEXOS...', 'SINCRONIZANDO...', 'TERMINANDO...']);
+
+            const loan = getLoan(expectedId);
+            const id = loan.id;
+            const lin = loan.lin;
+            const lins_pags = loan.lins_pags;
+
+            const dados_apagar = { id, lin };
+
+            if (lins_pags.length > 0) {
+                dados_apagar.lins_pags = lins_pags;
+            }
+
+
+            try {
+                console.log("DELETANDO emprestimo da planilha...");
+                const data_fetch = { data: dados_apagar, funcao: 'del_emprestimo' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - del emprestimo") };
+
+                const novoDB = await res.json();
+
+                if (novoDB.error) {
+                    throw new Error(novoDB.error);
+                }
+
+                console.log("Emprestimo deletado com sucesso");
+                DB = novoDB;
+            }
+            catch (err) {
+                console.log("Erro ao deletar Emprestimo");
+                console.log(err);
+
+            }
+
+            // Salvar backup local
+            backup_local();
+
             updateNotifBadge();
-            setTimeout(() => {
-                if (_prevScreen === 'cliente-detalhe') openClienteDetalhe(getLoan(expectedId)?.clientId || _currentClientId);
-                else navTo('emprestimos');
-            }, 300);
+            closeSheet(document.getElementById('delete-emp-confirm-sheet'));
+
+            navTo('dash');
+
+            hideLoading();
+
+            showToast('Empréstimo excluído', 'ok');
         }
 
-        function openEditCliente() {
-            const c = getClient(_currentClientId);
-            if (!c) return;
-            document.getElementById('ec-nome').value = c.nome || '';
-            document.getElementById('ec-tel').value = c.tel || '';
-            document.getElementById('ec-email').value = c.email || '';
-            document.getElementById('ec-desc').value = c.desc || '';
-            openSheet('edit-client-sheet');
-        }
-
-        function preConfirmarEditCliente() {
-            const nome = document.getElementById('ec-nome').value.trim();
-            const tel = document.getElementById('ec-tel').value.trim();
-            const email = document.getElementById('ec-email').value.trim();
-            const desc = document.getElementById('ec-desc').value.trim();
-            if (!nome || !tel) { showToast('Nome e telefone são obrigatórios', 'err'); return; }
-
-            const c = getClient(_currentClientId);
-            const mudou = (field, novo) => novo !== (c[field] || '') ?
-                `<div class="dr"><div class="dk">${field === 'nome' ? 'Nome' : field === 'tel' ? 'Telefone' : field === 'email' ? 'E-mail' : 'Notas'}</div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-            <div class="dv2 tc2" style="text-decoration:line-through;font-size:11px">${c[field] || '—'}</div>
-            <div class="dv2 c-g fw6">${novo || '—'}</div>
-          </div>
-        </div>` : '';
-
-            const alteracoes = [mudou('nome', nome), mudou('tel', tel), mudou('email', email), mudou('desc', desc)].filter(Boolean).join('');
-
-            document.getElementById('edit-client-confirm-body').innerHTML = `
-        <div class="warn-box" style="background:#3d7fff12;border-color:#3d7fff40;margin-bottom:12px">
-          <div class="wb-t" style="color:var(--acc2)">Revisar alterações</div>
-          <div class="wb-d">Confirme as mudanças abaixo antes de salvar.</div>
-        </div>
-        <div class="card-sm mb12">
-          ${alteracoes || '<div class="fs12 tc2 text-center" style="padding:8px 0">Nenhuma alteração detectada.</div>'}
-        </div>
-        <div class="confirm-btns">
-          <button class="cbtn-n" onclick="closeSheet(document.getElementById('edit-client-confirm-sheet'))">← Rever</button>
-          <button class="cbtn-y" ${!alteracoes ? 'disabled style="opacity:.4"' : ''} onclick="executarEditCliente('${nome.replace(/'/g, "\\'")}','${tel.replace(/'/g, "\\'")}','${email.replace(/'/g, "\\'")}','${desc.replace(/'/g, "\\'").replace(/\n/g, ' ')}')">Salvar ✓</button>
-        </div>`;
-
-            openSheet('edit-client-confirm-sheet');
-        }
-
-        function executarEditCliente(nome, tel, email, desc) {
-            const c = getClient(_currentClientId);
-            if (!c) return;
-            c.nome = nome;
-            c.tel = tel;
-            c.email = email;
-            c.desc = desc;
-            // Update initials
-            c.initials = nome.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase();
-            closeSheet(document.getElementById('edit-client-confirm-sheet'));
-            closeSheet(document.getElementById('edit-client-sheet'));
-            showToast('Cliente atualizado! ✓', 'ok');
-            // Re-render the detail screen with updated data
-            setTimeout(() => openClienteDetalhe(_currentClientId), 300);
-        }
 
         function openEditPag(lid, pid) {
             const loan = getLoan(lid);
@@ -5759,30 +6044,30 @@
                 const quitado = saldoApos <= 0;
 
                 return `
-      <div class="sc-lbl">Dados do pagamento</div>
-      <div class="fg"><div class="fl">Valor pago (R$)</div>
-        <input class="fi" id="epag-valor" type="text" inputmode="numeric" step="1" value="${pag.valor}" oninput="this.value=this.value.replace(/[^0-9\s]/g, '');refreshEditPag('${lid}','${pid}')">
-      </div>
-      <div class="fg"><div class="fl">Data do pagamento</div>
-        <input class="fi" id="epag-data" type="date" value="${pag.data}" min="${loan.emissao}" max="${dateStr(TODAY)}" onchange="refreshEditPag('${lid}','${pid}')">
-      </div>
+                <div class="sc-lbl">Dados do pagamento</div>
+                <div class="fg"><div class="fl">Valor pago (R$)</div>
+                    <input class="fi" id="epag-valor" type="text" inputmode="numeric" step="1" value="${pag.valor}" oninput="this.value=this.value.replace(/[^0-9\s]/g, '');refreshEditPag('${lid}','${pid}')">
+                </div>
+                <div class="fg"><div class="fl">Data do pagamento</div>
+                    <input class="fi" id="epag-data" type="date" value="${pag.data}" min="${loan.emissao}" max="${dateStr(TODAY)}" onchange="refreshEditPag('${lid}','${pid}')">
+                </div>
 
-      <div class="sc-lbl mt12">Impacto desta edição</div>
-      <div class="card-sm mb12" id="epag-impact-section">
-        <div class="fs12 tc2">Calculando…</div>
-      </div>
+                <div class="sc-lbl mt12">Impacto desta edição</div>
+                <div class="card-sm mb12" id="epag-impact-section">
+                    <div class="fs12 tc2">Calculando…</div>
+                </div>
 
-      <div class="sc-lbl">Histórico recalculado</div>
-      <div class="card-sm mb12" id="epag-tl-preview">
-        <div class="fs12 tc2">Calculando…</div>
-      </div>
+                <div class="sc-lbl">Histórico recalculado</div>
+                <div class="card-sm mb12" id="epag-tl-preview">
+                    <div class="fs12 tc2">Calculando…</div>
+                </div>
 
-      ${isRetro ? `<div class="warn-box mb12"><div class="wb-t">⚠ Pagamento retroativo</div><div class="wb-d">A data informada é anterior a hoje. O histórico será recalculado a partir desta edição.</div></div>` : ''}
+                ${isRetro ? `<div class="warn-box mb12"><div class="wb-t">⚠ Pagamento retroativo</div><div class="wb-d">A data informada é anterior a hoje. O histórico será recalculado a partir desta edição.</div></div>` : ''}
 
-      <div class="confirm-btns">
-        <button class="cbtn-n" onclick="closeSheet(document.getElementById('edit-pag-sheet'))">Cancelar</button>
-        <button class="cbtn-y" onclick="confirmarEditPag('${lid}','${pid}')">Salvar edição ✓</button>
-      </div>`;
+                <div class="confirm-btns">
+                    <button class="cbtn-n" onclick="closeSheet(document.getElementById('edit-pag-sheet'))">Cancelar</button>
+                    <button class="cbtn-y" onclick="confirmarEditPag('${lid}','${pid}')">Salvar edição ✓</button>
+                </div>`;
             }
 
             document.getElementById('edit-pag-body').innerHTML = buildEditBody();
@@ -6072,7 +6357,6 @@
             loan_retro.pagamentos = loan.pagamentos.filter(p => parseDate(p.data) < dtPag);
 
             removidos_lins = removidos.map(p => p.lin);
-            console.log(removidos_lins);
 
             const calc = getLoanCalc(loan_retro);
             const totalPagoAntes = calc.totalPago || 0;
@@ -6081,26 +6365,14 @@
             const status = totalPagoDepois >= calc.dividaTotal ? "PAGAMENTO COMPLETO" : "PAGAMENTO PARCIAL";
 
             // Criar o novo id do pagamento atual
-            let novo_id = "";
-            if (loan_retro.pagamentos.length > 0) {
-                let ids_pag = structuredClone(loan_retro.pagamentos);
-                ids_pag.sort((a, b) => b.id.localeCompare(a.id));
-                let id_max = ids_pag[0].id;
-                const partes = id_max.split('_');
-                const prefixo = 'P';
-                const numeroParcelaAtual = parseInt(partes[2].slice(1), 10);
-                const novoNumeroParcela = numeroParcelaAtual + 1;
-                const novaParcelaFormatada = prefixo + String(novoNumeroParcela).padStart(2, '0');
-                partes[2] = novaParcelaFormatada;
-                novo_id = partes.join('_');
-            } else {
-                novo_id = loan.id + '_P01';
-            }
+            const qtd_pags = loan.qtd_pags;
+            let novo_id = loan.id + "_P" + String(qtd_pags + 1).padStart(2, '0');;
 
             const pid = pid_old ? pid_old : novo_id;
             const lin_loan = loan.lin;
+            const novo_qtd_pags = qtd_pags + 1;
 
-            const pagamento = { id: pid, data, valor, status, anexo_pag: [], totalPagoAntes, geradoEm, lin_loan, removidos_lins };
+            const pagamento = { id: pid, data, valor, status, anexo_pag: [], totalPagoAntes, geradoEm, removidos_lins, lin_loan, novo_qtd_pags };
 
             try {
                 console.log("Adicionando pagamento na planilha...");
@@ -7313,12 +7585,9 @@
             try {
                 const data_fetch = { data: '', funcao: '' };
 
-                const res = await fetch(URL_SCRIPT, {
-                    method: "POST",
-                    body: JSON.stringify(data_fetch),
-                    headers: { "Content-Type": "text/plain" },
-                    redirect: "follow" // Garante que o fetch vai seguir o redirecionamento do Google
-                });
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
 
                 if (!res.ok) { throw new Error("Erro ao realizar fetch inicial") };
 
@@ -7337,30 +7606,6 @@
                 console.log("Fetch inicial - Erro");
                 console.log("Usando DB ficticio");
 
-                // Dados ficticios
-                DB = {
-                    "defaults":
-                    {
-                        "prazos": { "3": 10, "5": 15, "7": 20, "14": 25, "21": 30, "30": 35 },
-                        "juros_tipo": "fixo",
-                        "juros_val": 5,
-                        "juros_fixo_val": 5,
-                        "juros_perc_val": 2
-                    },
-                    "clients": [
-                        { "id": "C01", "nome": "Rafael Henrique", "tel": "12982958009", "email": "faelcpo@gmail.com", "desc": "Irmão, sempre pagou direito", "initials": "RH", "color": "av-g" },
-                        { "id": "C02", "nome": "Felipe Vinicius", "tel": "12981614690", "email": "feelipee500@gmail.com", "desc": "EU GOSTOSÃO", "initials": "FV", "color": "av-b" },
-                        { "id": "C03", "nome": "Genival Macedo", "tel": "12996170474", "email": "", "desc": "Pai caloteiro, ja pediu duas vezes", "initials": "GM", "color": "av-a" },
-                        { "id": "C04", "nome": "Neide Gomes", "tel": "12981228269", "email": "neidegomes@hotmail.com", "desc": "Mãe pobre, nunca me paga", "initials": "NG", "color": "av-r" }
-                    ],
-                    "loans": [
-                        { "id": "C02_E01", "clientId": "C02", "valor": 500, "prazo": 7, "juros_tipo": "fixo", "juros_val": 10, "emissao": "2026-05-23", "pago": 0, "pagamentos": [], "anexo_envio": [] },
-                        { "id": "C01_E01", "clientId": "C01", "valor": 300, "prazo": 5, "juros_tipo": "fixo", "juros_val": 5, "emissao": "2026-06-04", "pago": 0, "pagamentos": [], "anexo_envio": [] },
-                        { "id": "C03_E01", "clientId": "C03", "valor": 800, "prazo": 14, "juros_tipo": "perc", "juros_val": 2, "emissao": "2026-06-02", "pago": 0, "pagamentos": [], "anexo_envio": [] },
-                        { "id": "C01_E02", "clientId": "C01", "valor": 200, "prazo": 3, "juros_tipo": "fixo", "juros_val": 5, "emissao": "2026-05-18", "pago": 1, "pagamentos": [{ "id": "C01_E02_P01", "data": "2026-05-19", "valor": 230, "status": "PAGAMENTO COMPLETO", "anexo_pag": [], "totalPagoAntes": 0, "geradoEm": "2026-05-19" }], "anexo_envio": [] },
-                        { "id": "C04_E01", "clientId": "C04", "valor": 1200, "prazo": 14, "juros_tipo": "fixo", "juros_val": 20, "emissao": "2026-05-08", "pago": 0, "pagamentos": [{ "id": "C04_E01_P01", "data": "2026-05-28", "valor": 500, "status": "PAGAMENTO PARCIAL", "anexo_pag": [], "totalPagoAntes": 0, "geradoEm": "2026-06-12" }], "anexo_envio": [] }
-                    ]
-                };
 
                 showNotif('Erro ao sincronizar', 'err');
             }
@@ -7376,12 +7621,6 @@
 
 
         // VARIAVEIS GLOBAIS
-        // const data_fetch = { data: loan, funcao: 'add_emprestimo' };
-        // const res = await fetch(URL_SCRIPT,
-        //     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-        // );
-        // if (!res.ok) { throw new Error("Erro ao realizar fetch inicial") };
-        // let json_data = await res.json();
         const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
 
         var DB = {};
