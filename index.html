@@ -2920,11 +2920,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="fg">
-                            <div class="fl">Descrição (opcional)</div>
-                            <textarea class="fi fi-ta" id="ne-desc"
-                                placeholder="Ex: empréstimo para reforma, combinado via zap…"></textarea>
-                        </div>
                         <div id="novo-preview-mini" style="display:none" class="card-sm mt8">
                             <div class="sc-lbl">Prévia rápida</div>
                             <div class="dr">
@@ -3179,10 +3174,10 @@
 
                     <!-- Registrar pagamento -->
                     <div id="ed-pag-form-wrap"
-                        style="background:var(--bg2);border:1px solid var(--brd);border-radius:var(--rad16);padding:14px;margin-bottom:14px">
-                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+                        style="background:var(--bg2); border:1px solid var(--brd); border-radius:var(--rad16); padding:14px; margin-bottom:14px">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px">
                             <div
-                                style="width:30px;height:30px;border-radius:50%;background:#00e8a218;display:flex;align-items:center;justify-content:center">
+                                style="width:30px; height:30px; border-radius:50%; background:#00e8a218; display:flex; align-items:center;justify-content:center">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--acc)"
                                     stroke-width="2.5" stroke-linecap="round">
                                     <polyline points="20 6 9 17 4 12" />
@@ -3204,12 +3199,13 @@
                             </div>
                         </div>
                         <div id="ed-pag-retro-wrap" style="display:none">
-                            <div class="warn-box mt8">
+                            <div class="warn-box mt8" id="ed-pag-retro-wrap-retro">
                                 <div class="wb-t">⚠ Pagamento retroativo</div>
                                 <div class="wb-d">A data informada é anterior a hoje, pagamentos após esta data serão
                                     apagados. O histórico abaixo mostra o impacto desta alteração.</div>
                             </div>
-                            <div class="sc-lbl mt12">Histórico recalculado</div>
+                            <div class="sc-lbl mt12" style="justify-content:center; display:flex; align-items:center">
+                                Histórico recalculado</div>
                             <div class="card-sm mb12" id="novo-pag-tl-preview">
                                 <div class="fs12 tc2">Preencha o valor para ver o histórico</div>
                             </div>
@@ -3854,13 +3850,41 @@
 
     <script>
         // ==================== DATA ====================
-        const TODAY = new Date(); TODAY.setHours(0, 0, 0, 0);
+        // TODAY agora armazena o timestamp do início do dia de hoje
+        const TODAY = new Date().setHours(12, 0, 0, 0);
 
-        function dateStr(d) { return d.toISOString().slice(0, 10); }
-        function parseDate(s) { const [y, m, d] = s.split('-').map(Number); const dt = new Date(y, m - 1, d); dt.setHours(0, 0, 0, 0); return dt; }
-        function fmtDate(s) { const d = parseDate(s); return d.toLocaleDateString('pt-BR'); }
-        function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
-        function diffDays(a, b) { return Math.round((b - a) / (1000 * 60 * 60 * 24)); }
+        // Recebe um TIMESTAMP e retorna uma string no formato "yyyy-mm-dd" (para o HTML)
+        function dateStr(timestamp) {
+            const d = new Date(timestamp);
+            const ano = d.getFullYear();
+            const mes = String(d.getMonth() + 1).padStart(2, '0');
+            const dia = String(d.getDate()).padStart(2, '0');
+            return `${ano}-${mes}-${dia}`;
+        }
+
+        // Recebe uma string "yyyy-mm-dd" e retorna um TIMESTAMP (número)
+        function parseDate(s) {
+            const [y, m, d] = s.split('-').map(Number);
+            // Cria a data no fuso local zerando as horas e retorna o timestamp com .getTime()
+            return new Date(y, m - 1, d, 0, 0, 0, 0).getTime();
+        }
+
+        // Recebe um timestamp e retorna formatada em "dd/mm/yyyy" (pt-BR)
+        function fmtDate(s) { return new Date(s).toLocaleDateString('pt-BR'); }
+
+        // Recebe um TIMESTAMP inicial e o número de dias a adicionar. Retorna um novo TIMESTAMP.
+        function addDays(timestamp, n) {
+            const r = new Date(timestamp);
+            r.setDate(r.getDate() + n);
+            return r.getTime();
+        }
+
+        // Recebe dois TIMESTAMPS (a e b) e retorna a diferença exata em dias
+        function diffDays(a, b) {
+            // Como 'a' e 'b' já são números (milissegundos), a conta fica direta e muito mais rápida
+            return Math.trunc((b - a) / (1000 * 60 * 60 * 24));
+        }
+
         function fmtMoney(v) { return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
         // Live reference — reads DB.defaults.prazos so edits take effect immediately
@@ -3876,17 +3900,6 @@
             return (d[30] || 35) / 100;
         };
 
-        // ---- DADOS VIA GOOGLE SHEETS (loadDB) ----
-        // O DB é carregado via loadDB() ao iniciar o app.
-        // Formato esperado dos empréstimos:
-        // { id: "C02_E01", clientId: "C02", valor: 500, prazo: 7, juros_tipo: "fixo", juros_val: 10,
-        //   emissao: "2026-05-23", pago: 0, pagamentos: [], anexo_envio: [] }
-        // Formato dos pagamentos dentro de loan.pagamentos:
-        // { id: "C01_E02_P01", data: "2026-05-21", valor: 230, status: "PAGAMENTO TOTAL", anexo_pag: [] }
-        // anexo_envio = comprovante do meu PIX de envio (array no loan)
-        // anexo_pag = comprovantes de pagamento recebido (array dentro de cada pagamento)
-
-
         let _currentClientId = null;
         let _currentLoanId = null;
         let _currentScreen = 'dash';
@@ -3900,17 +3913,19 @@
             const cancel = cancel_pago || false;
             if (cancel) { loan.pago = 0; }
 
-            const emissao = parseDate(loan.emissao);
+            const emissao = loan.emissao;
             const vencimento = addDays(emissao, loan.prazo);
             const profitRate = getProfitRate(loan.prazo);
             const valorBase = loan.valor * (1 + profitRate);
             const diasParaVencer = diffDays(TODAY, vencimento);
 
             // Walk day-by-day (same as buildTimeline) to get accurate saldo
-            const sortedPags = [...loan.pagamentos].sort((a, b) => parseDate(a.data) - parseDate(b.data));
+            let max_data = Math.max(...loan.pagamentos.map(pago => pago.data));
+            const sortedPags = [...loan.pagamentos].sort((a, b) => a.data - b.data);
+            const sortedPags_antes = sortedPags.filter(p => p.data != max_data);
             const pagByDate = {};
             for (const p of sortedPags) {
-                const ds = dateStr(parseDate(p.data));
+                const ds = dateStr(p.data);
                 if (!pagByDate[ds]) pagByDate[ds] = [];
                 pagByDate[ds].push(p);
             }
@@ -3919,12 +3934,13 @@
             const jdv = loan.juros_tipo === 'fixo' ? loan.juros_val : valorBase * loan.juros_val / 100;
             let diasAtraso = 0;
             let acumJuros = 0;
-            const totalDays = diffDays(emissao, TODAY);
+            const totalDays = diffDays(emissao, TODAY) + 1;
 
             for (let d = 1; d <= totalDays; d++) {
                 const dia = addDays(emissao, d);
                 const ds = dateStr(dia);
-                if (dia > vencimento && saldoCorrente > 0) {
+
+                if (dia > vencimento && saldoCorrente > 0 && dia < TODAY + (12 * 60 * 60 * 1000)) {
                     diasAtraso++;
                     acumJuros += jdv;
                     saldoCorrente += jdv;
@@ -3938,6 +3954,7 @@
             }
 
             const totalPago = sortedPags.reduce((s, p) => s + p.valor, 0);
+            const totalPago_antes = sortedPags_antes.reduce((s, p) => s + p.valor, 0);
             const isPago = saldoCorrente <= 0 || loan.pago == 1;
             const saldoRestante = Math.max(0, saldoCorrente);
             const valorHoje = isPago ? 0 : saldoRestante;
@@ -3952,7 +3969,7 @@
 
             let pago = isPago ? 1 : 0;
 
-            return { emissao, vencimento, valorBase, profitRate, totalPago, saldoRestante, diasAtraso, isPago, jurosDia, totalJuros, valorHoje, diasParaVencer, status, dividaTotal, pago, acumJuros };
+            return { emissao, vencimento, valorBase, profitRate, totalPago, saldoRestante, diasAtraso, isPago, jurosDia, totalJuros, valorHoje, diasParaVencer, status, dividaTotal, pago, acumJuros, totalPago_antes };
         }
 
         function getJurosDiaValue(loan, saldoBase) {
@@ -3962,9 +3979,9 @@
 
         function buildTimeline(loan) {
             const c = getLoanCalc(loan);
-            const emissao = parseDate(loan.emissao);
+            const emissao = loan.emissao;
             const vencimento = addDays(emissao, loan.prazo);
-            const sortedPags = [...loan.pagamentos].sort((a, b) => parseDate(a.data) - parseDate(b.data));
+            const sortedPags = [...loan.pagamentos].sort((a, b) => a.data - b.data);
             const events = [];
 
             // Running saldo — tracks the debt at any point in time
@@ -3978,36 +3995,20 @@
                 valor: loan.valor, saldoAntes: 0, saldoDepois: c.valorBase, color: 'td-b'
             });
 
-            // === Payments BEFORE emissao (edge case: emissao changed to after payment date) ===
-            // Show them first, anchored at emissao date so they still appear in the timeline
-            const pagsBeforeEmissao = sortedPags.filter(p => parseDate(p.data) <= emissao);
-            for (const p of pagsBeforeEmissao) {
-                if (saldoCorrente <= 0) break;
-                const saldoAntes = saldoCorrente;
-                saldoCorrente = Math.max(0, saldoCorrente - p.valor);
-                events.push({
-                    date: parseDate(p.data), tipo: 'pagamento', pId: p.id,
-                    label: 'Pagamento recebido',
-                    desc: (p.status ? p.status + ' · ' : '') + '⚠ anterior à emissão',
-                    valor: p.valor,
-                    saldoAntes, saldoDepois: saldoCorrente,
-                    color: 'td-g'
-                });
-            }
-
             // Build day-by-day map only for payments ON or AFTER emissao
             const pagByDate = {};
             for (const p of sortedPags) {
-                const pDate = parseDate(p.data);
+                const pDate = p.data;
                 if (pDate < emissao) continue; // already handled above
                 const ds = dateStr(pDate);
                 if (!pagByDate[ds]) pagByDate[ds] = [];
                 pagByDate[ds].push(p);
             }
+            
 
             // Walk from emissao+1 until today (or last payment), inserting juros after vencimento
             const lastPagDate = sortedPags.length
-                ? sortedPags.reduce((last, p) => parseDate(p.data) > last ? parseDate(p.data) : last, emissao)
+                ? sortedPags.reduce((last, p) => p.data > last ? p.data : last, emissao)
                 : emissao;
             const endDate = c.isPago ? lastPagDate : TODAY;
 
@@ -4016,14 +4017,14 @@
             const jdv = getJurosDiaValue(loan, saldoCorrente); // fixed daily interest value
 
             // collect all days to walk
-            const totalDays = diffDays(emissao, endDate);
-            for (let d = 1; d <= totalDays; d++) {
+            const totalDays = diffDays(emissao, endDate) + 1;
+            for (let d = 0; d <= totalDays; d++) {
                 const dia = addDays(emissao, d);
                 const ds = dateStr(dia);
                 const isAfterVenc = dia > vencimento;
 
                 // Apply juros before payments on this day (if past venc and not yet paid)
-                if (isAfterVenc && saldoCorrente > 0) {
+                if (isAfterVenc && saldoCorrente > 0 && dia < TODAY + (12 * 60 * 60 * 1000)) {
                     diasAtraso++;
                     acumJuros += jdv;
                     const saldoAntes = saldoCorrente;
@@ -4046,7 +4047,7 @@
                         const saldoAntes = saldoCorrente;
                         saldoCorrente = Math.max(0, saldoCorrente - p.valor);
                         events.push({
-                            date: dia, tipo: 'pagamento', pId: p.id,
+                            date: p.data, tipo: 'pagamento', pId: p.id,
                             label: 'Pagamento recebido',
                             desc: p.status || '',
                             valor: p.valor,
@@ -4060,7 +4061,7 @@
             // Vencimento marker — inserted at vencimento date
             {
                 // Calc pago até o vencimento
-                const pagsAteVenc = sortedPags.filter(p => parseDate(p.data) <= vencimento);
+                const pagsAteVenc = sortedPags.filter(p => p.data <= vencimento + (23 * 60 * 60 * 1000));
                 const totalPagoAteVenc = pagsAteVenc.reduce((s, p) => s + p.valor, 0);
                 // saldo na data de vencimento (before any juros — juros start the day AFTER)
                 const saldoNoVenc = Math.max(0, c.valorBase - totalPagoAteVenc);
@@ -4068,7 +4069,7 @@
                 const algumPagAteVenc = pagsAteVenc.length > 0;
 
                 events.push({
-                    date: vencimento, tipo: 'vencimento',
+                    date: vencimento + (23 * 60 * 60 * 1000), tipo: 'vencimento',
                     label: 'Vencimento',
                     quitouAntes: quitouAntesVenc,
                     algumPag: algumPagAteVenc,
@@ -4083,7 +4084,7 @@
             // Hoje marker (if not paid)
             if (!c.isPago) {
                 events.push({
-                    date: TODAY, tipo: 'hoje',
+                    date: TODAY + (1000 * 60 * 60 * 11), tipo: 'hoje',
                     label: 'Hoje',
                     desc: TODAY > vencimento
                         ? `${diasAtraso} dia${diasAtraso !== 1 ? 's' : ''} em atraso`
@@ -4100,7 +4101,7 @@
             if (c.isPago) {
                 const lastPag = sortedPags.length > 0 ? sortedPags[sortedPags.length - 1] : null;
                 // If manually marked paid (loan.pago==1) with no payments, use today or emissao as reference date
-                const quitadoDate = lastPag ? parseDate(lastPag.data) : (loan.pago == 1 ? TODAY : emissao);
+                const quitadoDate = lastPag ? lastPag.data : (loan.pago == 1 ? TODAY : emissao);
                 events.push({
                     date: quitadoDate, tipo: 'quitado',
                     label: 'Dívida quitada',
@@ -4113,6 +4114,7 @@
             // Sort chronologically; within same day: juros → pagamento → quitado → hoje
             const typeOrder = { emissao: 0, juros: 1, pagamento: 2, vencimento: 3, quitado: 4, hoje: 5 };
             events.sort((a, b) => a.date - b.date || (typeOrder[a.tipo] || 0) - (typeOrder[b.tipo] || 0));
+            console.log(events);
             return events;
         }
 
@@ -4165,7 +4167,7 @@
 
         // ==================== DASH ====================
         function renderDash() {
-            const d = TODAY.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+            const d = new Date(TODAY).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
             document.getElementById('dash-date').textContent = d.charAt(0).toUpperCase() + d.slice(1);
 
             let totalRecv = 0, totalEmp = 0, totalLucro = 0;
@@ -4223,7 +4225,7 @@
             // Lists
             const lateLoans = DB.loans.filter(l => getLoanCalc(l).status === 'late');
             const warnLoans = DB.loans.filter(l => getLoanCalc(l).status === 'warn');
-            const recentLoans = [...DB.loans].sort((a, b) => parseDate(b.emissao) - parseDate(a.emissao)).slice(0, 3);
+            const recentLoans = [...DB.loans].sort((a, b) => b.emissao - a.emissao).slice(0, 3);
 
             const atenEl = document.getElementById('dash-atencao');
             const atenWrap = document.getElementById('dash-atencao-wrap');
@@ -4336,71 +4338,71 @@
                 );
 
             const prazo = Number(loan.prazo || 0);
-            const venc = addDays(parseDate(loan.emissao), prazo);
+            const venc = addDays(loan.emissao, prazo);
 
             return `
-      <div class="lc lc-${c.status}" onclick="closeSheet(document.getElementById('notif-sheet'));openEmpDetalhe('${loan.id}')">
-        <div class="lc-top">
-          <div class="flex-r">
-            ${showClient
+            <div class="lc lc-${c.status}" onclick="closeSheet(document.getElementById('notif-sheet')); openEmpDetalhe('${loan.id}')">
+                <div class="lc-top">
+                <div class="flex-r">
+                    ${showClient
                     ? `<div class="av ${client.color}">
-                  ${client.initials}
-                </div>`
+                        ${client.initials}
+                        </div>`
                     : ''}
-            <div>
-              <div class="lc-name">
-                ${fmtMoney(c.valorBase)}
-              </div>
-              <div class="lc-name">
-                ${showClient ? client.nome : loan.id}
-              </div>
-              <div class="lc-id">
-                ${fmtDate(loan.emissao)}
-                ⇨
-                ${fmtDate(dateStr(venc))}
-              </div>
-              <div class="lc-id">
-                ${prazo} dias
-              </div>
-            </div>
-          </div>
-          <div class="lc-id">
-          ${loan.id}
-          </div>
-          ${statusPill(c.status)}
-        </div>
-        <div class="lc-grid">
-          <div class="lc-mi">
-            <div class="lc-ml">Pago</div>
-            <div class="lc-mv">
-              ${fmtMoney(c.totalPago)}
-            </div>
-          </div>
-          <div class="lc-mi">
-            <div class="lc-ml">Restante</div>
-            <div class="lc-mv">
-              ${fmtMoney(
+                    <div>
+                    <div class="lc-name">
+                        ${fmtMoney(c.valorBase)}
+                    </div>
+                    <div class="lc-name">
+                        ${showClient ? client.nome : loan.id}
+                    </div>
+                    <div class="lc-id">
+                        ${fmtDate(loan.emissao)}
+                        ⇨
+                        ${fmtDate(venc)}
+                    </div>
+                    <div class="lc-id">
+                        ${prazo} dias
+                    </div>
+                    </div>
+                </div>
+                <div class="lc-id">
+                ${loan.id}
+                </div>
+                ${statusPill(c.status)}
+                </div>
+                <div class="lc-grid">
+                <div class="lc-mi">
+                    <div class="lc-ml">Pago</div>
+                    <div class="lc-mv">
+                    ${fmtMoney(c.totalPago)}
+                    </div>
+                </div>
+                <div class="lc-mi">
+                    <div class="lc-ml">Restante</div>
+                    <div class="lc-mv">
+                    ${fmtMoney(
                         Math.max(
                             0,
                             c.dividaTotal - c.totalPago
                         )
                     )}
-            </div>
-          </div>
-          <div class="lc-mi">
-            <div class="lc-ml">Situação</div>
-            <div class="lc-mv">
-              ${diasAtrasoOrVenc}
-            </div>
-          </div>
-        </div>
-        <div class="lc-bar">
-          <div
-            class="lc-fill ${fillClass}"
-            style="width:${progressPct}%"
-          ></div>
-        </div>
-      </div>`;
+                    </div>
+                </div>
+                <div class="lc-mi">
+                    <div class="lc-ml">Situação</div>
+                    <div class="lc-mv">
+                    ${diasAtrasoOrVenc}
+                    </div>
+                </div>
+                </div>
+                <div class="lc-bar">
+                <div
+                    class="lc-fill ${fillClass}"
+                    style="width:${progressPct}%"
+                ></div>
+                </div>
+            </div>`;
         }
 
         // ==================== EMPRESTIMOS ====================
@@ -4735,7 +4737,7 @@
                 if (_newLoanData) {
                     document.getElementById('ne-valor').value = _newLoanData.valor || '';
                     const dataEl = document.getElementById('ne-data');
-                    dataEl.value = _newLoanData.emissao || dateStr(TODAY);
+                    dataEl.value = dateStr(_newLoanData.emissao) || dateStr(TODAY);
                     dataEl.max = dateStr(TODAY);
                     document.getElementById('ne-juros-tipo').value = _newLoanData.juros_tipo || 'fixo';
                     document.getElementById('ne-juros-val').value = _newLoanData.juros_val || '';
@@ -4783,16 +4785,16 @@
             const valor = parseFloat(document.getElementById('ne-valor').value);
             if (valor < 0) { document.getElementById('ne-valor').value = ""; showToast('Insira um valor válido', 'err'); return; }
             const prazoRaw = prazoEl.value === 'custom' ? parseInt(document.getElementById('ne-prazo-custom').value) || 0 : parseInt(prazoEl.value) || 0;
-            const dataEmissao = document.getElementById('ne-data').value;
+            const dataEmissao = parseDate(document.getElementById('ne-data').value);
             if (!valor || !prazoRaw || !dataEmissao) { document.getElementById('novo-preview-mini').style.display = 'none'; return; }
-            const emissao = parseDate(dataEmissao);
+            const emissao = dataEmissao;
             const venc = addDays(emissao, prazoRaw);
             const pr = getProfitRate(prazoRaw);
             const valorBase = valor * (1 + pr);
             const jurosVal = parseFloat(document.getElementById('ne-juros-val').value);
             if (jurosVal < 0) { document.getElementById('ne-valor').value = ""; showToast('Insira um juros válido', 'err'); return; }
             document.getElementById('nv-receber').textContent = fmtMoney(valorBase);
-            document.getElementById('nv-venc').textContent = fmtDate(dateStr(venc));
+            document.getElementById('nv-venc').textContent = fmtDate(venc);
             document.getElementById('nv-lucro').textContent = fmtMoney(valorBase - valor) + ` (+${Math.round(pr * 100)}%)`;
             document.getElementById('novo-preview-mini').style.display = '';
         }
@@ -4800,12 +4802,12 @@
             const valor = parseFloat(document.getElementById('ne-valor').value) || 0;
             const prazoEl = document.getElementById('ne-prazo');
             const prazoRaw = prazoEl.value === 'custom' ? parseInt(document.getElementById('ne-prazo-custom').value) || 0 : parseInt(prazoEl.value) || 0;
-            const dataEmissao = document.getElementById('ne-data').value;
+            const dataEmissao = parseDate(document.getElementById('ne-data').value);
             const jurosTipo = document.getElementById('ne-juros-tipo').value;
             const jurosVal = parseFloat(document.getElementById('ne-juros-val').value) || 0;
             if (!valor || !prazoRaw || !dataEmissao || !jurosVal) { showToast('Preencha todos os campos obrigatórios', 'err'); return; }
             // Validate date
-            if (parseDate(dataEmissao) > TODAY) { showToast('A data de emissão não pode ser no futuro', 'err'); return; }
+            if (dataEmissao > TODAY) { showToast('A data de emissão não pode ser no futuro', 'err'); return; }
             // Validate valor
             if (valor <= 0) { showToast('O valor presisa ser maior que 0', 'err'); return; }
             const c = getClient(_novoSelectedClientId);
@@ -4838,7 +4840,7 @@
                     document.getElementById('novo-client-tel-lbl').textContent = c.tel;
                 }
                 document.getElementById('ne-valor').value = _newLoanData.valor || '';
-                document.getElementById('ne-data').value = _newLoanData.emissao || dateStr(TODAY);
+                document.getElementById('ne-data').value = dateStr(_newLoanData.emissao) || dateStr(TODAY);
                 document.getElementById('ne-juros-tipo').value = _newLoanData.juros_tipo || 'fixo';
                 document.getElementById('ne-juros-val').value = _newLoanData.juros_val || '';
                 const prazoEl = document.getElementById('ne-prazo');
@@ -4854,14 +4856,15 @@
                 updateNovoPreview();
             }
         }
+
         function renderPreview() {
             const d = _newLoanData;
             const c = getClient(d.clientId);
-            const emissao = parseDate(d.emissao);
+            const emissao = d.emissao;
             const venc = addDays(emissao, d.prazo);
             const pr = getProfitRate(d.prazo);
             const valorBase = d.valor * (1 + pr);
-            const isRetro = emissao < TODAY;
+            const isRetro = emissao < TODAY - 12 * 60 * 60 * 1000;
             const diasPassados = diffDays(emissao, TODAY);
             const isPastVenc = TODAY > venc;
             const diasAtraso = Math.max(0, diffDays(venc, TODAY));
@@ -4871,13 +4874,13 @@
 
             // Tabela de previsão de atraso (vencimento até 10 dias depois)
             let tblRows = '';
-            tblRows += `<tr class="venc"><td>${fmtDate(dateStr(venc))}</td><td>Vencimento</td><td>R$0,00</td><td>${fmtMoney(valorBase)}</td></tr>`;
+            tblRows += `<tr class="venc"><td>${fmtDate(venc)}</td><td>Vencimento</td><td>R$0,00</td><td>${fmtMoney(valorBase)}</td></tr>`;
             let acJ = 0;
             for (let dd = 1; dd <= 10; dd++) {
                 const dia = addDays(venc, dd);
                 acJ += jurosDia;
                 const isT = dateStr(dia) === dateStr(TODAY);
-                tblRows += `<tr class="${isT ? 'today' : ''}"><td>${fmtDate(dateStr(dia))}</td><td>+${dd}d</td><td>${fmtMoney(jurosDia)}</td><td>${fmtMoney(valorBase + acJ)}</td></tr>`;
+                tblRows += `<tr class="${isT ? 'today' : ''}"><td>${fmtDate(dia)}</td><td>+${dd}d</td><td>${fmtMoney(jurosDia)}</td><td>${fmtMoney(valorBase + acJ)}</td></tr>`;
             }
 
             let situacaoRetroHTML = '';
@@ -4911,7 +4914,7 @@
                 <div class="dr"><div class="dk">Valor a pagar (prazo)</div><div class="dv2 fw6 c-g" style="font-size:16px">${fmtMoney(valorBase)}</div></div>
                 <div class="dr"><div class="dk">Data de emissão</div><div class="dv2">${fmtDate(d.emissao)}</div></div>
                 <div class="dr"><div class="dk">Prazo de pagamento</div><div class="dv2">${d.prazo} dias</div></div>
-                <div class="dr" style="border:none"><div class="dk">Data de vencimento</div><div class="dv2 fw6">${fmtDate(dateStr(venc))}</div></div>
+                <div class="dr" style="border:none"><div class="dk">Data de vencimento</div><div class="dv2 fw6">${fmtDate(venc)}</div></div>
                 </div>
                 ${situacaoRetroHTML}
                 <div class="card mb12">
@@ -4922,11 +4925,13 @@
                 </div>
             `;
         }
+
         function irParaEmprestimoAposCriar() { openEmpDetalhe(_currentLoanId); }
+
         function confirmarEmprestimo() {
             const d = _newLoanData;
             const c = getClient(d.clientId);
-            const emissao = parseDate(d.emissao);
+            const emissao = d.emissao;
             const venc = addDays(emissao, d.prazo);
             const pr = getProfitRate(d.prazo);
             const valorBase = d.valor * (1 + pr);
@@ -4941,7 +4946,7 @@
                 <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${c.nome}</div></div>
                 <div class="dr"><div class="dk">Data de emissão</div><div class="dv2">${fmtDate(d.emissao)}</div></div>
                 <div class="dr"><div class="dk">Prazo</div><div class="dv2">${d.prazo} dias</div></div>
-                <div class="dr"><div class="dk">Vencimento</div><div class="dv2 fw6">${fmtDate(dateStr(venc))}</div></div>
+                <div class="dr"><div class="dk">Vencimento</div><div class="dv2 fw6">${fmtDate(venc)}</div></div>
                 <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(d.valor)}</div></div>
                 <div class="dr"><div class="dk">Valor a receber (+${Math.round(pr * 100)}%)</div><div class="dv2 c-g fw6" style="font-size:16px">${fmtMoney(valorBase)}</div></div>
                 <div class="dr" style="border:none"><div class="dk">Juros de atraso</div><div class="dv2 c-r">${jurosTxt}</div></div>
@@ -5022,27 +5027,27 @@
         function renderComprovante(loan) {
             const c = getClient(loan.clientId);
             const calc = getLoanCalc(loan);
-            const venc = addDays(parseDate(loan.emissao), loan.prazo);
+            const venc = addDays(loan.emissao, loan.prazo);
             const pr = getProfitRate(loan.prazo);
             document.getElementById('comp-content').innerHTML = `
-            <div class="receipt-head">
-                <div class="receipt-logo">EMPRÉS<span>TIMOS</span></div>
-                <div class="receipt-title">Comprovante de Empréstimo</div>
-                <div class="receipt-id">${loan.id}</div>
-            </div>
-            <div class="dv"></div>
-            <div class="dr"><div class="dk">Cliente</div><div class="dv2">${c.nome}</div></div>
-            <div class="dr"><div class="dk">Telefone</div><div class="dv2">${c.tel}</div></div>
-            <div class="dr"><div class="dk">Emissão</div><div class="dv2">${fmtDate(loan.emissao)}</div></div>
-            <div class="dr"><div class="dk">Prazo</div><div class="dv2">${loan.prazo} dias</div></div>
-            <div class="dr"><div class="dk">Vencimento</div><div class="dv2 fw6">${fmtDate(dateStr(venc))}</div></div>
-            <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(loan.valor)}</div></div>
-            <div class="dr"><div class="dk">Lucro (${Math.round(pr * 100)}%)</div><div class="dv2 c-g">+ ${fmtMoney(calc.valorBase - loan.valor)}</div></div>
-            <div class="dr" style="border:none"><div class="dk">Valor a pagar no prazo</div><div class="dv2 c-g fw6" style="font-size:16px">${fmtMoney(calc.valorBase)}</div></div>
-            <div class="dv"></div>
-            <div style="background:#00e8a210;border-radius:var(--rad8);padding:10px;text-align:center;margin-top:8px">
-                <div class="fs11 tc1">Juros de atraso: <strong>${loan.juros_tipo === 'fixo' ? fmtMoney(loan.juros_val) + '/dia' : loan.juros_val + '%/dia'}</strong></div>
-            </div>
+                <div class="receipt-head">
+                    <div class="receipt-logo">EMPRÉS<span>TIMOS</span></div>
+                    <div class="receipt-title">Comprovante de Empréstimo</div>
+                    <div class="receipt-id">${loan.id}</div>
+                </div>
+                <div class="dv"></div>
+                <div class="dr"><div class="dk">Cliente</div><div class="dv2">${c.nome}</div></div>
+                <div class="dr"><div class="dk">Telefone</div><div class="dv2">${c.tel}</div></div>
+                <div class="dr"><div class="dk">Emissão</div><div class="dv2">${fmtDate(loan.emissao)}</div></div>
+                <div class="dr"><div class="dk">Prazo</div><div class="dv2">${loan.prazo} dias</div></div>
+                <div class="dr"><div class="dk">Vencimento</div><div class="dv2 fw6">${fmtDate(venc)}</div></div>
+                <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(loan.valor)}</div></div>
+                <div class="dr"><div class="dk">Lucro (${Math.round(pr * 100)}%)</div><div class="dv2 c-g">+ ${fmtMoney(calc.valorBase - loan.valor)}</div></div>
+                <div class="dr" style="border:none"><div class="dk">Valor a pagar no prazo</div><div class="dv2 c-g fw6" style="font-size:16px">${fmtMoney(calc.valorBase)}</div></div>
+                <div class="dv"></div>
+                <div style="background:#00e8a210;border-radius:var(--rad8);padding:10px;text-align:center;margin-top:8px">
+                    <div class="fs11 tc1">Juros de atraso: <strong>${loan.juros_tipo === 'fixo' ? fmtMoney(loan.juros_val) + '/dia' : loan.juros_val + '%/dia'}</strong></div>
+                </div>
             `;
 
         }
@@ -5063,27 +5068,27 @@
                 const progressPct = Math.min(100, totalPago / Math.max(0, loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0)) * 100);
 
                 return `<div class="cc" onclick="openClienteDetalhe('${c.id}')">
-        <div class="cc-top">
-          <div class="av ${c.color}">${c.initials}</div>
-          <div class="cc-info">
-            <div class="cc-name">${c.nome}</div> 
-            <div class="cc-sub">${c.desc}</div>
-            <div class="cc-sub">${loans.length} empréstimo${loans.length !== 1 ? 's' : ''} · ${open} em aberto</div>
-          </div>
-          ${statusPill(statusC)}
-        </div>
-        <div class="cc-stats">
-          <div class="cc-s"><div class="cc-sv">${fmtMoney(totalEmp)}</div><div class="cc-sl">Emprestado</div></div>
-          <div class="cc-s"><div class="cc-sv c-g">${fmtMoney(totalPago)}</div><div class="cc-sl">Pago</div></div>
-          <div class="cc-s"><div class="cc-sv c-r">${fmtMoney(Math.max(0, loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0)))}</div><div class="cc-sl">A receber</div></div>
-        </div>
-        <div class="cc-bar">
-          <div
-            class="lc-fill done"
-            style="width:${progressPct}%"
-          ></div>
-        </div>
-      </div>`;
+                    <div class="cc-top">
+                    <div class="av ${c.color}">${c.initials}</div>
+                    <div class="cc-info">
+                        <div class="cc-name">${c.nome}</div> 
+                        <div class="cc-sub">${c.desc}</div>
+                        <div class="cc-sub">${loans.length} empréstimo${loans.length !== 1 ? 's' : ''} · ${open} em aberto</div>
+                    </div>
+                    ${statusPill(statusC)}
+                    </div>
+                    <div class="cc-stats">
+                    <div class="cc-s"><div class="cc-sv">${fmtMoney(totalEmp)}</div><div class="cc-sl">Emprestado</div></div>
+                    <div class="cc-s"><div class="cc-sv c-g">${fmtMoney(totalPago)}</div><div class="cc-sl">Pago</div></div>
+                    <div class="cc-s"><div class="cc-sv c-r">${fmtMoney(Math.max(0, loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0)))}</div><div class="cc-sl">A receber</div></div>
+                    </div>
+                    <div class="cc-bar">
+                    <div
+                        class="lc-fill done"
+                        style="width:${progressPct}%"
+                    ></div>
+                    </div>
+                </div>`;
             }).join('');
         }
 
@@ -5135,11 +5140,11 @@
             const sorted = [...loans].sort((a, b) => (order[getLoanCalc(a).status] || 2) - (order[getLoanCalc(b).status] || 2));
             document.getElementById('cd-emp-list').innerHTML = sorted.length ? sorted.map(l => {
                 const calc = getLoanCalc(l);
-                const venc = addDays(parseDate(l.emissao), l.prazo);
+                const venc = addDays(l.emissao, l.prazo);
                 const jVal = l.juros_tipo === 'fixo' ? fmtMoney(l.juros_val) + '/dia' : `${l.juros_val}%/dia`;
                 return `<div class="lc lc-${calc.status}" onclick="openEmpDetalhe('${l.id}')">
           <div class="lc-top">
-            <div><div class="lc-name">${fmtMoney(calc.valorBase)}</div><div class="lc-id">${fmtDate(l.emissao)} ⇨ ${fmtDate(dateStr(venc))}</div><div class="lc-id">${l.prazo} dias</div></div>
+            <div><div class="lc-name">${fmtMoney(calc.valorBase)}</div><div class="lc-id">${fmtDate(l.emissao)} ⇨ ${fmtDate(venc)}</div><div class="lc-id">${l.prazo} dias</div></div>
             <div><div class="lc-id">${l.id}</div></div>
             ${statusPill(calc.status)}
           </div>
@@ -5171,7 +5176,7 @@
             const c = getClient(l.clientId);
             _currentClientId = l.clientId;
             const calc = getLoanCalc(l);
-            const venc = addDays(parseDate(l.emissao), l.prazo);
+            const venc = addDays(l.emissao, l.prazo);
 
             const loan_anexo = l.anexo_envio[0] ? l.anexo_envio[0].anexo_id : '';
 
@@ -5185,14 +5190,14 @@
             document.getElementById('ed-valor-hoje').textContent = calc.isPago ? '✓ Quitado' : fmtMoney(calc.valorHoje);
             document.getElementById('ed-valor-hoje').className = 'amt-big ' + (calc.isPago ? 'c-g' : calc.status === 'late' ? 'c-r' : calc.status === 'warn' ? 'c-w' : 'c-g');
             document.getElementById('ed-dias-label').textContent = calc.isPago ? 'Totalmente pago' : calc.status === 'late' ? `${calc.diasAtraso} dia${calc.diasAtraso !== 1 ? 's' : ''} de atraso` : `${calc.diasParaVencer} dia${calc.diasParaVencer !== 1 ? 's' : ''} para vencer`;
-            document.getElementById('ed-venc-label').textContent = `Venceu ${fmtDate(dateStr(venc))}`;
+            document.getElementById('ed-venc-label').textContent = `Venceu ${fmtDate(venc)}`;
 
             // Resumo
             document.getElementById('ed-valor-emp').textContent = fmtMoney(l.valor);
             document.getElementById('ed-valor-comb').textContent = fmtMoney(calc.valorBase);
             document.getElementById('ed-data-emissao').textContent = fmtDate(l.emissao);
             document.getElementById('ed-prazo').textContent = `${l.prazo} dias`;
-            document.getElementById('ed-data-venc').textContent = fmtDate(dateStr(venc));
+            document.getElementById('ed-data-venc').textContent = fmtDate(venc);
             document.getElementById('ed-juros-dia').textContent = l.juros_tipo === 'fixo' ? fmtMoney(l.juros_val) + '/dia' : `${l.juros_val}%/dia`;
             document.getElementById('ed-total-pago').textContent = fmtMoney(calc.totalPago);
             document.getElementById('ed-saldo').textContent = calc.isPago ? 'Quitado' : fmtMoney(Math.max(0, calc.valorHoje));
@@ -5205,7 +5210,7 @@
             document.getElementById('ed-pag-form-wrap').style.display = calc.isPago ? 'none' : '';
             document.getElementById('ed-pag-valor').value = '';
             document.getElementById('ed-pag-data').value = dateStr(TODAY);
-            document.getElementById('ed-pag-data').min = l.emissao;
+            document.getElementById('ed-pag-data').min = dateStr(l.emissao);
             document.getElementById('ed-pag-data').max = dateStr(TODAY);
             document.getElementById('ed-pag-retro-wrap').style.display = 'none';
 
@@ -5290,7 +5295,7 @@
                         </svg>
                         Selecionar arquivo / imagem
                     </div>
-                    <button class="btn-p mt12" id="btn-salvar-anexo" onclick="saveAttach('loan', _currentLoanId)">Salvar</button>
+                    <button class="btn-p mt12" id="btn-salvar-anexo" onclick="add_anexo('loan', _currentLoanId, '${loan.emissao}')">Salvar</button>
                     `;
                 } else if (mode == 'pag' && pag.id) {
                     box_add.innerHTML = `
@@ -5304,7 +5309,7 @@
                         </svg>
                         Selecionar arquivo / imagem
                     </div>
-                    <button class="btn-p mt12" id="btn-salvar-anexo" onclick="saveAttach('pag','${pag.id}')">Salvar</button>
+                    <button class="btn-p mt12" id="btn-salvar-anexo" onclick="add_anexo('pag', '${pag.id}', '${pag.data}')">Salvar</button>
                     `;
                 }
             }
@@ -5323,7 +5328,7 @@
                     <div class="confirm-btns mt12">
                         <button class="cbtn-n"
                             onclick="closeSheet(document.getElementById('remove-attach'))">Cancelar</button>
-                        <button class="cbtn-r" onclick="remover_anexo('${anexo_id}', ${linha}, '${pid}', '${mode}')">Remover →</button>
+                        <button class="cbtn-r" onclick="del_anexo('${anexo_id}', ${linha}, '${pid}', '${mode}')">Remover →</button>
                     </div>
                 `;
             }
@@ -5345,8 +5350,8 @@
             const saldoIni = jurosEvents[0].saldoAntes;
             const saldoFim = jurosEvents[n - 1].saldoDepois;
             const totalJuros = jurosEvents.reduce((s, e) => s + e.valor, 0);
-            const firstDate = jurosEvents[0].date.toLocaleDateString('pt-BR');
-            const lastDate = jurosEvents[n - 1].date.toLocaleDateString('pt-BR');
+            const firstDate = fmtDate(jurosEvents[0].date);
+            const lastDate = fmtDate(jurosEvents[n - 1].date);
             const dateLabel = n === 1 ? firstDate : `${firstDate} – ${lastDate}`;
             const rangeLabel = n === 1
                 ? `${jurosEvents[0].label.replace('Dia ', '').replace(' de atraso', '').trim()}° dia de atraso`
@@ -5414,7 +5419,7 @@
                 quitado: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
             }[e.tipo] || '';
 
-            const dateFmt = e.date.toLocaleDateString('pt-BR');
+            const dateFmt = fmtDate(e.date);
             const dateLbl = e.isToday ? `<span style="color:var(--warn);font-weight:600">Hoje</span> · ${dateFmt}` : dateFmt;
 
             // Helper to build a row
@@ -5565,7 +5570,7 @@
                     ⚠ Adicionar anexo de pagamento
                     </button>`}
 
-                <button class="btn-icon w-full mb8" style="justify-content:center" onclick="closeSheet(document.getElementById('tl-event-sheet'));openEditPag('${lid}','${pid}')">
+                <button class="btn-icon w-full mb8" style="justify-content:center" onclick="closeSheet(document.getElementById('tl-event-sheet')); openEditPag('${lid}','${pid}')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 Editar pagamento
                 </button>
@@ -5582,12 +5587,12 @@
             const pag = loan && loan.pagamentos.find(p => p.id === pid);
             if (!pag) return;
             const client = getClient(loan.clientId);
-            const dtPag = parseDate(pag.data);
+            const dtPag = pag.data;
 
             // Simulate loan WITHOUT this payment to show impact
             const loanSim = structuredClone(loan);
             loanSim.pagamentos = loanSim.pagamentos.filter(p => p.id !== pid);
-            loanSim.pagamentos = loanSim.pagamentos.filter(p => parseDate(p.data) <= dtPag);
+            loanSim.pagamentos = loanSim.pagamentos.filter(p => p.data <= dtPag);
             const calcSim = getLoanCalc(loanSim);
             const calcNow = getLoanCalc(loan);
 
@@ -5596,7 +5601,8 @@
 
             document.getElementById('delete-pag-confirm-body').innerHTML = `
                 <div class="warn-box" style="background:#ff4d6d14;border-color:#ff4d6d40;margin-bottom:12px">
-                <div class="wb-t" style="color:var(--danger)">⚠ Ação irreversível</div>
+                <div class="wb-t" style="color:var(--danger)">⚠ AÇÃO IRREVERSILVEL</div>
+                <div class="wb-t" style="color:var(--danger)">TODOS OS PAGAMENTOS APÓS A DATA DESSE PAGAMENTO SERÃO APAGADOS TAMBÉM!</div>
                 <div class="wb-d">Este pagamento será apagado permanentemente e o histórico será recalculado.</div>
                 </div>
                 <div class="card-sm mb12">
@@ -5629,21 +5635,64 @@
                 </div>
                 <div class="confirm-btns">
                 <button class="cbtn-n" onclick="closeSheet(document.getElementById('delete-pag-confirm-sheet'))">Cancelar</button>
-                <button class="cbtn-y" style="background:var(--danger)" onclick="executarDeletePag('${lid}','${pid}')">Apagar ✗</button>
+                <button class="cbtn-y" style="background:var(--danger)" onclick="del_pagamento('${lid}','${pid}')">Apagar ✗</button>
                 </div>`;
 
             openSheet('delete-pag-confirm-sheet');
         }
 
-        function executarDeletePag(lid, pid) {
+        async function del_pagamento(lid, pid) {
             const loan = getLoan(lid);
-            if (!loan) return;
+            const pag = loan.pagamentos.find(p => p.id === pid);
+            if (!loan || !pag) return;
+            showLoading(['APAGANDO PAGAMENTO...', 'ATUALIZANDO DADOS...', 'APAGANDO ANEXOS...', 'COLETANDO NOVOS VALORES...', 'TERMINANDO...']);
 
-            loan.pagamentos = loan.pagamentos.filter(p => p.id !== pid);
+            
+            const pags_removidos = loan.pagamentos.filter(p => p.data >= pag.data);
+            let lins_pags = [pag.lin];
+            if (pags_removidos.length > 0) {
+                lins_pags = pags_removidos.map(pago => pago.lin);
+            }
+
+            const id = pid;
+            const data_busca = pag.data;
+
+            const dados_apagar = { id, lins_pags, data_busca };
+
+            try {
+                console.log("Apagando pagamento...");
+                const data_fetch = { data: dados_apagar, funcao: 'del_pagamento' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - del pagamento") };
+
+                const novoDB = await res.json();
+
+                if (novoDB.error) {
+                    throw new Error(novoDB.error);
+                }
+
+                console.log("Pagamento apagado com sucesso");
+                DB = novoDB;
+            }
+            catch (err) {
+                console.log("Erro ao apagar o pagamento");
+                console.log(err);
+            }
+
+            // Salvar backup local
+            backup_local();
+
             closeSheet(document.getElementById('delete-pag-confirm-sheet'));
+            openEmpDetalhe(lid)
+            hideLoading();
+
             showToast('Pagamento apagado', 'ok');
             updateNotifBadge();
-            setTimeout(() => openEmpDetalhe(lid), 300);
+            openEmpDetalhe(lid);
         }
 
         function openEmpMenu() {
@@ -5662,7 +5711,7 @@
             const loan = getLoan(_currentLoanId);
             if (!loan) return;
             document.getElementById('ee-valor').value = loan.valor;
-            document.getElementById('ee-data').value = loan.emissao;
+            document.getElementById('ee-data').value = dateStr(loan.emissao);
             document.getElementById('ee-data').max = dateStr(TODAY);
             document.getElementById('ee-prazo').value = loan.prazo;
             document.getElementById('ee-juros-tipo').value = loan.juros_tipo;
@@ -5676,7 +5725,7 @@
             if (!loan) return;
             const c = getLoanCalc(loan);
             const novoValor = parseFloat(document.getElementById('ee-valor').value) || 0;
-            const novaData = document.getElementById('ee-data').value;
+            const novaData = parseDate(document.getElementById('ee-data').value);
             const novoPrazo = parseInt(document.getElementById('ee-prazo').value) || 0;
             const novoTipo = document.getElementById('ee-juros-tipo').value;
             const novoJuros = parseFloat(document.getElementById('ee-juros-val').value) || 0;
@@ -5694,7 +5743,7 @@
 
             const pr = getProfitRate(novoPrazo);
             const novoBase = novoValor * (1 + pr);
-            const novaVenc = addDays(parseDate(novaData), novoPrazo);
+            const novaVenc = addDays(novaData, novoPrazo);
 
             // Simulate loan with new values
             const loanSim = structuredClone(loan);
@@ -5711,8 +5760,8 @@
             const row = (lbl, antes, depois, color) => {
                 const changed = String(antes) !== String(depois);
                 return `<div class="dr"><div class="dk">${lbl}</div>
-                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-                        ${changed ? `<div class="dv2 tc2" style="text-decoration:line-through;font-size:11px">${antes}</div>` : ''}
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px">
+                        ${changed ? `<div class="dv2 tc2" style="text-decoration:line-through; font-size:11px">${antes}</div>` : ''}
                         <div class="dv2 fw6" style="color:${color || 'var(--txt0)'}">${depois}</div>
                     </div></div>`;
             };
@@ -5723,7 +5772,7 @@
                 row('A receber (prazo)', fmtMoney(c.valorBase), fmtMoney(novoBase), 'var(--acc2)') +
                 row('Data de emissão', fmtDate(loan.emissao), fmtDate(novaData), '') +
                 row('Prazo', loan.prazo + 'd', novoPrazo + 'd', '') +
-                row('Vencimento', fmtDate(dateStr(addDays(parseDate(loan.emissao), loan.prazo))), fmtDate(dateStr(novaVenc)), '') +
+                row('Vencimento', fmtDate(addDays(loan.emissao, loan.prazo)), fmtDate(novaVenc), '') +
                 row('Juros/dia', jAntTxt, jTxt, 'var(--danger)');
 
             // Status box
@@ -5734,7 +5783,7 @@
             document.getElementById('ee-valor-hoje').textContent = cSim.isPago ? '✓ Quitado' : fmtMoney(cSim.valorHoje);
             document.getElementById('ee-valor-hoje').style.color = statusColors[cSim.status] || 'var(--acc2)';
             document.getElementById('ee-status-label').textContent = statusLabels[cSim.status] || '';
-            document.getElementById('ee-venc-label').textContent = `Vence ${fmtDate(dateStr(novaVenc))}`;
+            document.getElementById('ee-venc-label').textContent = `Vence ${fmtDate(novaVenc)}`;
 
             // Timeline
             const events = buildTimeline(loanSim);
@@ -5745,12 +5794,12 @@
         let _pendingEditEmp = null;
         function preConfirmarEditEmp() {
             const novoValor = parseFloat(document.getElementById('ee-valor').value) || 0;
-            const novaData = document.getElementById('ee-data').value;
+            const novaData = parseDate(document.getElementById('ee-data').value);
             const novoPrazo = parseInt(document.getElementById('ee-prazo').value) || 0;
             const novoTipo = document.getElementById('ee-juros-tipo').value;
             const novoJuros = parseFloat(document.getElementById('ee-juros-val').value) || 0;
             if (!novoValor || !novaData || !novoPrazo || !novoJuros) { showToast('Preencha todos os campos', 'err'); return; }
-            if (parseDate(novaData) > TODAY) { showToast('Data não pode ser no futuro', 'err'); return; }
+            if (novaData > TODAY) { showToast('Data não pode ser no futuro', 'err'); return; }
 
             _pendingEditEmp = { valor: novoValor, emissao: novaData, prazo: novoPrazo, juros_tipo: novoTipo, juros_val: novoJuros, pago: _pendingEditEmp_pago };
 
@@ -6010,6 +6059,7 @@
         }
 
 
+        // Abrir janela de edição de pagamentos
         function openEditPag(lid, pid) {
             const loan = getLoan(lid);
             let loan_retro = structuredClone(loan);
@@ -6018,38 +6068,17 @@
 
             function buildEditBody() {
                 const editValor = document.getElementById('epag-valor')?.value ?? pag.valor;
-                const editData = document.getElementById('epag-data')?.value ?? pag.data;
+                const dtPag = document.getElementById('epag-data')?.value ? parseDate(document.getElementById('epag-data')?.value) : pag.data;
                 const vValor = parseFloat(editValor) || 0;
-                const vData = editData || pag.data;
-                const dtPag = parseDate(vData);
-
-                // Simulate loan WITHOUT this payment to get base state
-                const loanSim = structuredClone(loan);
-                loanSim.pagamentos = loanSim.pagamentos.filter(p => p.id !== pid);
-                loanSim.pagamentos = loanSim.pagamentos.filter(p => parseDate(p.data) <= dtPag);
-
-                const calcSim = getLoanCalc(loanSim);
-                const venc = addDays(parseDate(loan.emissao), loan.prazo);
-
-                const jDia = loan.juros_tipo === 'fixo' ? loan.juros_val : calcSim.valorBase * loan.juros_val / 100;
-                const diasAtrasoNoPag = Math.max(0, diffDays(venc, dtPag));
-                const jurosNoPag = diasAtrasoNoPag * jDia;
-                const valorNoPag = Math.max(0, calcSim.valorBase - calcSim.totalPago) + jurosNoPag;
-                const saldoApos = Math.max(0, valorNoPag - vValor);
-                const isRetro = dtPag < TODAY;
-                // Today's state after edit
-                const diasAtrasoHoje = Math.max(0, diffDays(venc, TODAY));
-                const jurosHoje = Math.max(0, diasAtrasoHoje - diasAtrasoNoPag) * jDia;
-                const valorHoje = isRetro ? Math.max(0, saldoApos + (dtPag < venc ? 0 : jurosHoje)) : saldoApos;
-                const quitado = saldoApos <= 0;
+                const isRetro = dtPag < TODAY - 12 * 60 * 60 * 1000;
 
                 return `
                 <div class="sc-lbl">Dados do pagamento</div>
                 <div class="fg"><div class="fl">Valor pago (R$)</div>
-                    <input class="fi" id="epag-valor" type="text" inputmode="numeric" step="1" value="${pag.valor}" oninput="this.value=this.value.replace(/[^0-9\s]/g, '');refreshEditPag('${lid}','${pid}')">
+                    <input class="fi" id="epag-valor" type="text" inputmode="numeric" step="1" value="${pag.valor}" oninput="this.value=this.value.replace(/[^0-9\s]/g, ''); refreshEditPag('${lid}','${pid}')">
                 </div>
                 <div class="fg"><div class="fl">Data do pagamento</div>
-                    <input class="fi" id="epag-data" type="date" value="${pag.data}" min="${loan.emissao}" max="${dateStr(TODAY)}" onchange="refreshEditPag('${lid}','${pid}')">
+                    <input class="fi" id="epag-data" type="date" value="${dateStr(pag.data)}" min="${dateStr(loan.emissao)}" max="${dateStr(TODAY)}" onchange="refreshEditPag('${lid}','${pid}')">
                 </div>
 
                 <div class="sc-lbl mt12">Impacto desta edição</div>
@@ -6071,9 +6100,11 @@
             }
 
             document.getElementById('edit-pag-body').innerHTML = buildEditBody();
+
+            // Atualiza os impacto da edição do pagamento
+            refreshEditPag(lid, pid);
+
             openSheet('edit-pag-sheet');
-            // Populate impact + timeline immediately with current values
-            requestAnimationFrame(() => refreshEditPag(lid, pid));
         }
 
         // Shared renderer: converts events array → grouped HTML (juros collapsed)
@@ -6106,112 +6137,137 @@
             const idx = loanSim.pagamentos.findIndex(p => p.id === excludePid);
             if (idx >= 0) loanSim.pagamentos[idx] = { ...loanSim.pagamentos[idx], valor: novoValor, data: novaData };
             const events = buildTimeline(loanSim);
+
             return `<ul class="tl" style="padding-left:0">${renderTimelineHTML(events, null)}</ul>`;
         }
 
+        let _valor_edit;
         function refreshEditPag(lid, pid) {
             const loan = getLoan(lid);
             const pag = loan.pagamentos.find(p => p.id === pid);
             if (!pag) return;
             const vValor = parseFloat(document.getElementById('epag-valor')?.value) || 0;
-            const vData = document.getElementById('epag-data')?.value || '';
+            _valor_edit = vValor;
+            const vData = document.getElementById('epag-data')?.value ? parseDate(document.getElementById('epag-data')?.value) : '';
             if (!vData) return;
-            const dtPag = parseDate(vData);
+            const dtPag = vData + (21 * 60 * 60 * 1000);
+            const isRetro = vData < TODAY - (12 * 60 * 60 * 1000 + 100);
 
-            // Rebuild impact summary
+            // Simular emprestimo sem o pagamento atual e sem os pagamentos posterior ao editado
             const loanSim = structuredClone(loan);
-            //loanSim.pagamentos = loanSim.pagamentos.filter(p => p.id !== pid);
-            loanSim.pagamentos = loanSim.pagamentos.filter(p => parseDate(p.data) <= dtPag);
+
+            let pags_removidos = [];
+            if (dtPag >= pag.data) {
+                pags_removidos = loanSim.pagamentos.filter(p => p.data > pag.data);
+                loanSim.pagamentos = loanSim.pagamentos.filter(p => p.data <= pag.data);
+            } else {
+                pags_removidos = loanSim.pagamentos.filter(p => p.data > dtPag && p.id != pid);
+                loanSim.pagamentos = loanSim.pagamentos.filter(p => p.data <= dtPag || p.id == pid);
+            }
+
 
             const calcSim = getLoanCalc(loanSim);
-            const venc = addDays(parseDate(loan.emissao), loan.prazo);
+            const venc = addDays(loan.emissao, loan.prazo)-(21 * 60 * 60 * 1000);
+            const isLate = calcSim.status == "late";
 
             const jDia = loan.juros_tipo === 'fixo' ? loan.juros_val : calcSim.valorBase * loan.juros_val / 100;
             const diasAtrasoNoPag = Math.max(0, diffDays(venc, dtPag));
             const jurosNoPag = diasAtrasoNoPag * jDia;
-            const valorNoPag = Math.max(0, calcSim.valorBase - calcSim.totalPago) + jurosNoPag;
-            const saldoApos = vValor > 0 ? Math.max(0, valorNoPag - vValor) : null;
-            const isRetro = dtPag < TODAY;
-            const quitado = saldoApos !== null && saldoApos <= 0;
+            const valorNoPag = Math.max(0, calcSim.valorBase - calcSim.totalPago_antes) + jurosNoPag;
+            const saldoApos = Math.max(0, valorNoPag - vValor);
+
+            // Calcular valores no dia de hoje
             const diasAtrasoHoje = Math.max(0, diffDays(venc, TODAY));
-            const jurosHoje = Math.max(0, diasAtrasoHoje - diasAtrasoNoPag) * jDia;
-            const valorHoje = isRetro && saldoApos !== null ? Math.max(0, saldoApos + (dtPag < venc ? 0 : jurosHoje)) : saldoApos;
+            const jurosTotal = Math.max(0, diasAtrasoHoje * jDia);
+            const jurosRestante = jurosTotal - jurosNoPag;
+            const valorHoje = isLate ? Math.max(0, saldoApos + jurosRestante) : saldoApos;
+            const quitado = saldoApos <= 0;
 
             const impactEl = document.getElementById('epag-impact-section');
             if (impactEl) {
                 impactEl.innerHTML = `
-          <div class="dr"><div class="dk">Valor previsto em ${fmtDate(vData)}</div><div class="dv2 c-a">${fmtMoney(valorNoPag)}</div></div>
-          ${vValor > 0 ? `
-          <div class="dr"><div class="dk">Saldo após pagamento</div><div class="dv2 ${quitado ? 'c-g' : 'c-r'}">${quitado ? '✓ Quitado' : fmtMoney(saldoApos)}</div></div>
-          ${isRetro && !quitado ? `
-            <div class="dr"><div class="dk">Juros até hoje</div><div class="dv2 c-r">+ ${fmtMoney(jurosHoje)}</div></div>
-            <div class="dr" style="border:none"><div class="dk">Total a pagar hoje</div><div class="dv2 c-r fw6" style="font-size:15px">${fmtMoney(valorHoje)}</div></div>
-          ` : `<div class="dr" style="border:none"><div class="dk">Situação</div><div class="dv2 ${quitado ? 'c-g' : 'c-b'}">${quitado ? '✓ Dívida quitada' : 'Em dia'}</div></div>`}
-          ` : '<div class="dr" style="border:none"><div class="dk tc2 fs12">Preencha o valor para ver o impacto</div></div>'}`;
+                <div class="dr"><div class="dk">Valor previsto em ${fmtDate(dtPag)}</div><div class="dv2 c-a">${fmtMoney(valorNoPag)}</div></div>
+                ${vValor > 0 ? `
+                <div class="dr"><div class="dk">Saldo após pagamento</div><div class="dv2 ${quitado ? 'c-g' : 'c-r'}">${quitado ? '✓ Quitado' : fmtMoney(saldoApos)}</div></div>${isLate && !quitado ? `
+                <div class="dr"><div class="dk">Juros até hoje</div><div class="dv2 c-r">+ ${fmtMoney(jurosTotal)}</div></div>
+                <div class="dr" style="border:none"><div class="dk">Total a pagar hoje</div><div class="dv2 c-r fw6" style="font-size:15px">${fmtMoney(valorHoje)}</div></div>
+                ` : `<div class="dr" style="border:none"><div class="dk">Situação</div><div class="dv2 ${quitado ? 'c-g' : 'c-b'}">${quitado ? '✓ Dívida quitada' : 'Em dia'}</div></div>`}
+                ` : '<div class="dr" style="border:none"><div class="dk tc2 fs12">Preencha o valor para ver o impacto</div></div>'}`;
             }
 
             // Rebuild timeline
             const tlEl = document.getElementById('epag-tl-preview');
             if (tlEl) {
                 if (vValor > 0) {
-                    tlEl.innerHTML = buildEditTimelinePreview(loanSim, pid, vValor, vData);
+                    tlEl.innerHTML = buildEditTimelinePreview(loanSim, pid, vValor, dtPag);
                 } else {
                     tlEl.innerHTML = '<div class="fs12 tc2">Preencha o valor para ver o histórico</div>';
                 }
             }
         }
 
+        // 
         function confirmarEditPag(lid, pid) {
             const loan = getLoan(lid);
-            const pag = loan.pagamentos.find(p => p.id === pid);
+            const loanSim = structuredClone(loan);
+            const pag = loanSim.pagamentos.find(p => p.id === pid);
             if (!pag) return;
             const novoValor = parseFloat(document.getElementById('epag-valor').value) || 0;
-            const novaData = document.getElementById('epag-data').value;
+            let novaData = parseDate(document.getElementById('epag-data').value);
             if (!novoValor || !novaData) { showToast('Preencha valor e data', 'err'); return; }
 
-            const dt = parseDate(novaData);
-            const emissao = parseDate(loan.emissao);
-            if (dt < emissao) { showToast('A data não pode ser anterior à emissão do empréstimo', 'err'); return; }
+            const dt = novaData;
+            const emissao = loanSim.emissao;
+            if (dt + (12 * 60 * 60 * 1000)< emissao) { showToast('A data não pode ser anterior à emissão do empréstimo', 'err'); return; }
             if (dt > TODAY) { showToast('A data não pode ser no futuro', 'err'); return; }
 
-            const isRetro = dt < TODAY;
+            loanSim.pagamentos = loanSim.pagamentos.filter(p => p.data <= (dt + 12 * 60 * 60 * 1000));
+
+            let loan_pags_no_dia = loanSim.pagamentos.filter(p => p.data <= (dt + 12 * 60 * 60 * 1000) && p.data >= dt);
+            let max_data = dt + 100001;
+            if (loan_pags_no_dia.length > 0) {
+                max_data = Math.max(...loan_pags_no_dia.map(pago => pago.data)) + 1;
+            }
+            data = max_data;
+
+            const isRetro = dt < TODAY - 12 * 60 * 60 * 1000;
             const valorAnterior = pag.valor;
             const dataAnterior = pag.data;
             const alterouValor = novoValor !== valorAnterior;
             const alterouData = novaData !== dataAnterior;
 
-            _pendingEditPag = { lid, pid, valor: novoValor, data: novaData };
+            _pendingEditPag = { lid, pid, valor: novoValor, data: data };
 
             document.getElementById('edit-pag-confirm-body').innerHTML = `
-        <div class="warn-box" style="background:#f5a62312;border-color:#f5a62340;margin-bottom:12px">
-          <div class="wb-t" style="color:var(--acc3)">⚠ Confirmar alteração?</div>
-          <div class="wb-d">Esta edição irá recalcular o histórico do empréstimo.</div>
-        </div>
-        <div class="card-sm mb12">
-          <div class="sc-lbl">Antes</div>
-          <div class="dr"><div class="dk">Valor</div><div class="dv2 tc1">${fmtMoney(valorAnterior)}</div></div>
-          <div class="dr" style="border:none"><div class="dk">Data</div><div class="dv2 tc1">${fmtDate(dataAnterior)}</div></div>
-        </div>
-        <div class="card-sm mb12" style="border-color:var(--acc)">
-          <div class="sc-lbl" style="color:var(--acc)">Depois</div>
-          <div class="dr"><div class="dk">Valor</div><div class="dv2 ${alterouValor ? 'c-g fw6' : ''}">${fmtMoney(novoValor)}</div></div>
-          <div class="dr" style="border:none"><div class="dk">Data</div><div class="dv2 ${alterouData ? 'c-g fw6' : ''}">${fmtDate(novaData)}${isRetro ? ' <span style="color:var(--warn);font-size:11px">(retroativo)</span>' : ''}</div></div>
-        </div>
-        <div style="background:var(--bg2);border:1px solid var(--acc3);border-radius:var(--rad12);padding:12px;margin-bottom:12px">
-          <div class="fl" style="color:var(--acc3)">Digite o ID do pagamento para confirmar - ${pid}</div>
-          <input class="fi" id="edit-pag-id-input" type="text" placeholder="C00_E00_P00" style="border-color:var(--acc3)">
-        </div>
-        <div class="confirm-btns">
-          <button class="cbtn-n" onclick="closeSheet(document.getElementById('edit-pag-confirm-sheet'))">Cancelar</button>
-          <button class="cbtn-y" onclick="executarEditPag()">Salvar edição ✓</button>
-        </div>`;
+                <div class="warn-box" style="background:#f5a62312;border-color:#f5a62340;margin-bottom:12px">
+                <div class="wb-t" style="color:var(--acc3)">⚠ Confirmar alteração?</div>
+                <div class="wb-d">Esta edição irá recalcular o histórico do empréstimo.</div>
+                </div>
+                <div class="card-sm mb12">
+                <div class="sc-lbl">Antes</div>
+                <div class="dr"><div class="dk">Valor</div><div class="dv2 tc1">${fmtMoney(valorAnterior)}</div></div>
+                <div class="dr" style="border:none"><div class="dk">Data</div><div class="dv2 tc1">${fmtDate(dataAnterior)}</div></div>
+                </div>
+                <div class="card-sm mb12" style="border-color:var(--acc)">
+                <div class="sc-lbl" style="color:var(--acc)">Depois</div>
+                <div class="dr"><div class="dk">Valor</div><div class="dv2 ${alterouValor ? 'c-g fw6' : ''}">${fmtMoney(novoValor)}</div></div>
+                <div class="dr" style="border:none"><div class="dk">Data</div><div class="dv2 ${alterouData ? 'c-g fw6' : ''}">${fmtDate(novaData)}${isRetro ? ' <span style="color:var(--warn);font-size:11px">(retroativo)</span>' : ''}</div></div>
+                </div>
+                <div style="background:var(--bg2);border:1px solid var(--acc3);border-radius:var(--rad12);padding:12px;margin-bottom:12px">
+                <div class="fl" style="color:var(--acc3)">Digite o ID do pagamento para confirmar - ${pid}</div>
+                <input class="fi" id="edit-pag-id-input" type="text" placeholder="C00_E00_P00" style="border-color:var(--acc3)">
+                </div>
+                <div class="confirm-btns">
+                <button class="cbtn-n" onclick="closeSheet(document.getElementById('edit-pag-confirm-sheet'))">Cancelar</button>
+                <button class="cbtn-y" onclick="edit_pagamento()">Salvar edição ✓</button>
+                </div>`;
 
             openSheet('edit-pag-confirm-sheet');
         }
 
         let _pendingEditPag = null;
 
-        function executarEditPag() {
+        function edit_pagamento() {
             if (!_pendingEditPag) return;
             const { lid, pid, valor: novoValor, data: novaData } = _pendingEditPag;
             const typed = document.getElementById('edit-pag-id-input')?.value?.trim();
@@ -6219,7 +6275,7 @@
 
             closeSheet(document.getElementById('edit-pag-confirm-sheet'));
             closeSheet(document.getElementById('edit-pag-sheet'));
-            confirmarPagamento(lid, novoValor, novaData, pid)
+            add_pagamento(lid, novoValor, novaData, pid)
         }
 
         // ==================== PAGAMENTO ====================
@@ -6234,28 +6290,37 @@
             const loan = getLoan(_currentLoanId);
             let loan_retro = structuredClone(loan);
 
-            const data = document.getElementById('ed-pag-data').value;
+            let data = parseDate(document.getElementById('ed-pag-data').value);
             const valor = parseFloat(document.getElementById('ed-pag-valor').value) || 0;
             const wrap = document.getElementById('ed-pag-retro-wrap');
+            const wrap_retro = document.getElementById('ed-pag-retro-wrap-retro');
 
             if (!data) { wrap.style.display = 'none'; return; }
+            wrap.style.display = '';
 
-            const dt = parseDate(data);
-            const isRetro = dt < TODAY;
+            const dt = data;
+            const isRetro = dt < (TODAY - 12 * 60 * 60 * 1000);
+            if (!isRetro) { wrap_retro.style.display = 'none'; }
+            else { wrap_retro.style.display = ''; }
 
-            if (!isRetro) { wrap.style.display = 'none'; return; }
-
+            
             if (isRetro) {
-                loan_retro.pagamentos = loan_retro.pagamentos.filter(p => parseDate(p.data) <= dt);
+                loan_retro.pagamentos = loan_retro.pagamentos.filter(p => p.data <= (dt + 12 * 60 * 60 * 1000));
             }
 
-            wrap.style.display = '';
+            let loan_pags_no_dia = loan_retro.pagamentos.filter(p => p.data <= (dt + 12 * 60 * 60 * 1000) && p.data >= dt);
+            let max_data = dt + (22 * 60 * 60 * 1000);
+            if (loan_pags_no_dia.length > 0) {
+                max_data = Math.max(...loan_pags_no_dia.map(pago => pago.data)) + 1;
+            }
+            data = max_data;
 
             const tlEl = document.getElementById('novo-pag-tl-preview');
             if (!valor) {
                 tlEl.innerHTML = '<div class="fs12 tc2">Preencha o valor para ver o histórico</div>';
                 return;
             }
+
 
             tlEl.innerHTML = buildNewPagTimeline(loan_retro, valor, data);
         }
@@ -6271,7 +6336,7 @@
         function doRegistrarPagamento() {
             let valor, data;
             valor = parseFloat(document.getElementById('ed-pag-valor').value) || 0;
-            data = document.getElementById('ed-pag-data').value;
+            data = parseDate(document.getElementById('ed-pag-data').value);
 
 
             if (!valor || !data) { showToast('Informe valor e data', 'err'); return; }
@@ -6280,21 +6345,25 @@
             const loan = getLoan(_currentLoanId);
             let loan_retro = structuredClone(loan);
 
-            const dt = parseDate(data);
-            const emissao = parseDate(loan.emissao);
-            const todayStr = dateStr(TODAY);
-            if (dt < emissao) {
+            const dt = data;
+            const emissao = loan.emissao;
+            if (dt + (22 * 60 * 60 * 1000) < emissao) {
                 showToast('A data não pode ser anterior à emissão do empréstimo', 'err'); return;
             }
             if (dt > TODAY) {
                 showToast('A data não pode ser no futuro', 'err'); return;
             }
 
+            const isRetro = dt < (TODAY - (12 * 60 * 60 * 1000));
 
-            const isRetro = dt < TODAY;
+            loan_retro.pagamentos = loan_retro.pagamentos.filter(p => p.data <= (dt + 12 * 60 * 60 * 1000));
 
-            loan_retro.pagamentos = loan_retro.pagamentos.filter(p => parseDate(p.data) < dt);
-
+            let loan_pags_no_dia = loan_retro.pagamentos.filter(p => p.data <= (dt + 12 * 60 * 60 * 1000) && p.data >= dt);
+            let max_data = dt + 100001;
+            if (loan_pags_no_dia.length > 0) {
+                max_data = Math.max(...loan_pags_no_dia.map(pago => pago.data)) + 1;
+            }
+            data = max_data;
 
             const calc = getLoanCalc(loan_retro);
 
@@ -6311,34 +6380,34 @@
             }
 
             bodyHTML += `
-        <div class="card-sm mb12">
-          <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${client.nome}</div></div>
-          <div class="dr"><div class="dk">Contrato</div><div class="dv2">${loan_retro.id}</div></div>
-          <div class="dr"><div class="dk">Data</div><div class="dv2 ${isRetro ? 'c-a' : ''}">${fmtDate(data)}${isRetro ? ' · retroativo' : ''}</div></div>
-          <div class="dr"><div class="dk">Valor pago</div><div class="dv2 c-g fw6" style="font-size:17px">${fmtMoney(valor)}</div></div>
-          <div class="dr" style="border:none"><div class="dk">Saldo após pagamento</div>
-            <div class="dv2 fw6 ${quitaria ? 'c-g' : 'c-r'}">${quitaria ? '✓ Dívida quitada' : fmtMoney(saldoApos)}</div>
-          </div>
-        </div>`;
+                <div class="card-sm mb12">
+                <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${client.nome}</div></div>
+                <div class="dr"><div class="dk">Contrato</div><div class="dv2">${loan_retro.id}</div></div>
+                <div class="dr"><div class="dk">Data</div><div class="dv2 ${isRetro ? 'c-a' : ''}">${fmtDate(data)}${isRetro ? ' · retroativo' : ''}</div></div>
+                <div class="dr"><div class="dk">Valor pago</div><div class="dv2 c-g fw6" style="font-size:17px">${fmtMoney(valor)}</div></div>
+                <div class="dr" style="border:none"><div class="dk">Saldo após pagamento</div>
+                    <div class="dv2 fw6 ${quitaria ? 'c-g' : 'c-r'}">${quitaria ? '✓ Dívida quitada' : fmtMoney(saldoApos)}</div>
+                </div>
+                </div>`;
 
             if (isRetro) {
                 bodyHTML += `
-        <div class="sc-lbl mt8">Histórico recalculado</div>
-        <div class="card-sm mb12">
-          ${buildNewPagTimeline(loan_retro, valor, data)}
-        </div>`;
+                <div class="sc-lbl mt8">Histórico recalculado</div>
+                <div class="card-sm mb12">
+                ${buildNewPagTimeline(loan_retro, valor, data + (22 * 60 * 60 * 1000))}
+                </div>`;
             }
 
             bodyHTML += `
-        <div class="confirm-btns">
-          <button class="cbtn-n" onclick="closeSheet(document.getElementById('pag-confirm-sheet'))">Cancelar</button><button class="cbtn-y" onclick="confirmarPagamento('${_currentLoanId}',${valor},'${data}')">Confirmar ✓</button></div>`;
+                <div class="confirm-btns">
+                <button class="cbtn-n" onclick="closeSheet(document.getElementById('pag-confirm-sheet'))">Cancelar</button><button class="cbtn-y" onclick="add_pagamento('${_currentLoanId}',${valor},'${data}')">Confirmar ✓</button></div>`;
 
             document.getElementById('pag-confirm-body').innerHTML = bodyHTML;
             openSheet('pag-confirm-sheet');
         }
 
 
-        async function confirmarPagamento(lid, valor, data, pid_old) {
+        async function add_pagamento(lid, valor, data, pid_old) {
             showLoading(['REALIZANDO PAGAMENTO...', 'SALVANDO DADOS...', 'COLETANDO NOVOS VALORES...', 'TERMINANDO...']);
             closeSheet(document.getElementById('pag-confirm-sheet'));
             closeSheet(document.getElementById('retro-final-sheet'));
@@ -6346,33 +6415,47 @@
             let loan_retro = structuredClone(loan);
 
             const pag = loan.pagamentos.find(p => p.id === pid_old);
-            const dtPag = parseDate(data);
-            const isRetro = dtPag < TODAY;
+            const dtPag = data;
+            const isRetro = dtPag < TODAY - 12 * 60 * 60 * 1000;
+            const qtd_pags = loan.qtd_pags;
 
             // Se retroativo: apaga todos os pagamentos com data APÓS a data deste pagamento
             let removidos_lins = [];
+            let removidos = [];
+            let novo_qtd_pags = 0;
+            if(pid_old) {
+                removidos = loan.pagamentos.filter(p => p.data > dtPag || p.data > pag.data || p.id === pid_old);
+                loan_retro.pagamentos = loan.pagamentos.filter(p => p.data < dtPag && p.data < pag.data);
+                novo_qtd_pags = qtd_pags;
 
-            const removidos = loan.pagamentos.filter(p => parseDate(p.data) > dtPag || p.id === pid_old);
-
-            loan_retro.pagamentos = loan.pagamentos.filter(p => parseDate(p.data) < dtPag);
-
+            } else {
+                removidos = loan.pagamentos.filter(p => p.data > dtPag || p.id === pid_old);
+                loan_retro.pagamentos = loan.pagamentos.filter(p => p.data < dtPag);
+                novo_qtd_pags = qtd_pags + 1;
+            }
+            
             removidos_lins = removidos.map(p => p.lin);
+            
+
 
             const calc = getLoanCalc(loan_retro);
             const totalPagoAntes = calc.totalPago || 0;
             const totalPagoDepois = totalPagoAntes + valor;
-            const geradoEm = dateStr(TODAY);
+            const geradoEm = TODAY;
             const status = totalPagoDepois >= calc.dividaTotal ? "PAGAMENTO COMPLETO" : "PAGAMENTO PARCIAL";
 
             // Criar o novo id do pagamento atual
-            const qtd_pags = loan.qtd_pags;
             let novo_id = loan.id + "_P" + String(qtd_pags + 1).padStart(2, '0');;
 
             const pid = pid_old ? pid_old : novo_id;
             const lin_loan = loan.lin;
-            const novo_qtd_pags = qtd_pags + 1;
 
-            const pagamento = { id: pid, data, valor, status, anexo_pag: [], totalPagoAntes, geradoEm, removidos_lins, lin_loan, novo_qtd_pags };
+            const pagamento = { id: pid, data, valor, status, anexo_pag: [], totalPagoAntes, geradoEm, removidos_lins };
+
+            if (!pid_old) {
+                pagamento.lin_loan = lin_loan;
+                pagamento.novo_qtd_pags = novo_qtd_pags;
+            }
 
             try {
                 console.log("Adicionando pagamento na planilha...");
@@ -6400,8 +6483,8 @@
 
                 // Se retroativo: apaga todos os pagamentos com data APÓS a data deste pagamento
                 if (isRetro) {
-                    const removidos = structuredClone(loan.pagamentos.filter(p => parseDate(p.data) > dtPag));
-                    loan.pagamentos = loan_retro.pagamentos.filter(p => parseDate(p.data) <= dtPag);
+                    const removidos = structuredClone(loan.pagamentos.filter(p => p.data > dtPag));
+                    loan.pagamentos = loan_retro.pagamentos.filter(p => p.data <= dtPag);
                 }
                 loan.pagamentos.push(pagamento);
                 DB.time = Date.now();
@@ -6409,15 +6492,14 @@
 
             // Salvar backup local
             backup_local();
-            hideLoading();
 
-
-            showToast('Pagamento registrado! ✓', 'ok');
+            openEmpDetalhe(lid);
             updateNotifBadge();
-            setTimeout(() => {
-                openEmpDetalhe(lid);
-                setTimeout(() => abrirComprovantePagamento(lid, pid), 350);
-            }, 300);
+
+            hideLoading();
+            abrirComprovantePagamento(lid, pid);
+            showToast('Pagamento registrado! ✓', 'ok');
+
         }
 
 
@@ -6432,7 +6514,7 @@
 
 
         function renderComprovantePagamento(loan, pag) {
-            const vencimento = addDays(loan.emissao, loan.prazo);
+            const vencimento = addDays(loan.emissao, loan.prazo)-(21 * 60 * 60 * 1000);
             const pr = getProfitRate(loan.prazo);
             const valorBase = loan.valor * (1 + pr); // valor combinado (principal + lucro)
             const jDia = loan.juros_tipo === 'fixo' ? loan.juros_val : valorBase * loan.juros_val / 100;
@@ -6441,11 +6523,13 @@
 
             const juros_dia = loan.juros_tipo == 'fixo' ? fmtMoney(jDia) + '/dia' : loan.juros_val + '%/dia';
 
-            const dtPag = parseDate(pag.data);
+            const dtPag = pag.data;
 
             // Calc saldo and juros on the payment day
             let saldoNoDia, jurosAcumNoDia, diasAtrasoPag;
             diasAtrasoPag = diffDays(vencimento, dtPag);
+
+
             if (dtPag <= vencimento) {
                 // Within the term — no late interest yet
                 jurosAcumNoDia = 0;
@@ -6461,14 +6545,15 @@
 
             const dividaTotal = valorBase + jurosAcumNoDia;
             const valorApos = Math.max(0, saldoNoDia - pag.valor);
-            const progressoPct = Math.min(100, Math.round((totalPagoAgora / dividaTotal) * 100));
+            const progressoPct = Math.min(100, Math.ceil((totalPagoAgora / dividaTotal) * 100));
+
             const restantePct = Math.max(0, 100 - progressoPct);
 
-            const retro = pag.geradoEm > pag.data;
-            const diasRetro = diffDays(vencimento, parseDate(pag.geradoEm));
-            const diasRetro_Pag = diffDays(parseDate(pag.data), parseDate(pag.geradoEm));
+            const retro = pag.data < pag.geradoEm - 12 * 60 * 60 * 1000;
+            const diasRetro = diffDays(vencimento, pag.geradoEm);
+            const diasRetro_Pag = diffDays(pag.data, pag.geradoEm);
             let jurosRetro, saldoFuturo, dividaTotalFuturo;
-            if (parseDate(pag.geradoEm) <= vencimento) {
+            if (pag.geradoEm <= vencimento) {
                 // Within the term — no late interest yet
                 jurosRetro = 0;
                 saldoFuturo = valorApos;
@@ -6497,7 +6582,7 @@
             return `
               <div style="padding:2px">
                 <div style="text-align:center; padding-bottom:10px; margin-top:-20px">
-                    <div style="font-size:10px; color:var(--warn); font-weight:700; white-space:nowrap">${pag.geradoEm > pag.data ? 'RETROATIVO' : ''}</div>
+                    <div style="font-size:10px; color:var(--warn); font-weight:700; white-space:nowrap">${retro ? 'RETROATIVO' : ''}</div>
                     <div style="font-size:24px; font-weight:800; letter-spacing:.6px">${pag.status}</div>
                 </div>
                 <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin-bottom:30px; text-align:center">
@@ -6522,7 +6607,7 @@
                         <span>Restante</span>
                     </div>
                     <div class="rcpt-progress-bar">
-                        <div class="rcpt-progress-fill" style="width:${progressoPct}%;background:var(--acc)"></div>
+                        <div class="rcpt-progress-fill" style="width:${progressoPct}%; background:var(--acc)"></div>
                     </div>
                     <div class="flex-sb" style="margin-top:2px; font-size:11px">
                         <span>${fmtMoney(totalPagoAgora)}</span>
@@ -6571,7 +6656,7 @@
                         </div>
                 </div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:50px; max-width:250px; min-width:50px; margin:0 auto; padding-bottom:30px;">
-                    <div style="text-align:center; font-size:10px; font-weight:100">${fmtDate(dateStr(vencimento))}</div>
+                    <div style="text-align:center; font-size:10px; font-weight:100">${fmtDate(vencimento)}</div>
                         <div style="display:grid; grid-template-columns:60px auto; gap:10px; max-width:220px; min-width:100px; margin:0 auto">
                             <div style="text-align:start; font-size:10px; color:var(--txt2); white-space: nowrap ">${diasAtrasoPag > 0 ? 'DE ATRASO' :
                     diasAtrasoPag == 0 && !retro ? 'VENCE' :
@@ -6831,17 +6916,17 @@
             div.style.gap = '8px';
             div.style.alignItems = 'flex-end';
             div.innerHTML = `
-        <div class="fg" style="flex:1;margin-bottom:0">
-          <div class="fl">Prazo (dias)</div>
-          <input class="fi" id="def-dias-${tempKey}" type="text" inputmode="numeric" min="1" max="365" value="${nextDias}" placeholder="Ex: 7" oninput="this.value=this.value.replace(/[^0-9\s]/g, '')">
-        </div>
-        <div class="fg" style="flex:1;margin-bottom:0">
-          <div class="fl">Taxa de lucro (%)</div>
-          <input class="fi" id="def-prazo-${tempKey}" type="text" inputmode="numeric" min="0" max="999" step="0.1" placeholder="Ex: 20" oninput="this.value=this.value.replace(/[^0-9\s]/g, '')">
-        </div>
-        <div onclick="removePrazoRow('${tempKey}')" style="flex-shrink:0;width:32px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--danger)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-        </div>`;
+                <div class="fg" style="flex:1;margin-bottom:0">
+                <div class="fl">Prazo (dias)</div>
+                <input class="fi" id="def-dias-${tempKey}" type="text" inputmode="numeric" min="1" max="365" value="${nextDias}" placeholder="Ex: 7" oninput="this.value=this.value.replace(/[^0-9\s]/g, '')">
+                </div>
+                <div class="fg" style="flex:1;margin-bottom:0">
+                <div class="fl">Taxa de lucro (%)</div>
+                <input class="fi" id="def-prazo-${tempKey}" type="text" inputmode="numeric" min="0" max="999" step="0.1" placeholder="Ex: 20" oninput="this.value=this.value.replace(/[^0-9\s]/g, '')">
+                </div>
+                <div onclick="removePrazoRow('${tempKey}')" style="flex-shrink:0;width:32px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--danger)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                </div>`;
             container.appendChild(div);
             div.querySelector('input').focus();
         }
@@ -6894,19 +6979,19 @@
                     prazoDiffs += `<div class="dr"><div class="dk">Prazo ${dias} dias</div><div class="dv2 c-r fw6">Removido</div></div>`;
                 } else if (String(antes) !== String(depois)) {
                     prazoDiffs += `<div class="dr"><div class="dk">Prazo ${dias} dias</div>
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-              <div class="dv2 tc2" style="text-decoration:line-through;font-size:11px">${antes}%</div>
-              <div class="dv2 c-g fw6">${depois}%</div>
-            </div></div>`;
+                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                        <div class="dv2 tc2" style="text-decoration:line-through;font-size:11px">${antes}%</div>
+                        <div class="dv2 c-g fw6">${depois}%</div>
+                    </div></div>`;
                 }
             }
 
             const mudou = (label, antes, depois, suffix) => String(antes) !== String(depois)
                 ? `<div class="dr"><div class="dk">${label}</div>
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-              <div class="dv2 tc2" style="text-decoration:line-through;font-size:11px">${antes}${suffix}</div>
-              <div class="dv2 c-g fw6">${depois}${suffix}</div>
-            </div></div>` : '';
+                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+                        <div class="dv2 tc2" style="text-decoration:line-through;font-size:11px">${antes}${suffix}</div>
+                        <div class="dv2 c-g fw6">${depois}${suffix}</div>
+                    </div></div>` : '';
 
             const jurosTipoDiff = mudou('Tipo de juros padrão', d.juros_tipo === 'fixo' ? 'Fixo (R$)' : 'Percentual (%)', novoTipo === 'fixo' ? 'Fixo (R$)' : 'Percentual (%)', '');
             const jurosFixoDiff = mudou('Juros fixo padrão', d.juros_fixo_val || d.juros_val, novoFixoVal, ' R$');
@@ -6914,17 +6999,17 @@
             const allDiffs = prazoDiffs + jurosTipoDiff + jurosFixoDiff + jurosPercDiff;
 
             document.getElementById('defaults-confirm-body').innerHTML = `
-        <div class="warn-box" style="background:#3d7fff12;border-color:#3d7fff40;margin-bottom:12px">
-          <div class="wb-t" style="color:var(--acc2)">Confirmar alterações</div>
-          <div class="wb-d">Estes valores serão usados como padrão em todos os novos empréstimos.</div>
-        </div>
-        <div class="card-sm mb12">
-          ${allDiffs || '<div class="fs12 tc2 text-center" style="padding:8px 0">Nenhuma alteração detectada.</div>'}
-        </div>
-        <div class="confirm-btns">
-          <button class="cbtn-n" onclick="closeSheet(document.getElementById('defaults-confirm-sheet'))">← Rever</button>
-          <button class="cbtn-y" ${!allDiffs ? 'disabled style="opacity:.4"' : ''} onclick="executarDefaults()">Salvar ✓</button>
-        </div>`;
+                <div class="warn-box" style="background:#3d7fff12;border-color:#3d7fff40;margin-bottom:12px">
+                    <div class="wb-t" style="color:var(--acc2)">Confirmar alterações</div>
+                    <div class="wb-d">Estes valores serão usados como padrão em todos os novos empréstimos.</div>
+                    </div>
+                <div class="card-sm mb12">
+                    ${allDiffs || '<div class="fs12 tc2 text-center" style="padding:8px 0">Nenhuma alteração detectada.</div>'}
+                </div>
+                    <div class="confirm-btns">
+                    <button class="cbtn-n" onclick="closeSheet(document.getElementById('defaults-confirm-sheet'))">← Rever</button>
+                    <button class="cbtn-y" ${!allDiffs ? 'disabled style="opacity:.4"' : ''} onclick="executarDefaults()">Salvar ✓</button>
+                </div>`;
 
             _pendingDefaults = { prazos: novosPrazos, juros_tipo: novoTipo, juros_val: novoVal, juros_fixo_val: novoFixoVal, juros_perc_val: novoPercVal };
 
@@ -6959,8 +7044,8 @@
             sel.innerHTML = `<option value="">Escolher…</option>
         ${Object.entries(d).map(([dias, pct]) =>
                 `<option value="${dias}">${dias} dias (+${pct}%)</option>`
-            ).join('')}
-        <option value="custom">Personalizado</option>`;
+                ).join('')}
+                    <option value="custom">Personalizado</option>`;
             sel.value = cur; // restore selection if still valid
             // Also pre-fill juros fields if empty
             const tipoEl = document.getElementById('ne-juros-tipo');
@@ -7170,7 +7255,7 @@
         }
 
         // Função para enviar o anexo
-        async function saveAttach(mode, anexo_id) {
+        async function add_anexo(mode, anexo_id, data_x) {
             if (!attachFile) {
                 showToast('Selecione um arquivo');
                 return;
@@ -7181,6 +7266,7 @@
                 return;
             }
 
+            const data_ref = data_x;
             const file_name = anexo_id;
             showLoading(['CONVERTENDO ANEXO...', 'ENVIANDO PARA O DRIVE...', 'SALVANDO NA PASTA...', 'SINCRONIZANDO...', 'TERMINANDO...']);
 
@@ -7191,7 +7277,8 @@
                 const dadosParaEnvio = {
                     nome: file_name,
                     tipo: attachFile.type,
-                    base64: base64
+                    base64: base64,
+                    data_ref
                 };
 
 
@@ -7212,7 +7299,7 @@
 
                     console.log("Anexo adicionado com sucesso");
                     DB = novoDB;
-                    //console.log(DB);
+                    console.log(DB);
 
                     const loan = getLoan(_currentLoanId);
                     if (mode == 'loan') {
@@ -7245,7 +7332,7 @@
         }
 
         // Função para remover anexos
-        async function remover_anexo(anexo_id, linha, pid, mode) {
+        async function del_anexo(anexo_id, linha, pid, mode) {
             if (!anexo_id || !linha) { return showToast('Erro ao apagar anexo!'); }
 
             showLoading(['APAGANDO ANEXO...', 'APAGANDO NO DRIVE...', 'APAGANDO NA PLANILHA...', 'SINCRONIZANDO...', 'TERMINANDO...']);
