@@ -2759,12 +2759,23 @@
                         <div id="dash-prox"></div>
                     </div>
 
-                    <!-- Recentes -->
-                    <div class="sh mt8">
-                        <div class="sh-t">Recentes</div>
-                        <div class="sh-l" onclick="navTo('emprestimos','all')">Ver todos</div>
+                    <!-- Em dia -->
+                    <div id="dash-ok-wrap" class="mt8">
+                        <div class="sh">
+                            <div class="sh-t">Em Dia</div>
+                            <div class="sh-l" onclick="navTo('emprestimos','ok')">Ver todos</div>
+                        </div>
+                        <div id="dash-ok"></div>
                     </div>
-                    <div id="dash-recentes"></div>
+
+                    <!-- Pagos -->
+                    <div id="dash-done-wrap" class="mt8">
+                        <div class="sh">
+                            <div class="sh-t">Pagos</div>
+                            <div class="sh-l" onclick="navTo('emprestimos','done')">Ver todos</div>
+                        </div>
+                        <div id="dash-done"></div>
+                    </div>
                 </div>
             </div>
 
@@ -2821,12 +2832,12 @@
                             <div class="fg">
                                 <div class="fl">Nome completo *</div><input class="fi" id="nc-nome"
                                     placeholder="Ex: João da Silva"
-                                    oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, '');">
+                                    oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, ''); att_cliente('nc-nome');">
                             </div>
                             <div class="fg">
                                 <div class="fl">Telefone *</div><input class="fi" id="nc-tel" type="tel"
                                     placeholder="Ex: 12912345678"
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); att_cliente('nc-tel');">
                             </div>
                             <div class="fg">
                                 <div class="fl">E-mail</div><input class="fi" id="nc-email" type="email"
@@ -2848,7 +2859,7 @@
                             <div class="ptitle">Novo Empréstimo</div>
                             <div class="psub" style="margin-bottom:0">Passo 2 — Dados do empréstimo</div>
                         </div>
-                        <div class="btn-icon" style="height:34px;align-self:flex-start;margin-top:4px"
+                        <div class="btn-icon" style="height:34px; align-self:flex-start; margin-top:4px"
                             onclick="openDefaultsSheet()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round">
@@ -2858,6 +2869,7 @@
                             </svg>
                         </div>
                     </div>
+
                     <div class="card mb12">
                         <div class="sc-lbl">Cliente selecionado</div>
                         <div class="flex-r">
@@ -2866,61 +2878,85 @@
                                 <div class="fw6" id="novo-client-name-lbl"></div>
                                 <div class="fs11 tc2" id="novo-client-tel-lbl"></div>
                             </div>
-                            <div style="margin-left:auto;font-size:12px;color:var(--acc);cursor:pointer"
+                            <div style="margin-left:auto; font-size:12px; color:var(--acc); cursor:pointer"
                                 onclick="backToStep1()">
                                 Trocar</div>
                         </div>
                     </div>
+
                     <div class="card">
-                        <div class="sc-lbl">Dados do Empréstimo</div>
-                        <div class="fg">
-                            <div class="fl">Valor emprestado (R$) *</div>
-                            <input class="fi" id="ne-valor" type="text" inputmode="numeric" placeholder="100 R$"
-                                oninput="this.value=this.value.replace(/[^0-9]/g,'');updateNovoPreview();">
+                        <div class="sc-lbl" style="text-align: center;">Tipo de Cálculo</div>
+                        <div class="flex-r mb12"
+                            style="gap:4px; background:rgba(0,0,0,0.05); padding:4px; border-radius:8px; width:100%; justify-content: center;">
+                            <button id="btn-modo-padrao" type="button" class="btn-p"
+                                style="flex:1; margin:0; font-size:13px; height:36px; border-radius:6px; display: inline-flex; align-items: center; justify-content: center; padding: 0;"
+                                onclick="setModoCalculo('padrao')">Taxas Padrão</button>
+                            <button id="btn-modo-manual" type="button" class="btn-s"
+                                style="flex:1; margin:0; font-size:13px; height:36px; border-radius:6px; background:transparent; border:none; box-shadow:none; display: inline-flex; align-items: center; justify-content: center; padding: 0;"
+                                onclick="setModoCalculo('manual')">Manual / Livre</button>
                         </div>
-                        <div class="fr">
-                            <div class="fg">
-                                <div class="fl">Data de emissão *</div>
-                                <input class="fi" id="ne-data" type="date" onchange="updateNovoPreview()">
+                        <input type="hidden" id="ne-modo-calculo" value="padrao">
+                        <div class="sc-lbl mt12" style="text-align: center;">Dados do Empréstimo</div>
+                        <div class="fr" style="display: flex; gap: 12px; width: 100%;">
+                            <div class="fg" id="wrap-ne-valor"
+                                style="flex: 1; transition: all 0.2s ease; white-space: nowrap;">
+                                <div class="fl" style="text-align: center;">Valor emprestado (R$) *</div>
+                                <input class="fi" id="ne-valor" type="text" inputmode="numeric" placeholder="100 R$"
+                                    style="width: 100%; text-align: center;"
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview();">
                             </div>
-                            <div class="fg">
-                                <div class="fl">Prazo (dias) *</div>
-                                <select class="fi fs" id="ne-prazo" onchange="updateNovoPreview()">
+                            <div class="fg" id="wrap-ne-receber"
+                                style="display: none; flex: 1; transition: all 0.2s ease; white-space: nowrap;">
+                                <div class="fl" style="text-align: center;">Valor a receber (R$) *</div>
+                                <input class="fi" id="ne-receber-manual" type="text" inputmode="numeric"
+                                    placeholder="120 R$" style="width: 100%; text-align: center;"
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); validarECalcularManual();">
+                            </div>
+                        </div>
+                        <div class="fr" style="margin-top:8px; display: flex; gap: 12px;">
+                            <div class="fg" style="flex:1;">
+                                <div class="fl" style="text-align: center;">Data de emissão *</div>
+                                <input class="fi" id="ne-data" type="date" style="width: 100%; text-align: center;"
+                                    onchange="updateNovoPreview()">
+                            </div>
+                            <div class="fg" style="flex:1;">
+                                <div class="fl" style="text-align: center;">Prazo (dias) *</div>
+                                <select class="fi fs" id="ne-prazo"
+                                    style="width: 100%; text-align: center; text-align-last: center;"
+                                    onchange="updateNovoPreview()">
                                     <option value="">Escolher…</option>
-                                    <option value="3">3 dias (+10%)</option>
-                                    <option value="5">5 dias (+15%)</option>
-                                    <option value="7">7 dias (+20%)</option>
-                                    <option value="14">14 dias (+25%)</option>
-                                    <option value="21">21 dias (+30%)</option>
-                                    <option value="30">30 dias (+35%)</option>
                                     <option value="custom">Personalizado</option>
                                 </select>
+                                <input class="fi" id="ne-prazo-manual" type="text" inputmode="numeric"
+                                    placeholder="Ex: 15" style="display:none; width: 100%; text-align: center;"
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview();">
                             </div>
                         </div>
-                        <div id="custom-prazo-wrap" style="display:none" class="fg">
-                            <div class="fl">Prazo em dias *</div>
+                        <div id="custom-prazo-wrap" style="display:none" class="fg mt8">
+                            <div class="fl" style="text-align:center">Prazo em dias *</div>
                             <input class="fi" id="ne-prazo-custom" type="text" inputmode="numeric" min="1"
-                                placeholder="Ex: 10"
+                                placeholder="Ex: 10" style="width: 100%; text-align: center"
                                 oninput="this.value=this.value.replace(/[^0-9\s]/g, ''); updateNovoPreview()">
                         </div>
-                        <div class="fg">
-                            <div class="fl">Juros por dia de atraso *</div>
-                            <div class="flex-r" style="gap:10px;align-items:center">
-                                <select class="fi fs" id="ne-juros-tipo" style="flex:0.85"
+                        <div class="fg mt8">
+                            <div class="fl" style="text-align: center;">Juros por dia de atraso *</div>
+                            <div class="flex-r" style="gap:10px; align-items:center;">
+                                <select class="fi fs" id="ne-juros-tipo"
+                                    style="flex:0.85; text-align: center; text-align-last: center;"
                                     onchange="onJurosTipoChange()">
                                     <option value="fixo">Fixo</option>
                                     <option value="perc">Percentual</option>
                                 </select>
-                                <div style="position:relative;flex:1">
-                                    <input class="fi" id="ne-juros-val" type="text" inputmode="numeric" min="1" step="1"
-                                        style="padding-right:36px"
-                                        oninput="this.value=this.value.replace(/[^0-9]/g,'');updateNovoPreview();">
+                                <div style="position:relative; flex:1;">
+                                    <input class="fi" id="ne-juros-val" type="text" inputmode="numeric" min="1"
+                                        style="padding-right:36px; width: 100%; text-align: center;"
+                                        oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview();">
                                     <span id="ne-juros-suffix"
-                                        style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--txt2);pointer-events:none">R$</span>
+                                        style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:13px; color:var(--txt2); pointer-events:none;">R$</span>
                                 </div>
                             </div>
                         </div>
-                        <div id="novo-preview-mini" style="display:none" class="card-sm mt8">
+                        <div id="novo-preview-mini" style="display:none;" class="card-sm mt12">
                             <div class="sc-lbl">Prévia rápida</div>
                             <div class="dr">
                                 <div class="dk">Valor a receber</div>
@@ -2930,7 +2966,7 @@
                                 <div class="dk">Data de vencimento</div>
                                 <div class="dv2" id="nv-venc">—</div>
                             </div>
-                            <div class="dr" style="border:none">
+                            <div class="dr" style="border:none;">
                                 <div class="dk">Lucro esperado</div>
                                 <div class="dv2 c-g" id="nv-lucro">—</div>
                             </div>
@@ -3300,7 +3336,7 @@
 
     <!-- Notificações -->
     <div class="overlay" id="notif-sheet" data-backdrop="notif-sheet">
-        <div class="sheet" style="max-height:90vh; margin-bottom:-120px" onclick="event.stopPropagation()">
+        <div class="sheet" style="height:90vh; margin-bottom:-120px" onclick="event.stopPropagation()">
             <div class="sh-handle"></div>
             <div class="sh-hdr">
                 <div class="sh-title">Notificações</div>
@@ -3485,6 +3521,14 @@
                             placeholder="Ex: 2 %" oninput="this.value=this.value.replace(/[^0-9\s]/g, '')">
                     </div>
                 </div>
+                <div class="sc-lbl mt16">Calculo padrão</div>
+                <div class="fg">
+                    <div class="fl">Tipo</div>
+                    <select class="fi fs" id="def-calculo-tipo">
+                        <option value="padrao">Taxas Padrões</option>
+                        <option value="manual">Manual / Livre</option>
+                    </select>
+                </div>
                 <div class="confirm-btns mt12">
                     <button class="cbtn-n"
                         onclick="closeSheet(document.getElementById('defaults-sheet'))">Cancelar</button>
@@ -3640,7 +3684,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="menu-item" onclick="closeSheet(document.getElementById('emp-menu-sheet'));openEditEmp()">
+                <div class="menu-item" onclick="closeSheet(document.getElementById('emp-menu-sheet')); openEditEmp()">
                     <div class="menu-item-left">
                         <div class="menu-icon mi-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="1.8" stroke-linecap="round">
@@ -3688,35 +3732,83 @@
             <div class="sh-body">
                 <div class="fl" style="text-align:center; font-size:14px; color:var(--danger)">AO EDITAR, O EMPRESTIMO
                     SERÁ REINICIADO<br>E TODOS OS PAGAMENTOS E ANEXOS<br>SERÃO PERDIDOS</div>
-                <div class="fg">
-                    <div class="fl">Valor emprestado (R$) *</div>
-                    <input class="fi" id="ee-valor" type="number" min="1" step="0.01" placeholder="0,00"
-                        oninput="refreshEditEmpPreview()">
+                <div class="card">
+                    <div class="sc-lbl mt12">Dados do Empréstimo</div>
+
+                    <div class="fr" style="display: flex; gap: 12px; width: 100%;">
+                        <div class="fg" id="wrap-ee-valor-edit"
+                            style="flex: 1; transition: all 0.2s ease; white-space: nowrap;">
+                            <div class="fl">Valor emprestado (R$) *</div>
+                            <input class="fi" id="ee-valor-edit" type="text" inputmode="numeric" placeholder="100 R$"
+                                style="width: 100%;"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit();">
+                        </div>
+
+                        <div class="fg" id="wrap-ee-receber-edit"
+                            style="flex: 1; transition: all 0.2s ease; white-space: nowrap;">
+                            <div class="fl">Valor a receber (R$) *</div>
+                            <input class="fi" id="ee-receber-manual-edit" type="text" inputmode="numeric"
+                                placeholder="120 R$" style="width: 100%;"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,''); validarECalcularManual_edit();">
+                        </div>
+                    </div>
+
+                    <div class="fr" style="margin-top:8px;">
+                        <div class="fg" style="flex:1;">
+                            <div class="fl">Data de emissão *</div>
+                            <input class="fi" id="ee-data-edit" type="date" onchange="updateNovoPreview_edit()">
+                        </div>
+
+                        <div class="fg" style="flex:1;">
+                            <div class="fl">Prazo (dias) *</div>
+                            <input class="fi" id="ee-prazo-manual-edit" type="text" inputmode="numeric"
+                                placeholder="Ex: 15"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit();">
+                        </div>
+                    </div>
+
+                    <div id="custom-prazo-wrap-edit" style="display:none;" class="fg mt8">
+                        <div class="fl">Prazo em dias *</div>
+                        <input class="fi" id="ee-prazo-custom-edit" type="text" inputmode="numeric" min="1"
+                            placeholder="Ex: 10"
+                            oninput="this.value=this.value.replace(/[^0-9\s]/g, ''); updateNovoPreview_edit()">
+                    </div>
+
+                    <div class="fg mt8">
+                        <div class="fl">Juros por dia de atraso *</div>
+                        <div class="flex-r" style="gap:10px; align-items:center;">
+                            <select class="fi fs" id="ee-juros-tipo-edit" style="flex:0.85;"
+                                onchange="onJurosTipoChange_edit()">
+                                <option value="fixo">Fixo</option>
+                                <option value="perc">Percentual</option>
+                            </select>
+                            <div style="position:relative; flex:1;">
+                                <input class="fi" id="ee-juros-val-edit" type="text" inputmode="numeric" min="1"
+                                    style="padding-right:36px;"
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit();">
+                                <span id="ee-juros-suffix-edit"
+                                    style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:13px; color:var(--txt2); pointer-events:none;">R$</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="novo-preview-mini-edit" style="display:none;" class="card-sm mt12">
+                        <div class="sc-lbl">Prévia rápida</div>
+                        <div class="dr">
+                            <div class="dk">Valor a receber</div>
+                            <div class="dv2 c-g" id="ee-receber-edit">—</div>
+                        </div>
+                        <div class="dr">
+                            <div class="dk">Data de vencimento</div>
+                            <div class="dv2" id="ee-venc-edit">—</div>
+                        </div>
+                        <div class="dr" style="border:none;">
+                            <div class="dk">Lucro esperado</div>
+                            <div class="dv2 c-g" id="ee-lucro-edit">—</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="fr">
-                    <div class="fg">
-                        <div class="fl">Data de emissão *</div>
-                        <input class="fi" id="ee-data" type="date" onchange="refreshEditEmpPreview()">
-                    </div>
-                    <div class="fg">
-                        <div class="fl">Prazo (dias) *</div>
-                        <input class="fi" id="ee-prazo" type="number" min="1" placeholder="Ex: 7"
-                            oninput="refreshEditEmpPreview()">
-                    </div>
-                </div>
-                <div class="fr">
-                    <div class="fg">
-                        <div class="fl">Tipo de juros</div><select class="fi fs" id="ee-juros-tipo"
-                            onchange="refreshEditEmpPreview()">
-                            <option value="fixo">Fixo (R$)</option>
-                            <option value="perc">Percentual (%)</option>
-                        </select>
-                    </div>
-                    <div class="fg">
-                        <div class="fl">Juros/dia</div><input class="fi" id="ee-juros-val" type="number" min="0"
-                            step="0.01" placeholder="0,00" oninput="refreshEditEmpPreview()">
-                    </div>
-                </div>
+
                 <div class="sc-lbl mt12">Impacto da edição</div>
                 <div class="card-sm mb8" id="ee-impact"></div>
                 <div class="sc-lbl mt8">Situação após edição</div>
@@ -3885,19 +3977,29 @@
             return Math.trunc((b - a) / (1000 * 60 * 60 * 24));
         }
 
+        // Recebe um valor numerico e transforma em reais monetário (R$ X.XXX,XX)
         function fmtMoney(v) { return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
-        // Live reference — reads DB.defaults.prazos so edits take effect immediately
+        // FUNÇÃO PARA COLETAR AS TAXAS DE LUCRO (DINÂMICA - BASEADA NO PRAZO ANTERIOR)
         const getProfitRate = (prazo) => {
             const d = DB.defaults.prazos;
+
+            // 1. Se o prazo exato existir no objeto, retorna ele direto (dividido por 100)
             if (d[prazo] !== undefined) return d[prazo] / 100;
-            // Fallback interpolation for custom prazos
-            if (prazo <= 3) return (d[3] || 10) / 100;
-            if (prazo <= 5) return (d[5] || 15) / 100;
-            if (prazo <= 7) return (d[7] || 20) / 100;
-            if (prazo <= 14) return (d[14] || 25) / 100;
-            if (prazo <= 21) return (d[21] || 30) / 100;
-            return (d[30] || 35) / 100;
+            // 2. Extrai os dias (chaves), converte para números e ordena do MAIOR para o MENOR
+            const prazosDisponiveis = Object.keys(d).map(Number).sort((a, b) => b - a); // Ex: [30, 21, 10, 7, 5, 3]
+            if (prazosDisponiveis.length === 0) return 0.10; // Fallback de segurança
+            // 3. Varre do maior para o menor procurando o primeiro dia que o prazo atual ultrapassou
+            for (let i = 0; i < prazosDisponiveis.length; i++) {
+                const limiteDia = prazosDisponiveis[i];
+                if (prazo >= limiteDia) {
+                    return d[limiteDia] / 100;
+                }
+            }
+            // 4. Se o prazo for menor que o menor de todos (ex: digitou 1 ou 2 dias), 
+            // retorna o menor prazo cadastrado (no caso, o de 3 dias)
+            const menorPrazo = prazosDisponiveis[prazosDisponiveis.length - 1];
+            return d[menorPrazo] / 100;
         };
 
         let _currentClientId = null;
@@ -3915,8 +4017,8 @@
 
             const emissao = loan.emissao;
             const vencimento = addDays(emissao, loan.prazo);
-            const profitRate = getProfitRate(loan.prazo);
-            const valorBase = loan.valor * (1 + profitRate);
+            const profitRate = (loan.valor_receber - loan.valor) / loan.valor * 100;
+            const valorBase = loan.valor_receber;
             const diasParaVencer = diffDays(TODAY, vencimento);
 
             // Walk day-by-day (same as buildTimeline) to get accurate saldo
@@ -4004,7 +4106,7 @@
                 if (!pagByDate[ds]) pagByDate[ds] = [];
                 pagByDate[ds].push(p);
             }
-            
+
 
             // Walk from emissao+1 until today (or last payment), inserting juros after vencimento
             const lastPagDate = sortedPags.length
@@ -4114,7 +4216,6 @@
             // Sort chronologically; within same day: juros → pagamento → quitado → hoje
             const typeOrder = { emissao: 0, juros: 1, pagamento: 2, vencimento: 3, quitado: 4, hoje: 5 };
             events.sort((a, b) => a.date - b.date || (typeOrder[a.tipo] || 0) - (typeOrder[b.tipo] || 0));
-            console.log(events);
             return events;
         }
 
@@ -4225,7 +4326,8 @@
             // Lists
             const lateLoans = DB.loans.filter(l => getLoanCalc(l).status === 'late');
             const warnLoans = DB.loans.filter(l => getLoanCalc(l).status === 'warn');
-            const recentLoans = [...DB.loans].sort((a, b) => b.emissao - a.emissao).slice(0, 3);
+            const okLoans = DB.loans.filter(l => getLoanCalc(l).status === 'ok');
+            const doneLoans = DB.loans.filter(l => getLoanCalc(l).status === 'done');
 
             const atenEl = document.getElementById('dash-atencao');
             const atenWrap = document.getElementById('dash-atencao-wrap');
@@ -4237,7 +4339,15 @@
             proxWrap.style.display = warnLoans.length ? '' : 'none';
             proxEl.innerHTML = warnLoans.map(l => loanCardHTML(l, true)).join('');
 
-            document.getElementById('dash-recentes').innerHTML = recentLoans.map(l => loanCardHTML(l, true)).join('');
+            const okEl = document.getElementById('dash-ok');
+            const okWrap = document.getElementById('dash-ok-wrap');
+            okWrap.style.display = okLoans.length ? '' : 'none';
+            okEl.innerHTML = okLoans.map(l => loanCardHTML(l, true)).join('');
+
+            const doneEl = document.getElementById('dash-done');
+            const doneWrap = document.getElementById('dash-done-wrap');
+            doneWrap.style.display = doneLoans.length ? '' : 'none';
+            doneEl.innerHTML = doneLoans.map(l => loanCardHTML(l, true)).join('');
         }
 
         function renderDonut(total, late, warn, ok, done) {
@@ -4451,6 +4561,7 @@
             document.getElementById('novo-step-2').style.display = 'none';
             document.getElementById('novo-client-form').style.display = 'none';
             document.getElementById('novo-client-list').style.display = ''; // <-- always show list again
+            _rebuildPrazoSelect();
             renderNovoClientList();
             if (_newLoanClientId) {
                 _novoSelectedClientId = _newLoanClientId;
@@ -4486,15 +4597,33 @@
             renderNovoClientList();
         }
 
+        function att_cliente(id_input) {
+            const inputX = document.getElementById(id_input);
+            inputX.style.borderColor = "";
+        }
+
         // FUNÇÃO PARA ADICIONAR NOVOS CLIENTES
         async function add_cliente() {
+            const inputNome = document.getElementById('nc-nome');
+            const inputTel = document.getElementById('nc-tel');
+            const inputEmail = document.getElementById('nc-email');
+            const inputDesc = document.getElementById('nc-desc');
+
+            const nome = inputNome.value.trim();
+            const tel = inputTel.value.trim();
+            const email = inputEmail.value.trim();
+            const desc = inputDesc.value.trim();
+
+            !nome ? inputNome.style.borderColor = "var(--err, #ff4d4d)" : inputNome.style.borderColor = "";
+            !tel ? inputTel.style.borderColor = "var(--err, #ff4d4d)" : inputTel.style.borderColor = "";
+
+            if (!nome || !tel) {
+                showToast('Nome e telefone são obrigatórios', 'err');
+                return;
+            }
+
             showLoading(['CRIANDO NOVO CLIENTE...', 'VERIFICANDO DADOS...', 'ENVIANDO PARA PLANILHA...', 'SINCRONIZANDO...', 'ATUALIZANDO LISTA...', 'TERMINANDO...']);
 
-            const nome = document.getElementById('nc-nome').value.trim();
-            const tel = document.getElementById('nc-tel').value.trim();
-            const email = document.getElementById('nc-email').value.trim();
-            const desc = document.getElementById('nc-desc').value.trim();
-            if (!nome || !tel) { showToast('Nome e telefone são obrigatórios', 'err'); return; }
             const initials = nome.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase();
             const colors = ['av-g', 'av-b', 'av-a', 'av-r', 'av-p'];
             const color = colors[DB.clients.length % colors.length];
@@ -4759,6 +4888,7 @@
             history.pushState({ scr: 'novo', subState: 'step2' }, '', '');
             document.getElementById('screens').scrollTop = 0;
         }
+
         function _updateJurosSuffix() {
             const tipo = document.getElementById('ne-juros-tipo')?.value;
             const suffix = document.getElementById('ne-juros-suffix');
@@ -4776,53 +4906,234 @@
             updateNovoPreview();
         }
 
-        function updateNovoPreview() {
-            const prazoEl = document.getElementById('ne-prazo');
-            const customWrap = document.getElementById('custom-prazo-wrap');
-            if (prazoEl.value === 'custom') customWrap.style.display = '';
-            else customWrap.style.display = 'none';
+        // Função auxiliar para alternar o modo mantendo simetria perfeita
+        function setModoCalculo(modo) {
+            const btnPadrao = document.getElementById('btn-modo-padrao');
+            const btnManual = document.getElementById('btn-modo-manual');
+            const inputModo = document.getElementById('ne-modo-calculo');
 
-            const valor = parseFloat(document.getElementById('ne-valor').value);
-            if (valor < 0) { document.getElementById('ne-valor').value = ""; showToast('Insira um valor válido', 'err'); return; }
-            const prazoRaw = prazoEl.value === 'custom' ? parseInt(document.getElementById('ne-prazo-custom').value) || 0 : parseInt(prazoEl.value) || 0;
-            const dataEmissao = parseDate(document.getElementById('ne-data').value);
-            if (!valor || !prazoRaw || !dataEmissao) { document.getElementById('novo-preview-mini').style.display = 'none'; return; }
+            const selectPrazo = document.getElementById('ne-prazo');
+            const inputPrazoManual = document.getElementById('ne-prazo-manual');
+
+            // Elementos da Linha de Valores
+            const wrapValor = document.getElementById('wrap-ne-valor');
+            const wrapReceber = document.getElementById('wrap-ne-receber');
+            const customPrazoWrap = document.getElementById('custom-prazo-wrap');
+
+            inputModo.value = modo;
+
+            if (modo === 'padrao') {
+                // Estilo dos botões alternadores
+                btnPadrao.className = "btn-p";
+                btnPadrao.style.background = "";
+                btnPadrao.style.color = "";
+                btnManual.className = "btn-s";
+                btnManual.style.background = "transparent";
+                btnManual.style.border = "none";
+                btnManual.style.boxShadow = "none";
+
+                // Controle dos Prazos
+                selectPrazo.style.display = "block";
+                inputPrazoManual.style.display = "none";
+
+                // COMPORTAMENTO DINÂMICO: Esconde o valor a receber e faz o valor emprestado ocupar 100%
+                wrapReceber.style.display = "none";
+                wrapValor.style.flex = "1 1 100%";
+            } else {
+                // Estilo dos botões alternadores
+                btnManual.className = "btn-p";
+                btnManual.style.background = "";
+                btnManual.style.color = "";
+                btnPadrao.className = "btn-s";
+                btnPadrao.style.background = "transparent";
+                btnPadrao.style.border = "none";
+                btnPadrao.style.boxShadow = "none";
+
+                // Controle dos Prazos
+                selectPrazo.style.display = "none";
+                inputPrazoManual.style.display = "block";
+                customPrazoWrap.style.display = "none";
+
+                // COMPORTAMENTO DINÂMICO: Mostra o valor a receber e divide o espaço igualmente (50% / 50%)
+                wrapReceber.style.display = "block";
+                wrapValor.style.flex = "1 1 calc(50% - 6px)"; // Ajusta considerando metade do gap de 12px
+                wrapReceber.style.flex = "1 1 calc(50% - 6px)";
+            }
+
+            // Limpa campos específicos para evitar resíduos ao alternar
+            document.getElementById('ne-receber-manual').value = '';
+            selectPrazo.value = '';
+            inputPrazoManual.value = '';
+
+            updateNovoPreview();
+        }
+
+        // Atualização da sua função updateNovoPreview
+        function updateNovoPreview() {
+            const inputValor = document.getElementById('ne-valor');
+            const inputReceber = document.getElementById('ne-receber-manual');
+            const inputPrazo = document.getElementById('ne-prazo');
+            const inputData = document.getElementById('ne-data');
+            const inputJurosVal = document.getElementById('ne-juros-val');
+
+            const modo = document.getElementById('ne-modo-calculo')?.value || 'padrao';
+            const customWrap = document.getElementById('custom-prazo-wrap');
+
+            let prazoRaw = 0;
+
+            if (modo === 'padrao') {
+                if (inputPrazo.value === 'custom') customWrap.style.display = '';
+                else customWrap.style.display = 'none';
+                prazoRaw = inputPrazo.value === 'custom' ? parseInt(document.getElementById('ne-prazo-custom').value) || 0 : parseInt(inputPrazo.value) || 0;
+            } else {
+                customWrap.style.display = 'none';
+                prazoRaw = parseInt(document.getElementById('ne-prazo-manual').value) || 0;
+            }
+
+            const valor = parseFloat(inputValor.value);
+            if (valor < 0) {
+                inputValor.style.borderColor = "var(--err, #ff4d4d)";
+                inputValor.value = "";
+                showToast('Insira um valor válido', 'err');
+                return;
+            } else {
+                inputValor.style.borderColor = "";
+            }
+
+            const dataEmissao = parseDate(inputData.value);
+
+            !prazoRaw ? inputPrazo.style.borderColor = "" : inputPrazo.style.borderColor = "";
+            !dataEmissao ? inputData.style.borderColor = "var(--err, #ff4d4d)" : inputData.style.borderColor = "";
+
+            if (!valor || !prazoRaw || !dataEmissao) {
+                document.getElementById('novo-preview-mini').style.display = 'none';
+                return;
+            }
+
             const emissao = dataEmissao;
             const venc = addDays(emissao, prazoRaw);
-            const pr = getProfitRate(prazoRaw);
-            const valorBase = valor * (1 + pr);
-            const jurosVal = parseFloat(document.getElementById('ne-juros-val').value);
-            if (jurosVal < 0) { document.getElementById('ne-valor').value = ""; showToast('Insira um juros válido', 'err'); return; }
+
+            let pr = 0;
+            let valorBase = 0;
+
+            if (modo === 'padrao') {
+                pr = getProfitRate(prazoRaw);
+                valorBase = valor * (1 + pr);
+                pr = pr * 100;
+            } else {
+                // Modo Manual: Captura valor digitado e força a trava (não aceita menor que o valor emprestado)
+                let vReceberDigito = parseFloat(inputReceber.value) || 0;
+
+                if (vReceberDigito > 0 && vReceberDigito < valor) {
+                    inputReceber.style.borderColor = "var(--err, #ff4d4d)";
+                    valorBase = valor; // Força renderizar o mínimo na prévia rápida
+                } else {
+                    inputReceber.style.borderColor = "";
+                    valorBase = vReceberDigito || valor;
+                }
+
+                // Engenharia reversa para descobrir a taxa com base nos valores livres informados
+                pr = valorBase > valor ? (valorBase - valor) / valor * 100 : 0;
+            }
+
+            const jurosVal = parseFloat(inputJurosVal.value);
+            if (jurosVal < 0) {
+                inputJurosVal.style.borderColor = "var(--err, #ff4d4d)";
+                inputJurosVal.value = "";
+                showToast('Insira um juros válido', 'err');
+                return;
+            } else {
+                inputJurosVal.style.borderColor = "";
+            }
+
             document.getElementById('nv-receber').textContent = fmtMoney(valorBase);
             document.getElementById('nv-venc').textContent = fmtDate(venc);
-            document.getElementById('nv-lucro').textContent = fmtMoney(valorBase - valor) + ` (+${Math.round(pr * 100)}%)`;
+
+            // Mantém a exibição padrão de porcentagem arredondada usando a taxa dinâmica calculada
+            document.getElementById('nv-lucro').textContent = fmtMoney(valorBase - valor) + ` (+${Math.round(pr)}%)`;
             document.getElementById('novo-preview-mini').style.display = '';
         }
+
+        // Atualização da sua função goToPreview com travas de segurança extras
         function goToPreview() {
-            const valor = parseFloat(document.getElementById('ne-valor').value) || 0;
-            const prazoEl = document.getElementById('ne-prazo');
-            const prazoRaw = prazoEl.value === 'custom' ? parseInt(document.getElementById('ne-prazo-custom').value) || 0 : parseInt(prazoEl.value) || 0;
-            const dataEmissao = parseDate(document.getElementById('ne-data').value);
+            const modo = document.getElementById('ne-modo-calculo')?.value || 'padrao';
+            const inputValor = document.getElementById('ne-valor');
+            const inputReceber = document.getElementById('ne-receber-manual');
+            const inputPrazo = document.getElementById('ne-prazo');
+            const inputData = document.getElementById('ne-data');
+            const inputJurosVal = document.getElementById('ne-juros-val');
+            const valor = parseFloat(inputValor.value) || 0;
+            const dataEmissao = parseDate(inputData.value);
             const jurosTipo = document.getElementById('ne-juros-tipo').value;
-            const jurosVal = parseFloat(document.getElementById('ne-juros-val').value) || 0;
-            if (!valor || !prazoRaw || !dataEmissao || !jurosVal) { showToast('Preencha todos os campos obrigatórios', 'err'); return; }
-            // Validate date
-            if (dataEmissao > TODAY) { showToast('A data de emissão não pode ser no futuro', 'err'); return; }
-            // Validate valor
-            if (valor <= 0) { showToast('O valor presisa ser maior que 0', 'err'); return; }
+            const jurosVal = parseFloat(inputJurosVal.value) || 0;
+
+            const valorEmprestado = parseFloat(inputValor.value) || 0;
+
+
+            let prazoRaw = 0;
+            if (modo === 'padrao') {
+                prazoRaw = inputPrazo.value === 'custom' ? parseInt(document.getElementById('ne-prazo-custom').value) || 0 : parseInt(inputPrazo.value) || 0;
+            } else {
+                prazoRaw = parseInt(document.getElementById('ne-prazo-manual').value) || 0;
+
+                // Validação extra e impeditiva para o valor a receber no modo manual
+                const valorReceber = parseFloat(inputReceber.value) || 0;
+                if (!valorReceber || valorReceber < valor) {
+                    inputReceber.style.borderColor = "var(--err, #ff4d4d)";
+                    showToast('O valor a receber precisa ser igual ou maior que o valor emprestado', 'err');
+                    return;
+                } else {
+                    inputReceber.style.borderColor = "";
+                }
+            }
+
+            if (!valor || !prazoRaw || !dataEmissao || !jurosVal) {
+                !valor ? inputValor.style.borderColor = "var(--err, #ff4d4d)" : inputValor.style.borderColor = "";
+                !prazoRaw ? inputPrazo.style.borderColor = "var(--err, #ff4d4d)" : inputPrazo.style.borderColor = "";
+                !dataEmissao ? inputData.style.borderColor = "var(--err, #ff4d4d)" : inputData.style.borderColor = "";
+                !jurosVal ? inputJurosVal.style.borderColor = "var(--err, #ff4d4d)" : inputJurosVal.style.borderColor = "";
+
+                showToast('Preencha todos os campos obrigatórios', 'err');
+                return;
+            }
+            if (dataEmissao > TODAY) {
+                showToast('A data de emissão não pode ser no futuro', 'err');
+                return;
+            }
+            if (valor <= 0) {
+                showToast('O valor precisa ser maior que 0', 'err');
+                return;
+            }
+
+            const pr = getProfitRate(prazoRaw);
+            const valor_receber = modo === 'manual' ? parseFloat(document.getElementById('ne-receber-manual').value) : valor * (1 + pr);
             const c = getClient(_novoSelectedClientId);
-            _newLoanData = { clientId: c.id, lin_cliente: c.lin, qtd_emps: c.qtd_emps, valor, prazo: prazoRaw, emissao: dataEmissao, juros_tipo: jurosTipo, juros_val: jurosVal };
+
+            // Injetamos a propriedade 'modo_calculo' e o 'valor_receber' para persistir os estados se o usuário voltar a tela
+            _newLoanData = {
+                clientId: c.id,
+                lin_cliente: c.lin,
+                qtd_emps: c.qtd_emps,
+                valor,
+                prazo: prazoRaw,
+                emissao: dataEmissao,
+                juros_tipo: jurosTipo,
+                juros_val: jurosVal,
+                modo_calculo: modo,
+                valor_receber
+            };
+
             renderPreview();
-            // Show preview screen directly without touching navStack (stays on 'novo')
+
             document.querySelectorAll('.scr').forEach(s => s.classList.remove('act'));
             document.getElementById('scr-preview').classList.add('act');
             document.getElementById('screens').scrollTop = 0;
-            // Push sub-state so back = "Rever"
+
             history.pushState({ scr: 'novo', subState: 'preview' }, '', '');
         }
 
+        // Atualização da sua função backFromPreview para restaurar se era padrão ou manual
         function backFromPreview() {
-            // Go back to step 2 with data restored — don't call renderNovo (resets everything)
             document.querySelectorAll('.scr').forEach(s => s.classList.remove('act'));
             document.getElementById('scr-novo').classList.add('act');
             document.getElementById('novo-step-1').style.display = 'none';
@@ -4830,7 +5141,7 @@
             document.getElementById('novo-client-list').style.display = '';
             document.getElementById('novo-client-form').style.display = 'none';
             document.getElementById('screens').scrollTop = 0;
-            // Restore fields from saved _newLoanData
+
             if (_newLoanData && _novoSelectedClientId) {
                 const c = getClient(_novoSelectedClientId);
                 if (c) {
@@ -4843,27 +5154,50 @@
                 document.getElementById('ne-data').value = dateStr(_newLoanData.emissao) || dateStr(TODAY);
                 document.getElementById('ne-juros-tipo').value = _newLoanData.juros_tipo || 'fixo';
                 document.getElementById('ne-juros-val').value = _newLoanData.juros_val || '';
-                const prazoEl = document.getElementById('ne-prazo');
-                const prazoOptions = [...prazoEl.options].map(o => o.value);
-                if (prazoOptions.includes(String(_newLoanData.prazo))) {
-                    prazoEl.value = String(_newLoanData.prazo);
-                    document.getElementById('custom-prazo-wrap').style.display = 'none';
+
+                // Restaura o modo de cálculo correto ao voltar da simulação
+                const modoSalvo = _newLoanData.modo_calculo || 'padrao';
+                setModoCalculo(modoSalvo);
+
+                if (modoSalvo === 'padrao') {
+                    const prazoEl = document.getElementById('ne-prazo');
+                    const prazoOptions = [...prazoEl.options].map(o => o.value);
+                    if (prazoOptions.includes(String(_newLoanData.prazo))) {
+                        prazoEl.value = String(_newLoanData.prazo);
+                        document.getElementById('custom-prazo-wrap').style.display = 'none';
+                    } else {
+                        prazoEl.value = 'custom';
+                        document.getElementById('ne-prazo-custom').value = _newLoanData.prazo;
+                        document.getElementById('custom-prazo-wrap').style.display = '';
+                    }
                 } else {
-                    prazoEl.value = 'custom';
-                    document.getElementById('ne-prazo-custom').value = _newLoanData.prazo;
-                    document.getElementById('custom-prazo-wrap').style.display = '';
+                    document.getElementById('ne-prazo-manual').value = _newLoanData.prazo || '';
+                    document.getElementById('ne-receber-manual').value = _newLoanData.valor_receber || '';
                 }
+
                 updateNovoPreview();
             }
         }
 
+        // Atualização da sua função renderPreview para que a tela final leia os dados de forma idêntica
         function renderPreview() {
             const d = _newLoanData;
             const c = getClient(d.clientId);
             const emissao = d.emissao;
             const venc = addDays(emissao, d.prazo);
-            const pr = getProfitRate(d.prazo);
-            const valorBase = d.valor * (1 + pr);
+
+            // CÁLCULO DE TAXA ADAPTATIVO: Se for manual, deduz pr inversamente, se não, usa a função nativa do seu sistema
+            let pr = 0;
+            let valorBase = 0;
+
+            if (d.modo_calculo === 'manual' && d.valor_receber) {
+                valorBase = d.valor_receber;
+                pr = valorBase > d.valor ? (valorBase - d.valor) / d.valor * 100 : 0;
+            } else {
+                pr = getProfitRate(d.prazo);
+                valorBase = d.valor * (1 + pr);
+            }
+
             const isRetro = emissao < TODAY - 12 * 60 * 60 * 1000;
             const diasPassados = diffDays(emissao, TODAY);
             const isPastVenc = TODAY > venc;
@@ -4872,7 +5206,6 @@
             const totalJuros = diasAtraso * jurosDia;
             const valorHoje = valorBase + totalJuros;
 
-            // Tabela de previsão de atraso (vencimento até 10 dias depois)
             let tblRows = '';
             tblRows += `<tr class="venc"><td>${fmtDate(venc)}</td><td>Vencimento</td><td>R$0,00</td><td>${fmtMoney(valorBase)}</td></tr>`;
             let acJ = 0;
@@ -4910,7 +5243,7 @@
                     <div class="fs11 tc2">${c.tel}</div>
                 </div>
                 <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2 fw6">${fmtMoney(d.valor)}</div></div>
-                <div class="dr"><div class="dk">Lucro (${Math.round(pr * 100)}% — ${d.prazo} dias)</div><div class="dv2 c-g">+ ${fmtMoney(valorBase - d.valor)}</div></div>
+                <div class="dr"><div class="dk">Lucro (${Math.round(pr)}% — ${d.prazo} dias)</div><div class="dv2 c-g">+ ${fmtMoney(valorBase - d.valor)}</div></div>
                 <div class="dr"><div class="dk">Valor a pagar (prazo)</div><div class="dv2 fw6 c-g" style="font-size:16px">${fmtMoney(valorBase)}</div></div>
                 <div class="dr"><div class="dk">Data de emissão</div><div class="dv2">${fmtDate(d.emissao)}</div></div>
                 <div class="dr"><div class="dk">Prazo de pagamento</div><div class="dv2">${d.prazo} dias</div></div>
@@ -4926,6 +5259,23 @@
             `;
         }
 
+        // Nova função intermediária para o modo manual
+        function validarECalcularManual() {
+            const valorEmprestado = parseFloat(document.getElementById('ne-valor').value) || 0;
+            const inputReceber = document.getElementById('ne-receber-manual');
+            let valorReceber = parseFloat(inputReceber.value) || 0;
+
+            // Se o usuário digitou um valor menor do que o emprestado, avisa ou força o valor mínimo
+            if (valorReceber > 0 && valorReceber < valorEmprestado) {
+                // Mantém a borda ou estilo visual indicando inconsistência, mas não quebra o fluxo até ele terminar de digitar.
+                inputReceber.style.borderColor = "var(--err, #ff4d4d)";
+            } else {
+                inputReceber.style.borderColor = "";
+            }
+
+            updateNovoPreview();
+        }
+
         function irParaEmprestimoAposCriar() { openEmpDetalhe(_currentLoanId); }
 
         function confirmarEmprestimo() {
@@ -4933,8 +5283,8 @@
             const c = getClient(d.clientId);
             const emissao = d.emissao;
             const venc = addDays(emissao, d.prazo);
-            const pr = getProfitRate(d.prazo);
-            const valorBase = d.valor * (1 + pr);
+            const pr = (d.valor_receber - d.valor) / d.valor * 100;
+            const valorBase = d.valor_receber;
             const jurosTxt = d.juros_tipo === 'fixo' ? fmtMoney(d.juros_val) + '/dia' : d.juros_val + '%/dia';
 
             document.getElementById('novo-emp-confirm-body').innerHTML = `
@@ -4948,7 +5298,7 @@
                 <div class="dr"><div class="dk">Prazo</div><div class="dv2">${d.prazo} dias</div></div>
                 <div class="dr"><div class="dk">Vencimento</div><div class="dv2 fw6">${fmtDate(venc)}</div></div>
                 <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(d.valor)}</div></div>
-                <div class="dr"><div class="dk">Valor a receber (+${Math.round(pr * 100)}%)</div><div class="dv2 c-g fw6" style="font-size:16px">${fmtMoney(valorBase)}</div></div>
+                <div class="dr"><div class="dk">Valor a receber (+${Math.round(pr)}%)</div><div class="dv2 c-g fw6" style="font-size:16px">${fmtMoney(valorBase)}</div></div>
                 <div class="dr" style="border:none"><div class="dk">Juros de atraso</div><div class="dv2 c-r">${jurosTxt}</div></div>
                 </div>
                 <div class="confirm-btns">
@@ -4974,6 +5324,7 @@
             const emissao = d.emissao;
             const lin_cliente = d.lin_cliente;
             const novo_qtd_emps = d.qtd_emps + 1;
+            const valor_receber = d.valor_receber;
 
             // Criar o novo id do emprestimo atual
             let novo_id = clientId + "_E" + String(novo_qtd_emps).padStart(2, '0');
@@ -4984,7 +5335,7 @@
 
             const qtd_emps = d.qtd_emps + 1;
 
-            const loan = { id, clientId, valor, prazo, juros_tipo, juros_val, emissao, pago, qtd_pags, lin_cliente, novo_qtd_emps };
+            const loan = { id, clientId, valor, valor_receber, prazo, juros_tipo, juros_val, emissao, pago, qtd_pags, lin_cliente, novo_qtd_emps };
 
             try {
                 console.log("Adicionando empréstimo na planilha...");
@@ -5028,7 +5379,7 @@
             const c = getClient(loan.clientId);
             const calc = getLoanCalc(loan);
             const venc = addDays(loan.emissao, loan.prazo);
-            const pr = getProfitRate(loan.prazo);
+            const pr = calc.profitRate;
             document.getElementById('comp-content').innerHTML = `
                 <div class="receipt-head">
                     <div class="receipt-logo">EMPRÉS<span>TIMOS</span></div>
@@ -5042,15 +5393,540 @@
                 <div class="dr"><div class="dk">Prazo</div><div class="dv2">${loan.prazo} dias</div></div>
                 <div class="dr"><div class="dk">Vencimento</div><div class="dv2 fw6">${fmtDate(venc)}</div></div>
                 <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(loan.valor)}</div></div>
-                <div class="dr"><div class="dk">Lucro (${Math.round(pr * 100)}%)</div><div class="dv2 c-g">+ ${fmtMoney(calc.valorBase - loan.valor)}</div></div>
+                <div class="dr"><div class="dk">Lucro (${Math.round(pr)}%)</div><div class="dv2 c-g">+ ${fmtMoney(calc.valorBase - loan.valor)}</div></div>
                 <div class="dr" style="border:none"><div class="dk">Valor a pagar no prazo</div><div class="dv2 c-g fw6" style="font-size:16px">${fmtMoney(calc.valorBase)}</div></div>
                 <div class="dv"></div>
                 <div style="background:#00e8a210;border-radius:var(--rad8);padding:10px;text-align:center;margin-top:8px">
                     <div class="fs11 tc1">Juros de atraso: <strong>${loan.juros_tipo === 'fixo' ? fmtMoney(loan.juros_val) + '/dia' : loan.juros_val + '%/dia'}</strong></div>
                 </div>
             `;
-
         }
+
+
+        // function setModoCalculo_edit(modo) {
+        //     const btnPadrao = document.getElementById('btn-modo-padrao-edit');
+        //     const btnManual = document.getElementById('btn-modo-manual-edit');
+        //     const inputModo = document.getElementById('ee-modo-calculo-edit');
+
+        //     const selectPrazo = document.getElementById('ee-prazo-edit');
+        //     const inputPrazoManual = document.getElementById('ee-prazo-manual-edit');
+
+        //     // Elementos da Linha de Valores
+        //     const wrapValor = document.getElementById('wrap-ee-valor-edit');
+        //     const wrapReceber = document.getElementById('wrap-ee-receber-edit');
+        //     const customPrazoWrap = document.getElementById('custom-prazo-wrap-edit');
+
+        //     inputModo.value = modo;
+
+        //     if (modo === 'padrao') {
+        //         // Estilo dos botões alternadores
+        //         btnPadrao.className = "btn-p";
+        //         btnPadrao.style.background = "";
+        //         btnPadrao.style.color = "";
+        //         btnManual.className = "btn-s";
+        //         btnManual.style.background = "transparent";
+        //         btnManual.style.border = "none";
+        //         btnManual.style.boxShadow = "none";
+
+        //         // Controle dos Prazos
+        //         selectPrazo.style.display = "block";
+        //         inputPrazoManual.style.display = "none";
+
+        //         // COMPORTAMENTO DINÂMICO: Esconde o valor a receber e faz o valor emprestado ocupar 100%
+        //         wrapReceber.style.display = "none";
+        //         wrapValor.style.flex = "1 1 100%";
+        //     } else {
+        //         // Estilo dos botões alternadores
+        //         btnManual.className = "btn-p";
+        //         btnManual.style.background = "";
+        //         btnManual.style.color = "";
+        //         btnPadrao.className = "btn-s";
+        //         btnPadrao.style.background = "transparent";
+        //         btnPadrao.style.border = "none";
+        //         btnPadrao.style.boxShadow = "none";
+
+        //         // Controle dos Prazos
+        //         selectPrazo.style.display = "none";
+        //         inputPrazoManual.style.display = "block";
+        //         customPrazoWrap.style.display = "none";
+
+        //         // COMPORTAMENTO DINÂMICO: Mostra o valor a receber e divide o espaço igualmente (50% / 50%)
+        //         wrapReceber.style.display = "block";
+        //         wrapValor.style.flex = "1 1 calc(50% - 6px)"; // Ajusta considerando metade do gap de 12px
+        //         wrapReceber.style.flex = "1 1 calc(50% - 6px)";
+        //     }
+
+        //     // Limpa campos específicos para evitar resíduos ao alternar
+        //     document.getElementById('ee-receber-manual-edit').value = '';
+        //     selectPrazo.value = '';
+        //     inputPrazoManual.value = '';
+
+        //     updateNovoPreview_edit();
+        // }
+
+        function updateNovoPreview_edit() {
+            const loan = getLoan(_currentLoanId);
+            if (!loan) return;
+            const c = getLoanCalc(loan);
+
+            const inputValor = document.getElementById('ee-valor-edit');
+            const inputReceber = document.getElementById('ee-receber-manual-edit');
+            const inputPrazo = document.getElementById('ee-prazo-custom-edit');
+            const inputData = document.getElementById('ee-data-edit');
+            const inputJurosVal = document.getElementById('ee-juros-val-edit');
+            const inputJurosTipo = document.getElementById('ee-juros-tipo-edit');
+
+            const modo = document.getElementById('ee-modo-calculo-edit')?.value || 'padrao';
+            const customWrap = document.getElementById('custom-prazo-wrap-edit');
+
+            const impactEl = document.getElementById('ee-impact');
+            const statusBox = document.getElementById('ee-status-box');
+            const tlWrap = document.getElementById('ee-timeline-wrap');
+
+            const novoValor = parseFloat(inputValor.value);
+            const novaData = parseDate(inputData.value);
+            const novoTipo = inputJurosTipo.value;
+
+            let novoPrazo = 0;
+
+            customWrap.style.display = 'none';
+            novoPrazo = parseInt(document.getElementById('ee-prazo-manual-edit').value) || 0;
+
+
+            if (novoValor < 0) {
+                inputValor.style.borderColor = "var(--err, #ff4d4d)";
+                inputValor.value = "";
+                showToast('Insira um valor válido', 'err');
+                return;
+            } else {
+                inputValor.style.borderColor = "";
+            }
+
+
+            !novoPrazo ? inputPrazo.style.borderColor = "" : inputPrazo.style.borderColor = "";
+            !novaData ? inputData.style.borderColor = "var(--err, #ff4d4d)" : inputData.style.borderColor = "";
+
+            if (!novoValor || !novoPrazo || !novaData) {
+                impactEl.innerHTML = '<div class="fs12 tc2">Preencha todos os campos para ver o impacto</div>';
+                statusBox.style.display = 'none';
+                tlWrap.innerHTML = '<div class="fs12 tc2">Preencha os campos para ver o histórico</div>';
+                return;
+            }
+
+            const emissao = novaData;
+            const novaVenc = addDays(emissao, novoPrazo);
+
+            let pr = 0;
+            let valorBase = 0;
+
+            // Modo Manual: Captura valor digitado e força a trava (não aceita menor que o valor emprestado)
+            let vReceberDigito = parseFloat(inputReceber.value) || 0;
+
+            if (vReceberDigito > 0 && vReceberDigito < novoValor) {
+                inputReceber.style.borderColor = "var(--err, #ff4d4d)";
+                valorBase = novoValor; // Força renderizar o mínimo na prévia rápida
+            } else {
+                inputReceber.style.borderColor = "";
+                valorBase = vReceberDigito || novoValor;
+            }
+
+            // Engenharia reversa para descobrir a taxa com base nos valores livres informados
+            pr = valorBase > novoValor ? (valorBase - novoValor) / novoValor * 100 : 0;
+            const novoBase = valorBase;
+
+            const novoJuros = parseFloat(inputJurosVal.value);
+            if (novoJuros < 0) {
+                inputJurosVal.style.borderColor = "var(--err, #ff4d4d)";
+                inputJurosVal.value = "";
+                showToast('Insira um juros válido', 'err');
+                return;
+            } else {
+                inputJurosVal.style.borderColor = "";
+            }
+
+            // Simulate loan with new values
+            const loanSim = structuredClone(loan);
+            loanSim.pagamentos = [];
+            loanSim.valor = novoValor;
+            loanSim.valor_receber = valorBase;
+            loanSim.prazo = novoPrazo;
+            loanSim.emissao = novaData;
+            loanSim.juros_tipo = novoTipo;
+            loanSim.juros_val = novoJuros;
+            const cSim = getLoanCalc(loanSim, true);
+            _pendingEditEmp_pago = cSim.pago;
+
+            // Impact diff rows
+            const row = (lbl, antes, depois, color) => {
+                const changed = String(antes) !== String(depois);
+                return `<div class="dr"><div class="dk">${lbl}</div>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px">
+                        ${changed ? `<div class="dv2 tc2" style="text-decoration:line-through; font-size:11px">${antes}</div>` : ''}
+                        <div class="dv2 fw6" style="color:${color || 'var(--txt0)'}">${depois}</div>
+                    </div></div>`;
+            };
+            const jAntTxt = (loan.juros_tipo === 'fixo' ? fmtMoney(loan.juros_val) : loan.juros_val + '%') + '/dia';
+            const jTxt = (novoTipo === 'fixo' ? fmtMoney(novoJuros) : novoJuros + '%') + '/dia';
+            impactEl.innerHTML =
+                row('Valor emprestado', fmtMoney(loan.valor), fmtMoney(novoValor), '') +
+                row('A receber (prazo)', fmtMoney(c.valorBase), fmtMoney(novoBase), 'var(--acc2)') +
+                row('Data de emissão', fmtDate(loan.emissao), fmtDate(novaData), '') +
+                row('Prazo', loan.prazo + 'd', novoPrazo + 'd', '') +
+                row('Vencimento', fmtDate(addDays(loan.emissao, loan.prazo)), fmtDate(novaVenc), '') +
+                row('Juros/dia', jAntTxt, jTxt, 'var(--danger)');
+
+            // Status box
+            const statusColors = { late: 'var(--danger)', warn: 'var(--warn)', ok: 'var(--acc2)', done: 'var(--acc)' };
+            const statusLabels = { late: `${cSim.diasAtraso} dia${cSim.diasAtraso !== 1 ? 's' : ''} em atraso`, warn: `Vence em ${cSim.diasParaVencer} dias`, ok: `Vence em ${cSim.diasParaVencer} dias`, done: 'Quitado' };
+            statusBox.style.display = '';
+            statusBox.className = `prev-box mb8 ${cSim.status === 'late' ? 'err-bdr' : cSim.status === 'warn' ? 'warn-bdr' : cSim.status === 'done' ? 'ok-bdr' : 'ok-bdr'}`;
+            document.getElementById('ee-valor-hoje').textContent = cSim.isPago ? '✓ Quitado' : fmtMoney(cSim.valorHoje);
+            document.getElementById('ee-valor-hoje').style.color = statusColors[cSim.status] || 'var(--acc2)';
+            document.getElementById('ee-status-label').textContent = statusLabels[cSim.status] || '';
+            document.getElementById('ee-venc-label').textContent = `Vence ${fmtDate(novaVenc)}`;
+
+            // Timeline
+            const events = buildTimeline(loanSim);
+            tlWrap.innerHTML = `<ul class="tl" style="padding-left:0">${renderTimelineHTML(events, null)}</ul>`;
+        }
+
+        function validarECalcularManual_edit() {
+            const valorEmprestado = parseFloat(document.getElementById('ee-valor-edit').value) || 0;
+            const inputReceber = document.getElementById('ee-receber-manual-edit');
+            let valorReceber = parseFloat(inputReceber.value) || 0;
+
+            // Se o usuário digitou um valor menor do que o emprestado, avisa ou força o valor mínimo
+            if (valorReceber > 0 && valorReceber < valorEmprestado) {
+                // Mantém a borda ou estilo visual indicando inconsistência, mas não quebra o fluxo até ele terminar de digitar.
+                inputReceber.style.borderColor = "var(--err, #ff4d4d)";
+            } else {
+                inputReceber.style.borderColor = "";
+            }
+
+            updateNovoPreview_edit();
+        }
+
+        function _updateJurosSuffix_edit() {
+            const tipo = document.getElementById('ee-juros-tipo-edit')?.value;
+            const suffix = document.getElementById('ee-juros-suffix-edit');
+            if (suffix) suffix.textContent = tipo === 'perc' ? '%' : 'R$';
+        }
+
+        function onJurosTipoChange_edit() {
+            const tipo = document.getElementById('ee-juros-tipo-edit').value;
+            // Swap to the default value for the newly selected type
+            const val = tipo === 'fixo'
+                ? (DB.defaults.juros_fixo_val || DB.defaults.juros_val || '')
+                : (DB.defaults.juros_perc_val || '');
+            document.getElementById('ee-juros-val-edit').value = val;
+            _updateJurosSuffix_edit();
+            updateNovoPreview_edit();
+        }
+
+        function openEmpMenu() {
+            const loan = getLoan(_currentLoanId);
+            if (!loan) return;
+            const c = getLoanCalc(loan);
+            const isPago = c.isPago;
+            document.getElementById('emp-menu-mark-lbl').textContent = isPago ? 'Desmarcar como pago' : 'Marcar como pago';
+            document.getElementById('emp-menu-mark-sub').textContent = isPago ? 'Remove a quitação manual' : 'Quita manualmente sem registrar pagamento';
+            const icon = document.querySelector('#emp-menu-mark-paid .menu-icon');
+            icon.className = isPago ? 'menu-icon mi-amber' : 'menu-icon mi-green';
+            openSheet('emp-menu-sheet');
+        }
+
+        function openEditEmp() {
+            const loan = getLoan(_currentLoanId);
+            if (!loan) return;
+            //setModoCalculo_edit('manual');
+            document.getElementById('ee-valor-edit').value = loan.valor;
+            document.getElementById('ee-receber-manual-edit').value = loan.valor_receber;
+            document.getElementById('ee-data-edit').value = dateStr(loan.emissao);
+            document.getElementById('ee-data-edit').max = dateStr(TODAY);
+            document.getElementById('ee-prazo-manual-edit').value = loan.prazo;
+            document.getElementById('ee-juros-tipo-edit').value = loan.juros_tipo;
+            document.getElementById('ee-juros-val-edit').value = loan.juros_val;
+            updateNovoPreview_edit();
+            openSheet('edit-emp-sheet');
+        }
+
+        let _pendingEditEmp_pago = null;
+        let _pendingEditEmp = null;
+        function preConfirmarEditEmp() {
+            const novoValor = parseFloat(document.getElementById('ee-valor-edit').value) || 0;
+            const novoValorReceber = parseFloat(document.getElementById('ee-receber-manual-edit').value) || 0;
+            const novaData = parseDate(document.getElementById('ee-data-edit').value);
+            const novoPrazo = parseInt(document.getElementById('ee-prazo-manual-edit').value) || 0;
+            const novoTipo = document.getElementById('ee-juros-tipo-edit').value;
+            const novoJuros = parseFloat(document.getElementById('ee-juros-val-edit').value) || 0;
+            if (!novoValor || !novoValorReceber || !novaData || !novoPrazo || !novoJuros) { showToast('Preencha todos os campos', 'err'); return; }
+            if (novaData > TODAY) { showToast('Data não pode ser no futuro', 'err'); return; }
+
+            _pendingEditEmp = { valor: novoValor, valor_receber: novoValorReceber, emissao: novaData, prazo: novoPrazo, juros_tipo: novoTipo, juros_val: novoJuros, pago: _pendingEditEmp_pago };
+
+            document.getElementById('edit-emp-confirm-body').innerHTML = `
+                <div class="warn-box" style="background:#f5a62312;border-color:#f5a62340;margin-bottom:12px">
+                <div class="wb-t" style="color:var(--acc3)">⚠ Atenção</div>
+                <div class="wb-d">Esta edição vai recalcular todos os juros, vencimentos e saldos do histórico.</div>
+                </div>
+                ${document.getElementById('ee-impact').innerHTML}
+                <div style="background:var(--bg2); border:1px solid var(--acc3); border-radius:var(--rad12); padding:12px; margin-bottom:12px">
+                <div class="fl" style="color:var(--acc3)">Digite o ID do empréstimo para confirmar - ${_currentLoanId}</div>
+                <input class="fi" id="edit-emp-id-input" type="text" placeholder="C00_E00" style="border-color:var(--acc3)">
+                </div>
+                <div class="confirm-btns mt12">
+                <button class="cbtn-n" onclick="closeSheet(document.getElementById('edit-emp-confirm-sheet'))">← Rever</button>
+                <button class="cbtn-y" onclick="edit_emprestimo()">Salvar ✓</button>
+                </div>`;
+            openSheet('edit-emp-confirm-sheet');
+        }
+
+
+        async function edit_emprestimo() {
+            if (!_pendingEditEmp) return;
+            const loan = getLoan(_currentLoanId);
+            if (!loan) return;
+
+            const typed = document.getElementById('edit-emp-id-input')?.value?.trim();
+            if (typed !== _currentLoanId) { showToast('ID incorreto, tente novamente', 'err'); return; }
+
+            console.log("Editando Emprestimo...");
+            showLoading(['Editando Emprestimo...', 'Atualizando Dados...', 'Apagando Pagamentos...', 'Apagando Anexos...', 'Salvando Novos Dados...', 'Finalizando...']);
+
+            closeSheet(document.getElementById('edit-emp-confirm-sheet'));
+            closeSheet(document.getElementById('edit-emp-sheet'));
+
+            const valor = _pendingEditEmp.valor;
+            const valor_receber = _pendingEditEmp.valor_receber;
+            const prazo = _pendingEditEmp.prazo;
+            const juros_val = _pendingEditEmp.juros_val;
+            const juros_tipo = _pendingEditEmp.juros_tipo;
+            const emissao = _pendingEditEmp.emissao;
+
+            const pago = 0;
+            const qtd_pags = 0;
+
+            const id = loan.id;
+            const clientId = loan.clientId;
+            const lin = loan.lin;
+            const lins_pags = loan.lins_pags;
+
+            const new_loan = { id, clientId, valor, valor_receber, prazo, juros_tipo, juros_val, emissao, pago, qtd_pags, lin };
+
+            if (lins_pags.length > 0) {
+                new_loan.lins_pags = lins_pags;
+            }
+
+            try {
+                const data_fetch = { data: new_loan, funcao: 'add_emprestimo' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - add emprestimo") };
+
+                const novoDB = await res.json();
+
+                if (!novoDB.time || novoDB.time <= DB.time) {
+                    console.log('novoDB');
+                    console.log(novoDB);
+                    throw new Error(novoDB.error);
+                }
+
+                console.log("Emprestimo editado com sucesso");
+                DB = novoDB;
+            }
+            catch (err) {
+                console.log("Erro ao editar emprestimo");
+                console.log(err);
+
+            }
+
+
+            // Salvar backup local
+            backup_local();
+
+
+            Object.assign(loan, _pendingEditEmp);
+
+
+            _pendingEditEmp = null;
+            _pendingEditEmp_pago = null;
+            showToast('Empréstimo atualizado! ✓', 'ok');
+            updateNotifBadge();
+            setTimeout(() => openEmpDetalhe(_currentLoanId), 300);
+        }
+
+        // ---- Marcar / desmarcar como pago ----
+        function openMarkPaidConfirm() {
+            const loan = getLoan(_currentLoanId);
+            if (!loan) return;
+            const c = getLoanCalc(loan);
+            const client = getClient(loan.clientId);
+            const isPago = loan.pago == 1;
+            const novoEstado = isPago ? 0 : 1;
+
+            document.getElementById('mark-paid-title').textContent = isPago ? 'Desmarcar como Pago' : 'Marcar como Pago';
+            document.getElementById('mark-paid-body').innerHTML = `
+                <div class="warn-box" style="background:${isPago ? '#ffb54714' : '#00e8a214'};border-color:${isPago ? '#ffb54740' : '#00e8a240'};margin-bottom:12px">
+                <div class="wb-t" style="color:${isPago ? 'var(--warn)' : 'var(--acc)'}">
+                    ${isPago ? '⚠ Remover quitação manual?' : '✓ Marcar como quitado?'}
+                </div>
+                <div class="wb-d">${isPago
+                    ? 'O empréstimo voltará ao status calculado com base nos pagamentos registrados.'
+                    : 'O empréstimo será marcado como quitado independente do saldo restante.'}</div>
+                </div>
+                <div class="card-sm mb12">
+                <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${client.nome}</div></div>
+                <div class="dr"><div class="dk">Contrato</div><div class="dv2">${loan.id}</div></div>
+                <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(loan.valor)}</div></div>
+                <div class="dr"><div class="dk">Total pago (registrado)</div><div class="dv2 c-g">${fmtMoney(c.totalPago)}</div></div>
+                ${!isPago && c.saldoRestante > 0 ? `<div class="dr"><div class="dk">Saldo que será ignorado</div><div class="dv2 c-a">${fmtMoney(c.saldoRestante)}</div></div>` : ''}
+                <div class="dr" style="border:none"><div class="dk">Novo status</div><div class="dv2 fw6 ${novoEstado ? 'c-g' : 'c-b'}">${novoEstado ? '✓ Pago' : 'Recalculado'}</div></div>
+                </div>
+                <div class="confirm-btns">
+                <button class="cbtn-n" onclick="closeSheet(document.getElementById('mark-paid-confirm-sheet'))">Cancelar</button>
+                <button class="cbtn-y" onclick="edit_pago(${novoEstado})">${isPago ? 'Desmarcar' : 'Confirmar ✓'}</button>
+                </div>`;
+            openSheet('mark-paid-confirm-sheet');
+        }
+
+        async function edit_pago(novoEstado) {
+            const loan = getLoan(_currentLoanId);
+            if (!loan) return;
+
+            showLoading(['ALTERANDO PAGO...', 'IGNORANDO PAGAMENTOS...', 'SALVANDO NA PLANILHA...', 'FINALIZANDO...']);
+
+            const id = loan.id;
+            const lin = loan.lin;
+            const novo_pago = novoEstado;
+
+            const novo_pago_x = { id, lin, novo_pago };
+
+            try {
+                console.log("ALTERANDO SE PAGO...");
+                const data_fetch = { data: novo_pago_x, funcao: 'edit_pago' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - edit pago") };
+
+                const novoDB = await res.json();
+
+                if (novoDB.error) {
+                    throw new Error(novoDB.error);
+                }
+
+                console.log("PAGO ALTERADO com sucesso");
+                DB = novoDB;
+            }
+            catch (err) {
+                console.log("Erro ao ALTERAR PAGO");
+                console.log(err);
+
+            }
+
+            // Salvar backup local
+            backup_local();
+
+
+            closeSheet(document.getElementById('mark-paid-confirm-sheet'));
+            updateNotifBadge();
+            openEmpDetalhe(_currentLoanId)
+
+            hideLoading();
+
+            showToast(novoEstado ? 'Marcado como pago! ✓' : 'Quitação removida', 'ok');
+        }
+
+
+        // ---- Excluir empréstimo ----
+        function openDeleteEmpConfirm() {
+            const loan = getLoan(_currentLoanId);
+            if (!loan) return;
+            const client = getClient(loan.clientId);
+            const c = getLoanCalc(loan);
+
+            document.getElementById('delete-emp-body').innerHTML = `
+                <div class="warn-box" style="background:#ff4d6d14;border-color:#ff4d6d40;margin-bottom:12px">
+                <div class="wb-t" style="color:var(--danger)">⚠ Ação irreversível</div>
+                <div class="wb-d">Este empréstimo e todos os seus pagamentos serão apagados permanentemente.</div>
+                </div>
+                <div class="card-sm mb12">
+                <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${client.nome}</div></div>
+                <div class="dr"><div class="dk">Contrato</div><div class="dv2">${loan.id}</div></div>
+                <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(loan.valor)}</div></div>
+                <div class="dr"><div class="dk">Pagamentos registrados</div><div class="dv2">${loan.pagamentos.length}</div></div>
+                <div class="dr" style="border:none"><div class="dk">Saldo em aberto</div><div class="dv2 c-r">${c.isPago ? '—' : fmtMoney(c.valorHoje)}</div></div>
+                </div>
+                <div style="background:var(--bg2);border:1px solid var(--danger);border-radius:var(--rad12);padding:12px;margin-bottom:12px">
+                <div class="fl" style="color:var(--danger)">Digite o ID do contrato para confirmar</div>
+                <input class="fi" id="delete-confirm-input" type="text" placeholder="${loan.id}" style="border-color:var(--danger)">
+                </div>
+                <div class="confirm-btns">
+                <button class="cbtn-n" onclick="closeSheet(document.getElementById('delete-emp-confirm-sheet'))">Cancelar</button>
+                <button class="cbtn-y" style="background:var(--danger)" onclick="del_emprestimo('${loan.id}')">Excluir ✗</button>
+                </div>`;
+            openSheet('delete-emp-confirm-sheet');
+        }
+
+        // FUNÇÃO PARA APAGAR EMPRESTIMOS
+        async function del_emprestimo(expectedId) {
+            const typed = document.getElementById('delete-confirm-input')?.value?.trim();
+            if (typed !== expectedId) { showToast('ID incorreto, tente novamente', 'err'); return; }
+
+            showLoading(['DELETANDO EMPRESTIMO...', 'APAGANDO DADOS...', 'REMOVENDO PAGAMENTOS...', 'ATUALIZANDO PLANILHA...', 'REMOVENDO ANEXOS...', 'SINCRONIZANDO...', 'TERMINANDO...']);
+
+            const loan = getLoan(expectedId);
+            const id = loan.id;
+            const lin = loan.lin;
+            const lins_pags = loan.lins_pags;
+
+            const dados_apagar = { id, lin };
+
+            if (lins_pags.length > 0) {
+                dados_apagar.lins_pags = lins_pags;
+            }
+
+
+            try {
+                console.log("DELETANDO emprestimo da planilha...");
+                const data_fetch = { data: dados_apagar, funcao: 'del_emprestimo' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - del emprestimo") };
+
+                const novoDB = await res.json();
+
+                if (novoDB.error) {
+                    throw new Error(novoDB.error);
+                }
+
+                console.log("Emprestimo deletado com sucesso");
+                DB = novoDB;
+            }
+            catch (err) {
+                console.log("Erro ao deletar Emprestimo");
+                console.log(err);
+
+            }
+
+            // Salvar backup local
+            backup_local();
+
+            updateNotifBadge();
+            closeSheet(document.getElementById('delete-emp-confirm-sheet'));
+
+            navTo('dash');
+
+            hideLoading();
+
+            showToast('Empréstimo excluído', 'ok');
+        }
+
         // ==================== CLIENTES ====================
         function renderClientes() {
             const list = document.getElementById('cli-list');
@@ -5574,7 +6450,7 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 Editar pagamento
                 </button>
-                <button class="btn-icon w-full" style="justify-content:center;color:var(--danger);border-color:#ff4d6d30" onclick="closeSheet(document.getElementById('tl-event-sheet'));openDeletePagConfirm('${lid}','${pid}')">
+                <button class="btn-icon w-full" style="justify-content:center;color:var(--danger); border-color:#ff4d6d30" onclick="closeSheet(document.getElementById('tl-event-sheet')); openDeletePagConfirm('${lid}','${pid}')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                 Apagar pagamento
                 </button>
@@ -5633,10 +6509,14 @@
                     </div>
                 </div>
                 </div>
+                <div style="background:var(--bg2); border:1px solid var(--acc3); border-radius:var(--rad12); padding:12px; margin-bottom:12px">
+                <div class="fl" style="color:var(--acc3)">Digite o ID do pagamento para confirmar - ${pid}</div>
+                <input class="fi" id="del-pag-id-input" type="text" placeholder="C00_E00_P00" style="border-color:var(--acc3)">
+                </div>
                 <div class="confirm-btns">
                 <button class="cbtn-n" onclick="closeSheet(document.getElementById('delete-pag-confirm-sheet'))">Cancelar</button>
                 <button class="cbtn-y" style="background:var(--danger)" onclick="del_pagamento('${lid}','${pid}')">Apagar ✗</button>
-                </div>`;
+                `;
 
             openSheet('delete-pag-confirm-sheet');
         }
@@ -5645,9 +6525,13 @@
             const loan = getLoan(lid);
             const pag = loan.pagamentos.find(p => p.id === pid);
             if (!loan || !pag) return;
+
+            const typed = document.getElementById('del-pag-id-input')?.value?.trim();
+            if (typed !== pid) { showToast('ID incorreto, tente novamente', 'err'); return; }
+
             showLoading(['APAGANDO PAGAMENTO...', 'ATUALIZANDO DADOS...', 'APAGANDO ANEXOS...', 'COLETANDO NOVOS VALORES...', 'TERMINANDO...']);
 
-            
+
             const pags_removidos = loan.pagamentos.filter(p => p.data >= pag.data);
             let lins_pags = [pag.lin];
             if (pags_removidos.length > 0) {
@@ -5694,370 +6578,6 @@
             updateNotifBadge();
             openEmpDetalhe(lid);
         }
-
-        function openEmpMenu() {
-            const loan = getLoan(_currentLoanId);
-            if (!loan) return;
-            const c = getLoanCalc(loan);
-            const isPago = c.isPago;
-            document.getElementById('emp-menu-mark-lbl').textContent = isPago ? 'Desmarcar como pago' : 'Marcar como pago';
-            document.getElementById('emp-menu-mark-sub').textContent = isPago ? 'Remove a quitação manual' : 'Quita manualmente sem registrar pagamento';
-            const icon = document.querySelector('#emp-menu-mark-paid .menu-icon');
-            icon.className = isPago ? 'menu-icon mi-amber' : 'menu-icon mi-green';
-            openSheet('emp-menu-sheet');
-        }
-
-        function openEditEmp() {
-            const loan = getLoan(_currentLoanId);
-            if (!loan) return;
-            document.getElementById('ee-valor').value = loan.valor;
-            document.getElementById('ee-data').value = dateStr(loan.emissao);
-            document.getElementById('ee-data').max = dateStr(TODAY);
-            document.getElementById('ee-prazo').value = loan.prazo;
-            document.getElementById('ee-juros-tipo').value = loan.juros_tipo;
-            document.getElementById('ee-juros-val').value = loan.juros_val;
-            refreshEditEmpPreview();
-            openSheet('edit-emp-sheet');
-        }
-
-        function refreshEditEmpPreview() {
-            const loan = getLoan(_currentLoanId);
-            if (!loan) return;
-            const c = getLoanCalc(loan);
-            const novoValor = parseFloat(document.getElementById('ee-valor').value) || 0;
-            const novaData = parseDate(document.getElementById('ee-data').value);
-            const novoPrazo = parseInt(document.getElementById('ee-prazo').value) || 0;
-            const novoTipo = document.getElementById('ee-juros-tipo').value;
-            const novoJuros = parseFloat(document.getElementById('ee-juros-val').value) || 0;
-
-            const impactEl = document.getElementById('ee-impact');
-            const statusBox = document.getElementById('ee-status-box');
-            const tlWrap = document.getElementById('ee-timeline-wrap');
-
-            if (!novoValor || !novaData || !novoPrazo) {
-                impactEl.innerHTML = '<div class="fs12 tc2">Preencha todos os campos para ver o impacto</div>';
-                statusBox.style.display = 'none';
-                tlWrap.innerHTML = '<div class="fs12 tc2">Preencha os campos para ver o histórico</div>';
-                return;
-            }
-
-            const pr = getProfitRate(novoPrazo);
-            const novoBase = novoValor * (1 + pr);
-            const novaVenc = addDays(novaData, novoPrazo);
-
-            // Simulate loan with new values
-            const loanSim = structuredClone(loan);
-            loanSim.pagamentos = [];
-            loanSim.valor = novoValor;
-            loanSim.prazo = novoPrazo;
-            loanSim.emissao = novaData;
-            loanSim.juros_tipo = novoTipo;
-            loanSim.juros_val = novoJuros;
-            const cSim = getLoanCalc(loanSim, true);
-            _pendingEditEmp_pago = cSim.pago;
-
-            // Impact diff rows
-            const row = (lbl, antes, depois, color) => {
-                const changed = String(antes) !== String(depois);
-                return `<div class="dr"><div class="dk">${lbl}</div>
-                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px">
-                        ${changed ? `<div class="dv2 tc2" style="text-decoration:line-through; font-size:11px">${antes}</div>` : ''}
-                        <div class="dv2 fw6" style="color:${color || 'var(--txt0)'}">${depois}</div>
-                    </div></div>`;
-            };
-            const jAntTxt = (loan.juros_tipo === 'fixo' ? fmtMoney(loan.juros_val) : loan.juros_val + '%') + '/dia';
-            const jTxt = (novoTipo === 'fixo' ? fmtMoney(novoJuros) : novoJuros + '%') + '/dia';
-            impactEl.innerHTML =
-                row('Valor emprestado', fmtMoney(loan.valor), fmtMoney(novoValor), '') +
-                row('A receber (prazo)', fmtMoney(c.valorBase), fmtMoney(novoBase), 'var(--acc2)') +
-                row('Data de emissão', fmtDate(loan.emissao), fmtDate(novaData), '') +
-                row('Prazo', loan.prazo + 'd', novoPrazo + 'd', '') +
-                row('Vencimento', fmtDate(addDays(loan.emissao, loan.prazo)), fmtDate(novaVenc), '') +
-                row('Juros/dia', jAntTxt, jTxt, 'var(--danger)');
-
-            // Status box
-            const statusColors = { late: 'var(--danger)', warn: 'var(--warn)', ok: 'var(--acc2)', done: 'var(--acc)' };
-            const statusLabels = { late: `${cSim.diasAtraso} dia${cSim.diasAtraso !== 1 ? 's' : ''} em atraso`, warn: `Vence em ${cSim.diasParaVencer} dias`, ok: `Vence em ${cSim.diasParaVencer} dias`, done: 'Quitado' };
-            statusBox.style.display = '';
-            statusBox.className = `prev-box mb8 ${cSim.status === 'late' ? 'err-bdr' : cSim.status === 'warn' ? 'warn-bdr' : cSim.status === 'done' ? 'ok-bdr' : 'ok-bdr'}`;
-            document.getElementById('ee-valor-hoje').textContent = cSim.isPago ? '✓ Quitado' : fmtMoney(cSim.valorHoje);
-            document.getElementById('ee-valor-hoje').style.color = statusColors[cSim.status] || 'var(--acc2)';
-            document.getElementById('ee-status-label').textContent = statusLabels[cSim.status] || '';
-            document.getElementById('ee-venc-label').textContent = `Vence ${fmtDate(novaVenc)}`;
-
-            // Timeline
-            const events = buildTimeline(loanSim);
-            tlWrap.innerHTML = `<ul class="tl" style="padding-left:0">${renderTimelineHTML(events, null)}</ul>`;
-        }
-
-        let _pendingEditEmp_pago = null;
-        let _pendingEditEmp = null;
-        function preConfirmarEditEmp() {
-            const novoValor = parseFloat(document.getElementById('ee-valor').value) || 0;
-            const novaData = parseDate(document.getElementById('ee-data').value);
-            const novoPrazo = parseInt(document.getElementById('ee-prazo').value) || 0;
-            const novoTipo = document.getElementById('ee-juros-tipo').value;
-            const novoJuros = parseFloat(document.getElementById('ee-juros-val').value) || 0;
-            if (!novoValor || !novaData || !novoPrazo || !novoJuros) { showToast('Preencha todos os campos', 'err'); return; }
-            if (novaData > TODAY) { showToast('Data não pode ser no futuro', 'err'); return; }
-
-            _pendingEditEmp = { valor: novoValor, emissao: novaData, prazo: novoPrazo, juros_tipo: novoTipo, juros_val: novoJuros, pago: _pendingEditEmp_pago };
-
-            document.getElementById('edit-emp-confirm-body').innerHTML = `
-                <div class="warn-box" style="background:#f5a62312;border-color:#f5a62340;margin-bottom:12px">
-                <div class="wb-t" style="color:var(--acc3)">⚠ Atenção</div>
-                <div class="wb-d">Esta edição vai recalcular todos os juros, vencimentos e saldos do histórico.</div>
-                </div>
-                ${document.getElementById('ee-impact').innerHTML}
-                <div class="confirm-btns mt12">
-                <button class="cbtn-n" onclick="closeSheet(document.getElementById('edit-emp-confirm-sheet'))">← Rever</button>
-                <button class="cbtn-y" onclick="edit_emprestimo()">Salvar ✓</button>
-                </div>`;
-            openSheet('edit-emp-confirm-sheet');
-        }
-
-
-        async function edit_emprestimo() {
-            if (!_pendingEditEmp) return;
-            const loan = getLoan(_currentLoanId);
-            if (!loan) return;
-
-            console.log("Editando Emprestimo...");
-            showLoading(['Editando Emprestimo...', 'Atualizando Dados...', 'Apagando Pagamentos...', 'Apagando Anexos...', 'Salvando Novos Dados...', 'Finalizando...']);
-
-            closeSheet(document.getElementById('edit-emp-confirm-sheet'));
-            closeSheet(document.getElementById('edit-emp-sheet'));
-
-            const valor = _pendingEditEmp.valor;
-            const prazo = _pendingEditEmp.prazo;
-            const juros_val = _pendingEditEmp.juros_val;
-            const juros_tipo = _pendingEditEmp.juros_tipo;
-            const emissao = _pendingEditEmp.emissao;
-
-            const pago = 0;
-            const qtd_pags = 0;
-
-            const id = loan.id;
-            const clientId = loan.clientId;
-            const lin = loan.lin;
-            const lins_pags = loan.lins_pags;
-
-            const new_loan = { id, clientId, valor, prazo, juros_tipo, juros_val, emissao, pago, qtd_pags, lin };
-
-            if (lins_pags.length > 0) {
-                new_loan.lins_pags = lins_pags;
-            }
-
-            try {
-                const data_fetch = { data: new_loan, funcao: 'add_emprestimo' };
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch - add emprestimo") };
-
-                const novoDB = await res.json();
-
-                if (!novoDB.time || novoDB.time <= DB.time) {
-                    console.log('novoDB');
-                    console.log(novoDB);
-                    throw new Error(novoDB.error);
-                }
-
-                console.log("Emprestimo editado com sucesso");
-                DB = novoDB;
-            }
-            catch (err) {
-                console.log("Erro ao editar emprestimo");
-                console.log(err);
-
-            }
-
-
-            // Salvar backup local
-            backup_local();
-
-
-            Object.assign(loan, _pendingEditEmp);
-
-
-            _pendingEditEmp = null;
-            _pendingEditEmp_pago = null;
-            showToast('Empréstimo atualizado! ✓', 'ok');
-            updateNotifBadge();
-            setTimeout(() => openEmpDetalhe(_currentLoanId), 300);
-        }
-
-        // ---- Marcar / desmarcar como pago ----
-        function openMarkPaidConfirm() {
-            const loan = getLoan(_currentLoanId);
-            if (!loan) return;
-            const c = getLoanCalc(loan);
-            const client = getClient(loan.clientId);
-            const isPago = loan.pago == 1;
-            const novoEstado = isPago ? 0 : 1;
-
-            document.getElementById('mark-paid-title').textContent = isPago ? 'Desmarcar como Pago' : 'Marcar como Pago';
-            document.getElementById('mark-paid-body').innerHTML = `
-                <div class="warn-box" style="background:${isPago ? '#ffb54714' : '#00e8a214'};border-color:${isPago ? '#ffb54740' : '#00e8a240'};margin-bottom:12px">
-                <div class="wb-t" style="color:${isPago ? 'var(--warn)' : 'var(--acc)'}">
-                    ${isPago ? '⚠ Remover quitação manual?' : '✓ Marcar como quitado?'}
-                </div>
-                <div class="wb-d">${isPago
-                    ? 'O empréstimo voltará ao status calculado com base nos pagamentos registrados.'
-                    : 'O empréstimo será marcado como quitado independente do saldo restante.'}</div>
-                </div>
-                <div class="card-sm mb12">
-                <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${client.nome}</div></div>
-                <div class="dr"><div class="dk">Contrato</div><div class="dv2">${loan.id}</div></div>
-                <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(loan.valor)}</div></div>
-                <div class="dr"><div class="dk">Total pago (registrado)</div><div class="dv2 c-g">${fmtMoney(c.totalPago)}</div></div>
-                ${!isPago && c.saldoRestante > 0 ? `<div class="dr"><div class="dk">Saldo que será ignorado</div><div class="dv2 c-a">${fmtMoney(c.saldoRestante)}</div></div>` : ''}
-                <div class="dr" style="border:none"><div class="dk">Novo status</div><div class="dv2 fw6 ${novoEstado ? 'c-g' : 'c-b'}">${novoEstado ? '✓ Pago' : 'Recalculado'}</div></div>
-                </div>
-                <div class="confirm-btns">
-                <button class="cbtn-n" onclick="closeSheet(document.getElementById('mark-paid-confirm-sheet'))">Cancelar</button>
-                <button class="cbtn-y" onclick="edit_pago(${novoEstado})">${isPago ? 'Desmarcar' : 'Confirmar ✓'}</button>
-                </div>`;
-            openSheet('mark-paid-confirm-sheet');
-        }
-
-        async function edit_pago(novoEstado) {
-            const loan = getLoan(_currentLoanId);
-            if (!loan) return;
-
-            showLoading(['ALTERANDO PAGO...', 'IGNORANDO PAGAMENTOS...', 'SALVANDO NA PLANILHA...', 'FINALIZANDO...']);
-
-            const id = loan.id;
-            const lin = loan.lin;
-            const novo_pago = novoEstado;
-
-            const novo_pago_x = { id, lin, novo_pago };
-
-            try {
-                console.log("ALTERANDO SE PAGO...");
-                const data_fetch = { data: novo_pago_x, funcao: 'edit_pago' };
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch - edit pago") };
-
-                const novoDB = await res.json();
-
-                if (novoDB.error) {
-                    throw new Error(novoDB.error);
-                }
-
-                console.log("PAGO ALTERADO com sucesso");
-                DB = novoDB;
-            }
-            catch (err) {
-                console.log("Erro ao ALTERAR PAGO");
-                console.log(err);
-
-            }
-
-            // Salvar backup local
-            backup_local();
-
-
-            closeSheet(document.getElementById('mark-paid-confirm-sheet'));
-            updateNotifBadge();
-            openEmpDetalhe(_currentLoanId)
-
-            hideLoading();
-
-            showToast(novoEstado ? 'Marcado como pago! ✓' : 'Quitação removida', 'ok');
-        }
-
-
-        // ---- Excluir empréstimo ----
-        function openDeleteEmpConfirm() {
-            const loan = getLoan(_currentLoanId);
-            if (!loan) return;
-            const client = getClient(loan.clientId);
-            const c = getLoanCalc(loan);
-
-            document.getElementById('delete-emp-body').innerHTML = `
-                <div class="warn-box" style="background:#ff4d6d14;border-color:#ff4d6d40;margin-bottom:12px">
-                <div class="wb-t" style="color:var(--danger)">⚠ Ação irreversível</div>
-                <div class="wb-d">Este empréstimo e todos os seus pagamentos serão apagados permanentemente.</div>
-                </div>
-                <div class="card-sm mb12">
-                <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${client.nome}</div></div>
-                <div class="dr"><div class="dk">Contrato</div><div class="dv2">${loan.id}</div></div>
-                <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(loan.valor)}</div></div>
-                <div class="dr"><div class="dk">Pagamentos registrados</div><div class="dv2">${loan.pagamentos.length}</div></div>
-                <div class="dr" style="border:none"><div class="dk">Saldo em aberto</div><div class="dv2 c-r">${c.isPago ? '—' : fmtMoney(c.valorHoje)}</div></div>
-                </div>
-                <div style="background:var(--bg2);border:1px solid var(--danger);border-radius:var(--rad12);padding:12px;margin-bottom:12px">
-                <div class="fl" style="color:var(--danger)">Digite o ID do contrato para confirmar</div>
-                <input class="fi" id="delete-confirm-input" type="text" placeholder="${loan.id}" style="border-color:var(--danger)">
-                </div>
-                <div class="confirm-btns">
-                <button class="cbtn-n" onclick="closeSheet(document.getElementById('delete-emp-confirm-sheet'))">Cancelar</button>
-                <button class="cbtn-y" style="background:var(--danger)" onclick="del_emprestimo('${loan.id}')">Excluir ✗</button>
-                </div>`;
-            openSheet('delete-emp-confirm-sheet');
-        }
-
-        // FUNÇÃO PARA APAGAR EMPRESTIMOS
-        async function del_emprestimo(expectedId) {
-            const typed = document.getElementById('delete-confirm-input')?.value?.trim();
-            if (typed !== expectedId) { showToast('ID incorreto, tente novamente', 'err'); return; }
-
-            showLoading(['DELETANDO EMPRESTIMO...', 'APAGANDO DADOS...', 'REMOVENDO PAGAMENTOS...', 'ATUALIZANDO PLANILHA...', 'REMOVENDO ANEXOS...', 'SINCRONIZANDO...', 'TERMINANDO...']);
-
-            const loan = getLoan(expectedId);
-            const id = loan.id;
-            const lin = loan.lin;
-            const lins_pags = loan.lins_pags;
-
-            const dados_apagar = { id, lin };
-
-            if (lins_pags.length > 0) {
-                dados_apagar.lins_pags = lins_pags;
-            }
-
-
-            try {
-                console.log("DELETANDO emprestimo da planilha...");
-                const data_fetch = { data: dados_apagar, funcao: 'del_emprestimo' };
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch - del emprestimo") };
-
-                const novoDB = await res.json();
-
-                if (novoDB.error) {
-                    throw new Error(novoDB.error);
-                }
-
-                console.log("Emprestimo deletado com sucesso");
-                DB = novoDB;
-            }
-            catch (err) {
-                console.log("Erro ao deletar Emprestimo");
-                console.log(err);
-
-            }
-
-            // Salvar backup local
-            backup_local();
-
-            updateNotifBadge();
-            closeSheet(document.getElementById('delete-emp-confirm-sheet'));
-
-            navTo('dash');
-
-            hideLoading();
-
-            showToast('Empréstimo excluído', 'ok');
-        }
-
 
         // Abrir janela de edição de pagamentos
         function openEditPag(lid, pid) {
@@ -6167,7 +6687,7 @@
 
 
             const calcSim = getLoanCalc(loanSim);
-            const venc = addDays(loan.emissao, loan.prazo)-(21 * 60 * 60 * 1000);
+            const venc = addDays(loan.emissao, loan.prazo) - (21 * 60 * 60 * 1000);
             const isLate = calcSim.status == "late";
 
             const jDia = loan.juros_tipo === 'fixo' ? loan.juros_val : calcSim.valorBase * loan.juros_val / 100;
@@ -6218,7 +6738,7 @@
 
             const dt = novaData;
             const emissao = loanSim.emissao;
-            if (dt + (12 * 60 * 60 * 1000)< emissao) { showToast('A data não pode ser anterior à emissão do empréstimo', 'err'); return; }
+            if (dt + (12 * 60 * 60 * 1000) < emissao) { showToast('A data não pode ser anterior à emissão do empréstimo', 'err'); return; }
             if (dt > TODAY) { showToast('A data não pode ser no futuro', 'err'); return; }
 
             loanSim.pagamentos = loanSim.pagamentos.filter(p => p.data <= (dt + 12 * 60 * 60 * 1000));
@@ -6239,27 +6759,27 @@
             _pendingEditPag = { lid, pid, valor: novoValor, data: data };
 
             document.getElementById('edit-pag-confirm-body').innerHTML = `
-                <div class="warn-box" style="background:#f5a62312;border-color:#f5a62340;margin-bottom:12px">
-                <div class="wb-t" style="color:var(--acc3)">⚠ Confirmar alteração?</div>
-                <div class="wb-d">Esta edição irá recalcular o histórico do empréstimo.</div>
+                <div class="warn-box" style="background:#f5a62312; border-color:#f5a62340; margin-bottom:12px">
+                    <div class="wb-t" style="color:var(--acc3)">⚠ Confirmar alteração?</div>
+                    <div class="wb-d">Esta edição irá recalcular o histórico do empréstimo.</div>
                 </div>
                 <div class="card-sm mb12">
-                <div class="sc-lbl">Antes</div>
-                <div class="dr"><div class="dk">Valor</div><div class="dv2 tc1">${fmtMoney(valorAnterior)}</div></div>
-                <div class="dr" style="border:none"><div class="dk">Data</div><div class="dv2 tc1">${fmtDate(dataAnterior)}</div></div>
+                    <div class="sc-lbl">Antes</div>
+                    <div class="dr"><div class="dk">Valor</div><div class="dv2 tc1">${fmtMoney(valorAnterior)}</div></div>
+                    <div class="dr" style="border:none"><div class="dk">Data</div><div class="dv2 tc1">${fmtDate(dataAnterior)}</div></div>
                 </div>
                 <div class="card-sm mb12" style="border-color:var(--acc)">
-                <div class="sc-lbl" style="color:var(--acc)">Depois</div>
-                <div class="dr"><div class="dk">Valor</div><div class="dv2 ${alterouValor ? 'c-g fw6' : ''}">${fmtMoney(novoValor)}</div></div>
-                <div class="dr" style="border:none"><div class="dk">Data</div><div class="dv2 ${alterouData ? 'c-g fw6' : ''}">${fmtDate(novaData)}${isRetro ? ' <span style="color:var(--warn);font-size:11px">(retroativo)</span>' : ''}</div></div>
+                    <div class="sc-lbl" style="color:var(--acc)">Depois</div>
+                    <div class="dr"><div class="dk">Valor</div><div class="dv2 ${alterouValor ? 'c-g fw6' : ''}">${fmtMoney(novoValor)}</div></div>
+                    <div class="dr" style="border:none"><div class="dk">Data</div><div class="dv2 ${alterouData ? 'c-g fw6' : ''}">${fmtDate(novaData)}${isRetro ? ' <span style="color:var(--warn);font-size:11px">(retroativo)</span>' : ''}</div></div>
                 </div>
-                <div style="background:var(--bg2);border:1px solid var(--acc3);border-radius:var(--rad12);padding:12px;margin-bottom:12px">
+                <div style="background:var(--bg2); border:1px solid var(--acc3); border-radius:var(--rad12); padding:12px; margin-bottom:12px">
                 <div class="fl" style="color:var(--acc3)">Digite o ID do pagamento para confirmar - ${pid}</div>
                 <input class="fi" id="edit-pag-id-input" type="text" placeholder="C00_E00_P00" style="border-color:var(--acc3)">
                 </div>
-                <div class="confirm-btns">
-                <button class="cbtn-n" onclick="closeSheet(document.getElementById('edit-pag-confirm-sheet'))">Cancelar</button>
-                <button class="cbtn-y" onclick="edit_pagamento()">Salvar edição ✓</button>
+                    <div class="confirm-btns">
+                    <button class="cbtn-n" onclick="closeSheet(document.getElementById('edit-pag-confirm-sheet'))">Cancelar</button>
+                    <button class="cbtn-y" onclick="edit_pagamento()">Salvar edição ✓</button>
                 </div>`;
 
             openSheet('edit-pag-confirm-sheet');
@@ -6303,7 +6823,7 @@
             if (!isRetro) { wrap_retro.style.display = 'none'; }
             else { wrap_retro.style.display = ''; }
 
-            
+
             if (isRetro) {
                 loan_retro.pagamentos = loan_retro.pagamentos.filter(p => p.data <= (dt + 12 * 60 * 60 * 1000));
             }
@@ -6423,7 +6943,7 @@
             let removidos_lins = [];
             let removidos = [];
             let novo_qtd_pags = 0;
-            if(pid_old) {
+            if (pid_old) {
                 removidos = loan.pagamentos.filter(p => p.data > dtPag || p.data > pag.data || p.id === pid_old);
                 loan_retro.pagamentos = loan.pagamentos.filter(p => p.data < dtPag && p.data < pag.data);
                 novo_qtd_pags = qtd_pags;
@@ -6433,9 +6953,9 @@
                 loan_retro.pagamentos = loan.pagamentos.filter(p => p.data < dtPag);
                 novo_qtd_pags = qtd_pags + 1;
             }
-            
+
             removidos_lins = removidos.map(p => p.lin);
-            
+
 
 
             const calc = getLoanCalc(loan_retro);
@@ -6514,9 +7034,9 @@
 
 
         function renderComprovantePagamento(loan, pag) {
-            const vencimento = addDays(loan.emissao, loan.prazo)-(21 * 60 * 60 * 1000);
-            const pr = getProfitRate(loan.prazo);
-            const valorBase = loan.valor * (1 + pr); // valor combinado (principal + lucro)
+            const vencimento = addDays(loan.emissao, loan.prazo) - (21 * 60 * 60 * 1000);
+            const pr = (loan.valor_receber - loan.valor) / loan.valor * 100;
+            const valorBase = loan.valor_receber; // valor combinado (principal + lucro)
             const jDia = loan.juros_tipo === 'fixo' ? loan.juros_val : valorBase * loan.juros_val / 100;
 
             const totalPagoAgora = pag.totalPagoAntes + pag.valor;
@@ -6900,6 +7420,7 @@
             document.getElementById('def-juros-tipo').value = DB.defaults.juros_tipo || 'fixo';
             document.getElementById('def-juros-fixo-val').value = DB.defaults.juros_fixo_val || DB.defaults.juros_val || '';
             document.getElementById('def-juros-perc-val').value = DB.defaults.juros_perc_val || '';
+            document.getElementById('def-calculo-tipo').value = DB.defaults.calculo_tipo || 'manual';
             openSheet('defaults-sheet');
         }
 
@@ -6907,6 +7428,11 @@
             // Read current rows to get next suggested dias value
             const existing = [...document.querySelectorAll('[id^="def-dias-"]')]
                 .map(el => parseInt(el.value) || 0);
+
+            if (existing.length >= 8) {
+                showToast('Maximo de 8 prazos permitido!', 'err');
+                return;
+            }
             const nextDias = existing.length ? Math.max(...existing) + 7 : 7;
             const tempKey = 'new_' + Date.now();
             const container = document.getElementById('defaults-prazos-list');
@@ -6963,6 +7489,7 @@
             const novoFixoVal = parseFloat(document.getElementById('def-juros-fixo-val').value) || 0;
             const novoPercVal = parseFloat(document.getElementById('def-juros-perc-val').value) || 0;
             const novoVal = novoTipo === 'fixo' ? novoFixoVal : novoPercVal;
+            const novocalculo = document.getElementById('def-calculo-tipo').value;
 
             const d = DB.defaults;
 
@@ -6996,7 +7523,9 @@
             const jurosTipoDiff = mudou('Tipo de juros padrão', d.juros_tipo === 'fixo' ? 'Fixo (R$)' : 'Percentual (%)', novoTipo === 'fixo' ? 'Fixo (R$)' : 'Percentual (%)', '');
             const jurosFixoDiff = mudou('Juros fixo padrão', d.juros_fixo_val || d.juros_val, novoFixoVal, ' R$');
             const jurosPercDiff = mudou('Juros percentual padrão', d.juros_perc_val || 0, novoPercVal, '%');
-            const allDiffs = prazoDiffs + jurosTipoDiff + jurosFixoDiff + jurosPercDiff;
+            const calculoTipoDiff = mudou('Tipo de calculo padrão', d.calculo_tipo == "manual" ? "Manual / Livre" : "Taxas Padrões",
+                novocalculo == "manual" ? "Manual / Livre" : "Taxas Padrões", '');
+            const allDiffs = prazoDiffs + jurosTipoDiff + jurosFixoDiff + jurosPercDiff + calculoTipoDiff;
 
             document.getElementById('defaults-confirm-body').innerHTML = `
                 <div class="warn-box" style="background:#3d7fff12;border-color:#3d7fff40;margin-bottom:12px">
@@ -7008,46 +7537,68 @@
                 </div>
                     <div class="confirm-btns">
                     <button class="cbtn-n" onclick="closeSheet(document.getElementById('defaults-confirm-sheet'))">← Rever</button>
-                    <button class="cbtn-y" ${!allDiffs ? 'disabled style="opacity:.4"' : ''} onclick="executarDefaults()">Salvar ✓</button>
+                    <button class="cbtn-y" ${!allDiffs ? 'disabled style="opacity:.4"' : ''} onclick="att_padroes()">Salvar ✓</button>
                 </div>`;
 
-            _pendingDefaults = { prazos: novosPrazos, juros_tipo: novoTipo, juros_val: novoVal, juros_fixo_val: novoFixoVal, juros_perc_val: novoPercVal };
+            _pendingDefaults = { prazos: novosPrazos, juros_tipo: novoTipo, juros_val: novoVal, juros_fixo_val: novoFixoVal, juros_perc_val: novoPercVal, calculo_tipo: novocalculo };
 
             openSheet('defaults-confirm-sheet');
         }
 
         let _pendingDefaults = null;
 
-        function executarDefaults() {
+        async function att_padroes() {
+            showLoading(['ATUALIZANDO PADRÕES...', 'CALCULANDO VALORES...', 'SALVANDO...', 'PADRONIZANDO...', 'TERMINANDO...']);
             if (!_pendingDefaults) return;
-            const { prazos: novosPrazos, juros_tipo: novoTipo, juros_fixo_val: novoFixoVal, juros_perc_val: novoPercVal } = _pendingDefaults;
-            _pendingDefaults = null;
-            DB.defaults.prazos = {};
-            for (const [dias, pct] of Object.entries(novosPrazos)) {
-                DB.defaults.prazos[Number(dias)] = pct;
+
+            const dados_att = _pendingDefaults;
+
+            try {
+                console.log("Atualizando padrões...");
+                const data_fetch = { data: dados_att, funcao: 'att_padroes' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - att padroes") };
+
+                const novoDB = await res.json();
+
+                if (novoDB.error) {
+                    throw new Error(novoDB.error);
+                }
+
+                console.log("Padrões atualizados com sucesso");
+                DB = novoDB;
             }
-            DB.defaults.juros_tipo = novoTipo;
-            DB.defaults.juros_val = novoTipo === 'fixo' ? novoFixoVal : novoPercVal;
-            DB.defaults.juros_fixo_val = novoFixoVal;
-            DB.defaults.juros_perc_val = novoPercVal;
+            catch (err) {
+                console.log("Erro ao atualizar padrões");
+                console.log(err);
+            }
+
+            // Salvar backup local
+            backup_local();
+
             _rebuildPrazoSelect();
             closeSheet(document.getElementById('defaults-confirm-sheet'));
             closeSheet(document.getElementById('defaults-sheet'));
-            showToast('Padrões salvos! ✓', 'ok');
+            hideLoading();
+
+            _pendingDefaults = null;
+
+            showToast('Padrões atualizados! ✓', 'ok');
         }
+
 
         function _rebuildPrazoSelect() {
             const sel = document.getElementById('ne-prazo');
             if (!sel) return;
             const cur = sel.value;
             const d = DB.defaults.prazos;
-            sel.innerHTML = `<option value="">Escolher…</option>
-        ${Object.entries(d).map(([dias, pct]) =>
-                `<option value="${dias}">${dias} dias (+${pct}%)</option>`
-                ).join('')}
-                    <option value="custom">Personalizado</option>`;
-            sel.value = cur; // restore selection if still valid
-            // Also pre-fill juros fields if empty
+            sel.innerHTML = `<option value="">Escolher…</option>${Object.entries(d).map(([dias, pct]) => `<option value="${dias}">${dias} dias (+${pct}%)</option>`).join('')}<option value="custom">Personalizado</option>`;
+            sel.value = cur;
+
+            setModoCalculo(DB.defaults.calculo_tipo);
             const tipoEl = document.getElementById('ne-juros-tipo');
             const valEl = document.getElementById('ne-juros-val');
             if (tipoEl && !valEl?.value) {
@@ -7056,6 +7607,7 @@
                 updateNovoPreview();
             }
         }
+
         const LS_MESSAGES = [
             'Carregando dados…',
             'Buscando empréstimos…',
@@ -7704,7 +8256,6 @@
             console.log("Backup local salvo");
             console.log(DB);
         }
-
 
 
         // VARIAVEIS GLOBAIS
