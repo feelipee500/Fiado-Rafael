@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EMPRESTIMOS</title>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400; 500; 600; 700; 800; 900&family=DM+Sans:ital,opsz,wght@0,9..40,300; 0,9..40,400; 0,9..40,500; 0,9..40,600; 1,9..40,300&display=swap"
         rel="stylesheet">
     <style>
         :root {
@@ -2811,7 +2811,7 @@
                             <div class="ptitle">Novo Empréstimo</div>
                             <div class="psub" style="margin-bottom:0">Passo 1 — Escolher cliente</div>
                         </div>
-                        <div class="btn-icon" style="height:34px;align-self:flex-start;margin-top:4px"
+                        <div class="btn-icon" style="height:34px; align-self:flex-start; margin-top:4px"
                             onclick="openDefaultsSheet()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round">
@@ -2832,12 +2832,12 @@
                             <div class="fg">
                                 <div class="fl">Nome completo *</div><input class="fi" id="nc-nome"
                                     placeholder="Ex: João da Silva"
-                                    oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, ''); att_cliente('nc-nome');">
+                                    oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, ''); att_cliente('nc-nome'); ">
                             </div>
                             <div class="fg">
                                 <div class="fl">Telefone *</div><input class="fi" id="nc-tel" type="tel"
                                     placeholder="Ex: 12912345678"
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); att_cliente('nc-tel');">
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); att_cliente('nc-tel'); ">
                             </div>
                             <div class="fg">
                                 <div class="fl">E-mail</div><input class="fi" id="nc-email" type="email"
@@ -2885,51 +2885,51 @@
                     </div>
 
                     <div class="card">
-                        <div class="sc-lbl" style="text-align: center;">Tipo de Cálculo</div>
+                        <div class="sc-lbl" style="text-align: center; ">Tipo de Cálculo</div>
                         <div class="flex-r mb12"
-                            style="gap:4px; background:rgba(0,0,0,0.05); padding:4px; border-radius:8px; width:100%; justify-content: center;">
+                            style="gap:4px; background:rgba(0,0,0,0.05); padding:4px; border-radius:8px; width:100%; justify-content: center; ">
                             <button id="btn-modo-padrao" type="button" class="btn-p"
-                                style="flex:1; margin:0; font-size:13px; height:36px; border-radius:6px; display: inline-flex; align-items: center; justify-content: center; padding: 0;"
+                                style="flex:1; margin:0; font-size:13px; height:36px; border-radius:6px; display: inline-flex; align-items: center; justify-content: center; padding: 0; "
                                 onclick="setModoCalculo('padrao')">Taxas Padrão</button>
                             <button id="btn-modo-manual" type="button" class="btn-s"
-                                style="flex:1; margin:0; font-size:13px; height:36px; border-radius:6px; background:transparent; border:none; box-shadow:none; display: inline-flex; align-items: center; justify-content: center; padding: 0;"
+                                style="flex:1; margin:0; font-size:13px; height:36px; border-radius:6px; background:transparent; border:none; box-shadow:none; display: inline-flex; align-items: center; justify-content: center; padding: 0; "
                                 onclick="setModoCalculo('manual')">Manual / Livre</button>
                         </div>
                         <input type="hidden" id="ne-modo-calculo" value="padrao">
-                        <div class="sc-lbl mt12" style="text-align: center;">Dados do Empréstimo</div>
-                        <div class="fr" style="display: flex; gap: 12px; width: 100%;">
+                        <div class="sc-lbl mt12" style="text-align: center; ">Dados do Empréstimo</div>
+                        <div class="fr" style="display: flex; gap: 12px; width: 100%; ">
                             <div class="fg" id="wrap-ne-valor"
-                                style="flex: 1; transition: all 0.2s ease; white-space: nowrap;">
-                                <div class="fl" style="text-align: center;">Valor emprestado (R$) *</div>
+                                style="flex: 1; transition: all 0.2s ease; white-space: nowrap; ">
+                                <div class="fl" style="text-align: center; ">Valor emprestado (R$) *</div>
                                 <input class="fi" id="ne-valor" type="text" inputmode="numeric" placeholder="100 R$"
-                                    style="width: 100%; text-align: center;"
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview();">
+                                    style="width: 100%; text-align: center; "
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview(); ">
                             </div>
                             <div class="fg" id="wrap-ne-receber"
-                                style="display: none; flex: 1; transition: all 0.2s ease; white-space: nowrap;">
-                                <div class="fl" style="text-align: center;">Valor a receber (R$) *</div>
+                                style="display: none; flex: 1; transition: all 0.2s ease; white-space: nowrap; ">
+                                <div class="fl" style="text-align: center; ">Valor a receber (R$) *</div>
                                 <input class="fi" id="ne-receber-manual" type="text" inputmode="numeric"
-                                    placeholder="120 R$" style="width: 100%; text-align: center;"
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); validarECalcularManual();">
+                                    placeholder="120 R$" style="width: 100%; text-align: center; "
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); validarECalcularManual(); ">
                             </div>
                         </div>
-                        <div class="fr" style="margin-top:8px; display: flex; gap: 12px;">
-                            <div class="fg" style="flex:1;">
-                                <div class="fl" style="text-align: center;">Data de emissão *</div>
-                                <input class="fi" id="ne-data" type="date" style="width: 100%; text-align: center;"
+                        <div class="fr" style="margin-top:8px; display: flex; gap: 12px; ">
+                            <div class="fg" style="flex:1; ">
+                                <div class="fl" style="text-align: center; ">Data de emissão *</div>
+                                <input class="fi" id="ne-data" type="date" style="width: 100%; text-align: center; "
                                     onchange="updateNovoPreview()">
                             </div>
-                            <div class="fg" style="flex:1;">
-                                <div class="fl" style="text-align: center;">Prazo (dias) *</div>
+                            <div class="fg" style="flex:1; ">
+                                <div class="fl" style="text-align: center; ">Prazo (dias) *</div>
                                 <select class="fi fs" id="ne-prazo"
-                                    style="width: 100%; text-align: center; text-align-last: center;"
+                                    style="width: 100%; text-align: center; text-align-last: center; "
                                     onchange="updateNovoPreview()">
                                     <option value="">Escolher…</option>
                                     <option value="custom">Personalizado</option>
                                 </select>
                                 <input class="fi" id="ne-prazo-manual" type="text" inputmode="numeric"
-                                    placeholder="Ex: 15" style="display:none; width: 100%; text-align: center;"
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview();">
+                                    placeholder="Ex: 15" style="display:none; width: 100%; text-align: center; "
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview(); ">
                             </div>
                         </div>
                         <div id="custom-prazo-wrap" style="display:none" class="fg mt8">
@@ -2939,24 +2939,24 @@
                                 oninput="this.value=this.value.replace(/[^0-9\s]/g, ''); updateNovoPreview()">
                         </div>
                         <div class="fg mt8">
-                            <div class="fl" style="text-align: center;">Juros por dia de atraso *</div>
-                            <div class="flex-r" style="gap:10px; align-items:center;">
+                            <div class="fl" style="text-align: center; ">Juros por dia de atraso *</div>
+                            <div class="flex-r" style="gap:10px; align-items:center; ">
                                 <select class="fi fs" id="ne-juros-tipo"
-                                    style="flex:0.85; text-align: center; text-align-last: center;"
+                                    style="flex:0.85; text-align: center; text-align-last: center; "
                                     onchange="onJurosTipoChange()">
                                     <option value="fixo">Fixo</option>
                                     <option value="perc">Percentual</option>
                                 </select>
-                                <div style="position:relative; flex:1;">
+                                <div style="position:relative; flex:1; ">
                                     <input class="fi" id="ne-juros-val" type="text" inputmode="numeric" min="1"
-                                        style="padding-right:36px; width: 100%; text-align: center;"
-                                        oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview();">
+                                        style="padding-right:36px; width: 100%; text-align: center; "
+                                        oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview(); ">
                                     <span id="ne-juros-suffix"
-                                        style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:13px; color:var(--txt2); pointer-events:none;">R$</span>
+                                        style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:13px; color:var(--txt2); pointer-events:none; ">R$</span>
                                 </div>
                             </div>
                         </div>
-                        <div id="novo-preview-mini" style="display:none;" class="card-sm mt12">
+                        <div id="novo-preview-mini" style="display:none; " class="card-sm mt12">
                             <div class="sc-lbl">Prévia rápida</div>
                             <div class="dr">
                                 <div class="dk">Valor a receber</div>
@@ -2966,7 +2966,7 @@
                                 <div class="dk">Data de vencimento</div>
                                 <div class="dv2" id="nv-venc">—</div>
                             </div>
-                            <div class="dr" style="border:none;">
+                            <div class="dr" style="border:none; ">
                                 <div class="dk">Lucro esperado</div>
                                 <div class="dv2 c-g" id="nv-lucro">—</div>
                             </div>
@@ -3019,7 +3019,7 @@
                             <div style="display:flex; align-items:center; justify-content:space-between">
                                 <div class="fs11 tc2" id="cd-tel"></div>
                                 <div id="cd-whatsapp-btn" onclick="openSheet('open-whatsapp')"
-                                    style="display:flex; align-items:center; gap:4px; background:#25D36618; border:1px solid #25D36630; color:#25D366;border-radius:20px; padding:3px 9px; cursor:pointer; font-size:11px; font-weight:600">
+                                    style="display:flex; align-items:center; gap:4px; background:#25D36618; border:1px solid #25D36630; color:#25D366; border-radius:20px; padding:3px 9px; cursor:pointer; font-size:11px; font-weight:600">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                                         <path
                                             d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
@@ -3075,17 +3075,17 @@
 
                 <!-- HERO HEADER — full-width colored banner -->
                 <div id="ed-hero"
-                    style="position:relative;padding:20px 16px 28px;background:var(--bg1);border-bottom:1px solid var(--brd)">
+                    style="position:relative; padding:20px 16px 28px; background:var(--bg1); border-bottom:1px solid var(--brd)">
                     <!-- nav bar -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-                        <div class="back-btn" id="ed-back-btn" style="margin-bottom:0;color:var(--txt1)">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px">
+                        <div class="back-btn" id="ed-back-btn" style="margin-bottom:0; color:var(--txt1)">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
                                 <polyline points="15 18 9 12 15 6" />
                             </svg>Voltar
                         </div>
-                        <div style="display:flex;align-items:center;gap:8px">
+                        <div style="display:flex; align-items:center; gap:8px">
                             <div id="ed-status-pill"></div>
-                            <div class="btn-icon" style="height:32px;width:32px" onclick="openEmpMenu()">
+                            <div class="btn-icon" style="height:32px; width:32px" onclick="openEmpMenu()">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round">
                                     <circle cx="12" cy="5" r="1" fill="currentColor" />
@@ -3101,7 +3101,7 @@
                             <div style="font-family:var(--font-d); font-size:20px; font-weight:800; letter-spacing:-.5px; line-height:1.1"
                                 id="ed-client-name"></div>
                             <div id="ed-whatsapp-btn" onclick="openSheet('open-whatsapp')"
-                                style="display:flex;align-items:center;gap:5px;background:#25D36618;border:1px solid #25D36630;color:#25D366;border-radius:20px;padding:5px 11px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap">
+                                style="display:flex; align-items:center; gap:5px; background:#25D36618; border:1px solid #25D36630; color:#25D366; border-radius:20px; padding:5px 11px; cursor:pointer; font-size:12px; font-weight:600; white-space:nowrap">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                                     <path
                                         d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
@@ -3116,24 +3116,24 @@
                     <!-- main value display -->
                     <div id="ed-sit-box" style="position:relative">
                         <div class="fs11 tc2" style="margin-bottom:2px">Valor a pagar hoje</div>
-                        <div style="font-family:var(--font-d);font-size:34px;font-weight:900;letter-spacing:-1.5px;line-height:1"
+                        <div style="font-family:var(--font-d); font-size:34px; font-weight:900; letter-spacing:-1.5px; line-height:1"
                             id="ed-valor-hoje">R$ 0</div>
-                        <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+                        <div style="display:flex; align-items:center; gap:8px; margin-top:6px">
                             <div class="fs12" id="ed-dias-label" style="font-weight:500"></div>
                             <div class="fs11 tc2" id="ed-venc-label"></div>
                         </div>
                     </div>
                     <!-- progress bar -->
                     <div style="margin-top:16px">
-                        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px">
                             <span class="fs11 tc2">Total pago: <span id="ed-total-pago"
-                                    style="color:var(--txt1);font-weight:500"></span></span>
+                                    style="color:var(--txt1); font-weight:500"></span></span>
                             <span class="fs11 tc2">Meta: <span id="ed-valor-comb"
-                                    style="color:var(--txt1);font-weight:500"></span></span>
+                                    style="color:var(--txt1); font-weight:500"></span></span>
                         </div>
-                        <div style="height:4px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden">
+                        <div style="height:4px; background:rgba(255,255,255,.12); border-radius:2px; overflow:hidden">
                             <div id="ed-progress-bar"
-                                style="height:100%;border-radius:2px;background:var(--acc);transition:width .4s ease;width:0%">
+                                style="height:100%; border-radius:2px; background:var(--acc); transition:width .4s ease; width:0%">
                             </div>
                         </div>
                     </div>
@@ -3142,36 +3142,38 @@
                 <div class="pw" style="padding-top:14px">
 
                     <!-- Quick stats grid -->
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-                        <div class="card-sm" style="display:flex;flex-direction:column;gap:2px">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px">
+                        <div class="card-sm" style="display:flex; flex-direction:column; gap:2px">
                             <span class="fs10 tc2"
-                                style="text-transform:uppercase;letter-spacing:.6px;font-weight:600">Emprestado</span>
-                            <span style="font-family:var(--font-d);font-size:17px;font-weight:700;letter-spacing:-.4px"
+                                style="text-transform:uppercase; letter-spacing:.6px; font-weight:600">Emprestado</span>
+                            <span
+                                style="font-family:var(--font-d); font-size:17px; font-weight:700; letter-spacing:-.4px"
                                 id="ed-valor-emp"></span>
                         </div>
-                        <div class="card-sm" style="display:flex;flex-direction:column;gap:2px">
+                        <div class="card-sm" style="display:flex; flex-direction:column; gap:2px">
                             <span class="fs10 tc2"
-                                style="text-transform:uppercase;letter-spacing:.6px;font-weight:600">Saldo
+                                style="text-transform:uppercase; letter-spacing:.6px; font-weight:600">Saldo
                                 restante</span>
-                            <span style="font-family:var(--font-d);font-size:17px;font-weight:700;letter-spacing:-.4px"
+                            <span
+                                style="font-family:var(--font-d); font-size:17px; font-weight:700; letter-spacing:-.4px"
                                 id="ed-saldo"></span>
                         </div>
-                        <div class="card-sm" style="display:flex;flex-direction:column;gap:2px">
+                        <div class="card-sm" style="display:flex; flex-direction:column; gap:2px">
                             <span class="fs10 tc2"
-                                style="text-transform:uppercase;letter-spacing:.6px;font-weight:600">Emissão</span>
-                            <span style="font-size:14px;font-weight:500" id="ed-data-emissao"></span>
+                                style="text-transform:uppercase; letter-spacing:.6px; font-weight:600">Emissão</span>
+                            <span style="font-size:14px; font-weight:500" id="ed-data-emissao"></span>
                         </div>
-                        <div class="card-sm" style="display:flex;flex-direction:column;gap:2px">
+                        <div class="card-sm" style="display:flex; flex-direction:column; gap:2px">
                             <span class="fs10 tc2"
-                                style="text-transform:uppercase;letter-spacing:.6px;font-weight:600">Vencimento</span>
-                            <span style="font-size:14px;font-weight:500" id="ed-data-venc"></span>
+                                style="text-transform:uppercase; letter-spacing:.6px; font-weight:600">Vencimento</span>
+                            <span style="font-size:14px; font-weight:500" id="ed-data-venc"></span>
                         </div>
                     </div>
 
                     <!-- Prazo + Juros strip -->
                     <div
-                        style="background:var(--bg2);border:1px solid var(--brd);border-radius:var(--rad12);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
-                        <div style="display:flex;align-items:center;gap:6px">
+                        style="background:var(--bg2); border:1px solid var(--brd); border-radius:var(--rad12); padding:12px 14px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between">
+                        <div style="display:flex; align-items:center; gap:6px">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--txt2)"
                                 stroke-width="2" stroke-linecap="round">
                                 <rect x="3" y="4" width="18" height="18" rx="2" />
@@ -3182,8 +3184,8 @@
                             <span class="fs12 tc2">Prazo</span>
                             <span class="fs12 fw6" id="ed-prazo"></span>
                         </div>
-                        <div style="width:1px;height:18px;background:var(--brd)"></div>
-                        <div style="display:flex;align-items:center;gap:6px">
+                        <div style="width:1px; height:18px; background:var(--brd)"></div>
+                        <div style="display:flex; align-items:center; gap:6px">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--danger)"
                                 stroke-width="2" stroke-linecap="round">
                                 <circle cx="12" cy="12" r="10" />
@@ -3213,13 +3215,13 @@
                         style="background:var(--bg2); border:1px solid var(--brd); border-radius:var(--rad16); padding:14px; margin-bottom:14px">
                         <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px">
                             <div
-                                style="width:30px; height:30px; border-radius:50%; background:#00e8a218; display:flex; align-items:center;justify-content:center">
+                                style="width:30px; height:30px; border-radius:50%; background:#00e8a218; display:flex; align-items:center; justify-content:center">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--acc)"
                                     stroke-width="2.5" stroke-linecap="round">
                                     <polyline points="20 6 9 17 4 12" />
                                 </svg>
                             </div>
-                            <span style="font-size:14px;font-weight:700;font-family:var(--font-d)">Registrar
+                            <span style="font-size:14px; font-weight:700; font-family:var(--font-d)">Registrar
                                 Pagamento</span>
                         </div>
                         <div class="fr">
@@ -3380,7 +3382,7 @@
             </div>
             <div class="sh-body" id="open-whatsapp-body">
                 <div id="cd-whatsapp-btn"
-                    style="display:flex; align-items:center; gap:4px; background:#25D36618; border:1px solid #25D36630;color:#25D366; border-radius: 20px; padding:3px 9px; cursor:pointer; font-size:11px; font-weight:600">
+                    style="display:flex; align-items:center; gap:4px; background:#25D36618; border:1px solid #25D36630; color:#25D366; border-radius: 20px; padding:3px 9px; cursor:pointer; font-size:11px; font-weight:600">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                         <path
                             d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
@@ -3495,10 +3497,9 @@
             <div class="sh-body">
                 <div class="sc-lbl">Prazos de Vencimento e Taxas de Lucro</div>
                 <div class="fs12 tc1 mb12">Defina os prazos disponíveis (em dias) e a taxa de lucro de cada um. Você
-                    pode
-                    editar, adicionar ou remover.</div>
+                    pode editar, adicionar ou remover.</div>
                 <div id="defaults-prazos-list"></div>
-                <button class="btn-s" style="margin-top:6px;width:100%" onclick="addPrazoRow()">+ Adicionar
+                <button class="btn-s" style="margin-top:6px; width:100%" onclick="addPrazoRow()">+ Adicionar
                     prazo</button>
                 <div class="sc-lbl mt16">Juros de Atraso Padrão</div>
                 <div class="fs12 tc1 mb12">Pré-preenche os campos de juros ao criar um novo empréstimo.</div>
@@ -3556,7 +3557,7 @@
 
     <!-- Editar cliente -->
     <div class="overlay" id="edit-client-sheet" data-backdrop="edit-client-sheet">
-        <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet" style="height:60vh" onclick="event.stopPropagation()">
             <div class="sh-handle"></div>
             <div class="sh-hdr">
                 <div class="sh-title">Editar Cliente</div>
@@ -3570,11 +3571,11 @@
                 <div class="fg">
                     <div class="fl">Nome completo *</div><input class="fi" id="ec-nome" type="text"
                         placeholder="Nome do cliente"
-                        oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, '');">
+                        oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, ''); ">
                 </div>
                 <div class="fg">
                     <div class="fl">Telefone *</div><input class="fi" id="ec-tel" type="tel"
-                        placeholder="Ex. 12981614690" oninput="this.value=this.value.replace(/[^0-9\s]/g, '');">
+                        placeholder="Ex. 12981614690" oninput="this.value=this.value.replace(/[^0-9\s]/g, ''); ">
                 </div>
                 <div class="fg">
                     <div class="fl">E-mail</div><input class="fi" id="ec-email" type="email"
@@ -3584,10 +3585,14 @@
                     <div class="fl">Notas / Descrição</div><textarea class="fi fi-ta" id="ec-desc"
                         placeholder="Observações sobre o cliente…"></textarea>
                 </div>
-                <div class="confirm-btns mt8">
+                <div class="confirm-btns mt8" style="padding-bottom: 200px;">
                     <button class="cbtn-n"
                         onclick="closeSheet(document.getElementById('edit-client-sheet'))">Cancelar</button>
                     <button class="cbtn-y" onclick="preConfirmarEditCliente()">Continuar →</button>
+                </div>
+                <div class="sh-title">Apagar Dados</div>
+                <div class="confirm-btns mt8" style="padding-bottom: 20px;">
+                    <button class="cbtn-r" onclick="preConfirmarDelCliente()">Continuar →</button>
                 </div>
             </div>
         </div>
@@ -3606,6 +3611,62 @@
                     </svg></div>
             </div>
             <div class="sh-body" id="edit-client-confirm-body"></div>
+        </div>
+    </div>
+
+    <!-- Apagar Dados Cliente -->
+    <div class="overlay" id="delete-cliente-confirm-sheet" data-backdrop="delete-cliente-confirm-sheet">
+        <div class="sheet" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title">Apagar Dados</div>
+                <div class="sh-close"
+                    onclick="closeSheet(document.getElementById('delete-cliente-confirm-sheet')); closeSheet(document.getElementById('edit-client-sheet'))">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </div>
+            </div>
+            <div class="sh-body" id="delete-cliente-confirm-body"
+                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                <div class="sh-title" style="color: var(--acc3); margin-bottom: 5px;">AVISO IMPORTANTE<br>ESSAS AÇÕES
+                    SÃO IRREVERSÍVEIS<br>TENHA CERTEZA QUE REALMENTE<br>DESEJA CONTINUAR</div>
+                <button class="cbtn-n" style="margin-bottom: 24px; min-width: 160px;"
+                    onclick="closeSheet(document.getElementById('delete-cliente-confirm-sheet')); closeSheet(document.getElementById('edit-client-sheet'))">CANCELAR</button>
+
+                <div class="fs12 tc1 mb12" style="max-width: 280px;">Essa opção vai apagar todos os empréstimos,
+                    pagamentos e anexos do cliente atual</div>
+                <button class="cbtn-r"
+                    style="margin-bottom: 24px; min-width: 160px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;"
+                    onclick="delClienteFinal(false)">APAGAR DADOS<br>DO CLIENTE</button>
+
+                <div class="fs12 tc1 mb12" style="max-width: 280px;">Essa opção vai apagar tudo do cliente atual,
+                    incluindo o próprio cliente</div>
+                <button class="cbtn-r"
+                    style="min-width: 160px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;"
+                    onclick="delClienteFinal(true)">APAGAR CLIENTE<br>TOTALMENTE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apagar Dados Cliente Final -->
+    <div class="overlay" id="delete-cliente-sheet" data-backdrop="delete-cliente-sheet">
+        <div class="sheet" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title">Confirmação Para Apagar</div>
+                <div class="sh-close"
+                    onclick="closeSheet(document.getElementById('delete-cliente-sheet')); closeSheet(document.getElementById('delete-cliente-confirm-sheet')); closeSheet(document.getElementById('edit-client-sheet'))">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </div>
+            </div>
+            <div class="sh-body" id="delete-cliente-body"
+                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+            </div>
         </div>
     </div>
 
@@ -3671,7 +3732,7 @@
             </div>
             <div class="sh-body" style="padding-bottom:8px">
                 <div class="menu-item" id="emp-menu-mark-paid"
-                    onclick="closeSheet(document.getElementById('emp-menu-sheet'));openMarkPaidConfirm()">
+                    onclick="closeSheet(document.getElementById('emp-menu-sheet')); openMarkPaidConfirm()">
                     <div class="menu-item-left">
                         <div class="menu-icon mi-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="1.8" stroke-linecap="round">
@@ -3698,7 +3759,7 @@
                     </div>
                 </div>
                 <div class="menu-item" style="border:none"
-                    onclick="closeSheet(document.getElementById('emp-menu-sheet'));openDeleteEmpConfirm()">
+                    onclick="closeSheet(document.getElementById('emp-menu-sheet')); openDeleteEmpConfirm()">
                     <div class="menu-item-left">
                         <div class="menu-icon mi-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="1.8" stroke-linecap="round">
@@ -3735,39 +3796,39 @@
                 <div class="card">
                     <div class="sc-lbl mt12">Dados do Empréstimo</div>
 
-                    <div class="fr" style="display: flex; gap: 12px; width: 100%;">
+                    <div class="fr" style="display: flex; gap: 12px; width: 100%; ">
                         <div class="fg" id="wrap-ee-valor-edit"
-                            style="flex: 1; transition: all 0.2s ease; white-space: nowrap;">
+                            style="flex: 1; transition: all 0.2s ease; white-space: nowrap; ">
                             <div class="fl">Valor emprestado (R$) *</div>
                             <input class="fi" id="ee-valor-edit" type="text" inputmode="numeric" placeholder="100 R$"
-                                style="width: 100%;"
-                                oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit();">
+                                style="width: 100%; "
+                                oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit(); ">
                         </div>
 
                         <div class="fg" id="wrap-ee-receber-edit"
-                            style="flex: 1; transition: all 0.2s ease; white-space: nowrap;">
+                            style="flex: 1; transition: all 0.2s ease; white-space: nowrap; ">
                             <div class="fl">Valor a receber (R$) *</div>
                             <input class="fi" id="ee-receber-manual-edit" type="text" inputmode="numeric"
-                                placeholder="120 R$" style="width: 100%;"
-                                oninput="this.value=this.value.replace(/[^0-9]/g,''); validarECalcularManual_edit();">
+                                placeholder="120 R$" style="width: 100%; "
+                                oninput="this.value=this.value.replace(/[^0-9]/g,''); validarECalcularManual_edit(); ">
                         </div>
                     </div>
 
-                    <div class="fr" style="margin-top:8px;">
-                        <div class="fg" style="flex:1;">
+                    <div class="fr" style="margin-top:8px; ">
+                        <div class="fg" style="flex:1; ">
                             <div class="fl">Data de emissão *</div>
                             <input class="fi" id="ee-data-edit" type="date" onchange="updateNovoPreview_edit()">
                         </div>
 
-                        <div class="fg" style="flex:1;">
+                        <div class="fg" style="flex:1; ">
                             <div class="fl">Prazo (dias) *</div>
                             <input class="fi" id="ee-prazo-manual-edit" type="text" inputmode="numeric"
                                 placeholder="Ex: 15"
-                                oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit();">
+                                oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit(); ">
                         </div>
                     </div>
 
-                    <div id="custom-prazo-wrap-edit" style="display:none;" class="fg mt8">
+                    <div id="custom-prazo-wrap-edit" style="display:none; " class="fg mt8">
                         <div class="fl">Prazo em dias *</div>
                         <input class="fi" id="ee-prazo-custom-edit" type="text" inputmode="numeric" min="1"
                             placeholder="Ex: 10"
@@ -3776,23 +3837,23 @@
 
                     <div class="fg mt8">
                         <div class="fl">Juros por dia de atraso *</div>
-                        <div class="flex-r" style="gap:10px; align-items:center;">
-                            <select class="fi fs" id="ee-juros-tipo-edit" style="flex:0.85;"
+                        <div class="flex-r" style="gap:10px; align-items:center; ">
+                            <select class="fi fs" id="ee-juros-tipo-edit" style="flex:0.85; "
                                 onchange="onJurosTipoChange_edit()">
                                 <option value="fixo">Fixo</option>
                                 <option value="perc">Percentual</option>
                             </select>
-                            <div style="position:relative; flex:1;">
+                            <div style="position:relative; flex:1; ">
                                 <input class="fi" id="ee-juros-val-edit" type="text" inputmode="numeric" min="1"
-                                    style="padding-right:36px;"
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit();">
+                                    style="padding-right:36px; "
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit(); ">
                                 <span id="ee-juros-suffix-edit"
-                                    style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:13px; color:var(--txt2); pointer-events:none;">R$</span>
+                                    style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:13px; color:var(--txt2); pointer-events:none; ">R$</span>
                             </div>
                         </div>
                     </div>
 
-                    <div id="novo-preview-mini-edit" style="display:none;" class="card-sm mt12">
+                    <div id="novo-preview-mini-edit" style="display:none; " class="card-sm mt12">
                         <div class="sc-lbl">Prévia rápida</div>
                         <div class="dr">
                             <div class="dk">Valor a receber</div>
@@ -3802,7 +3863,7 @@
                             <div class="dk">Data de vencimento</div>
                             <div class="dv2" id="ee-venc-edit">—</div>
                         </div>
-                        <div class="dr" style="border:none;">
+                        <div class="dr" style="border:none; ">
                             <div class="dk">Lucro esperado</div>
                             <div class="dv2 c-g" id="ee-lucro-edit">—</div>
                         </div>
@@ -4388,7 +4449,7 @@
                     if (seg.count === total) {
                         svgHTML += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
                             stroke="${seg.color}" stroke-width="${stroke}"
-                            style="cursor:pointer;transition:opacity .15s"
+                            style="cursor:pointer; transition:opacity .15s"
                             onclick="navTo('emprestimos','${seg.filter}')"
                             onmouseenter="this.style.opacity='.65'" onmouseleave="this.style.opacity='1'"
                         />`;
@@ -4403,7 +4464,7 @@
                         const d = arcPath(cx, cy, r, s, e);
                         svgHTML += `<path d="${d}" fill="none"
                             stroke="${seg.color}" stroke-width="${stroke}" stroke-linecap="butt"
-                            style="cursor:pointer;transition:opacity .15s"
+                            style="cursor:pointer; transition:opacity .15s"
                             onclick="navTo('emprestimos','${seg.filter}')"
                             onmouseenter="this.style.opacity='.65'" onmouseleave="this.style.opacity='1'"
                         />`;
@@ -4574,7 +4635,7 @@
             if (!DB.clients.length) { el.innerHTML = '<div class="empty"><p>Nenhum cliente cadastrado ainda</p></div>'; return; }
             el.innerHTML = DB.clients.map(c => `
     <div class="choice-item ${_novoSelectedClientId === c.id ? 'sel' : ''}" onclick="selectNovoClient('${c.id}')">
-      <div class="av ${c.color}" style="width:32px;height:32px;font-size:11px">${c.initials}</div>
+      <div class="av ${c.color}" style="width:32px; height:32px; font-size:11px">${c.initials}</div>
       <div style="flex:1"><div class="choice-label">${c.nome}</div><div class="choice-sub">${c.tel}</div></div>
       <div class="choice-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
     </div>
@@ -4695,8 +4756,8 @@
             const c = getClient(_currentClientId);
             const mudou = (field, novo) => novo !== (c[field] || '') ?
                 `<div class="dr"><div class="dk">${field === 'nome' ? 'Nome' : field === 'tel' ? 'Telefone' : field === 'email' ? 'E-mail' : 'Notas'}</div>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-                    <div class="dv2 tc2" style="text-decoration:line-through;font-size:11px">${c[field] || '—'}</div>
+                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px">
+                    <div class="dv2 tc2" style="text-decoration:line-through; font-size:11px">${c[field] || '—'}</div>
                     <div class="dv2 c-g fw6">${novo || '—'}</div>
                 </div>
                 </div>` : '';
@@ -4704,7 +4765,7 @@
             const alteracoes = [mudou('nome', nome), mudou('tel', tel), mudou('email', email), mudou('desc', desc)].filter(Boolean).join('');
 
             document.getElementById('edit-client-confirm-body').innerHTML = `
-                <div class="warn-box" style="background:#3d7fff12;border-color:#3d7fff40;margin-bottom:12px">
+                <div class="warn-box" style="background:#3d7fff12; border-color:#3d7fff40; margin-bottom:12px">
                 <div class="wb-t" style="color:var(--acc2)">Revisar alterações</div>
                 <div class="wb-d">Confirme as mudanças abaixo antes de salvar.</div>
                 </div>
@@ -4777,8 +4838,40 @@
             setTimeout(() => openClienteDetalhe(_currentClientId), 300);
         }
 
+
+        function preConfirmarDelCliente() {
+            const c = getClient(_currentClientId);
+            if (!c) return;
+
+            openSheet('delete-cliente-confirm-sheet');
+        }
+
+        function delClienteFinal(completo) {
+            if (!_currentClientId) return;
+
+            document.getElementById('delete-cliente-body').innerHTML = `
+                <div class="wb-t" style="color:var(--acc3); margin-bottom:12px; font-size:15px; font-weight:700">${completo ? 'APAGAR CLIENTE TOTALMENTE' : 'APAGAR DADOS DO CLIENTE'}</div>
+                <div style="background:var(--bg2); border:1px solid var(--danger); border-radius:var(--rad12); padding:12px; margin-bottom:12px">
+                <div class="fl" style="font-weight:700; color:var(--danger); font-size:15px">Digite o ID do cliente para confirmar<br>${_currentClientId}_${_currentClientId}</div>
+                <input class="fi" id="del-cliente-id-input" type="text" placeholder="C00_C00" style="border-color:var(--danger); font-size:15px">
+                </div>
+                    <div class="confirm-btns">
+                    <button class="cbtn-n" style="font-size:15px" onclick="closeSheet(document.getElementById('delete-cliente-sheet')); closeSheet(document.getElementById('delete-cliente-confirm-sheet')); closeSheet(document.getElementById('edit-client-sheet'))">Cancelar</button>
+                    <button class="cbtn-r" style="font-size:15px" onclick="del_cliente(${completo})">APAGAR ⇾</button>
+                </div>`;
+
+            openSheet('delete-cliente-sheet');
+        }
+
+
+
         // FUNÇÃO PARA ADICIONAR NOVOS CLIENTES
         async function del_cliente(completo) {
+            const typed = document.getElementById('del-cliente-id-input')?.value?.trim();
+            const id_verif = _currentClientId + '_' + _currentClientId;
+            if (typed !== id_verif) { showToast('ID incorreto, tente novamente', 'err'); return; }
+
+
             showLoading(['DELETANDO CLIENTE...', 'APAGANDO DADOS...', 'REMOVENDO EMPRESTIMOS...', 'ATUALIZANDO PLANILHA...', 'REMOVENDO ANEXOS...', 'SINCRONIZANDO...', 'ATUALIZANDO LISTA...', 'TERMINANDO...']);
 
             const c = getClient(_currentClientId);
@@ -4817,13 +4910,19 @@
             // Salvar backup local
             backup_local();
 
-            //renderClientes();
+            renderClientes();
             backFromClienteDetalhe();
+            closeSheet(document.getElementById('delete-cliente-sheet'));
+            closeSheet(document.getElementById('delete-cliente-confirm-sheet'));
+            closeSheet(document.getElementById('edit-client-sheet'));
 
+            goToStep2();
             hideLoading();
-            setTimeout(() => goToStep2(), 100);
+
             showToast('Cliente deletado!', 'ok');
         }
+
+
 
 
         function backToStep1() {
@@ -5239,7 +5338,7 @@
                 <div class="prev-box ok-bdr mb12">
                 <div class="text-center mb12">
                     <div class="fs12 tc2">Para</div>
-                    <div style="font-size:16px;font-weight:700;font-family:var(--font-d)">${c.nome}</div>
+                    <div style="font-size:16px; font-weight:700; font-family:var(--font-d)">${c.nome}</div>
                     <div class="fs11 tc2">${c.tel}</div>
                 </div>
                 <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2 fw6">${fmtMoney(d.valor)}</div></div>
@@ -5288,7 +5387,7 @@
             const jurosTxt = d.juros_tipo === 'fixo' ? fmtMoney(d.juros_val) + '/dia' : d.juros_val + '%/dia';
 
             document.getElementById('novo-emp-confirm-body').innerHTML = `
-                <div class="warn-box" style="background:#3d7fff12;border-color:#3d7fff40;margin-bottom:12px">
+                <div class="warn-box" style="background:#3d7fff12; border-color:#3d7fff40; margin-bottom:12px">
                 <div class="wb-t" style="color:var(--acc2)">Você tem certeza?</div>
                 <div class="wb-d">Revise os dados abaixo antes de confirmar. Esta ação não pode ser desfeita.</div>
                 </div>
@@ -5396,7 +5495,7 @@
                 <div class="dr"><div class="dk">Lucro (${Math.round(pr)}%)</div><div class="dv2 c-g">+ ${fmtMoney(calc.valorBase - loan.valor)}</div></div>
                 <div class="dr" style="border:none"><div class="dk">Valor a pagar no prazo</div><div class="dv2 c-g fw6" style="font-size:16px">${fmtMoney(calc.valorBase)}</div></div>
                 <div class="dv"></div>
-                <div style="background:#00e8a210;border-radius:var(--rad8);padding:10px;text-align:center;margin-top:8px">
+                <div style="background:#00e8a210; border-radius:var(--rad8); padding:10px; text-align:center; margin-top:8px">
                     <div class="fs11 tc1">Juros de atraso: <strong>${loan.juros_tipo === 'fixo' ? fmtMoney(loan.juros_val) + '/dia' : loan.juros_val + '%/dia'}</strong></div>
                 </div>
             `;
@@ -5665,7 +5764,7 @@
             _pendingEditEmp = { valor: novoValor, valor_receber: novoValorReceber, emissao: novaData, prazo: novoPrazo, juros_tipo: novoTipo, juros_val: novoJuros, pago: _pendingEditEmp_pago };
 
             document.getElementById('edit-emp-confirm-body').innerHTML = `
-                <div class="warn-box" style="background:#f5a62312;border-color:#f5a62340;margin-bottom:12px">
+                <div class="warn-box" style="background:#f5a62312; border-color:#f5a62340; margin-bottom:12px">
                 <div class="wb-t" style="color:var(--acc3)">⚠ Atenção</div>
                 <div class="wb-d">Esta edição vai recalcular todos os juros, vencimentos e saldos do histórico.</div>
                 </div>
@@ -5768,7 +5867,7 @@
 
             document.getElementById('mark-paid-title').textContent = isPago ? 'Desmarcar como Pago' : 'Marcar como Pago';
             document.getElementById('mark-paid-body').innerHTML = `
-                <div class="warn-box" style="background:${isPago ? '#ffb54714' : '#00e8a214'};border-color:${isPago ? '#ffb54740' : '#00e8a240'};margin-bottom:12px">
+                <div class="warn-box" style="background:${isPago ? '#ffb54714' : '#00e8a214'}; border-color:${isPago ? '#ffb54740' : '#00e8a240'}; margin-bottom:12px">
                 <div class="wb-t" style="color:${isPago ? 'var(--warn)' : 'var(--acc)'}">
                     ${isPago ? '⚠ Remover quitação manual?' : '✓ Marcar como quitado?'}
                 </div>
@@ -5849,7 +5948,7 @@
             const c = getLoanCalc(loan);
 
             document.getElementById('delete-emp-body').innerHTML = `
-                <div class="warn-box" style="background:#ff4d6d14;border-color:#ff4d6d40;margin-bottom:12px">
+                <div class="warn-box" style="background:#ff4d6d14; border-color:#ff4d6d40; margin-bottom:12px">
                 <div class="wb-t" style="color:var(--danger)">⚠ Ação irreversível</div>
                 <div class="wb-d">Este empréstimo e todos os seus pagamentos serão apagados permanentemente.</div>
                 </div>
@@ -5860,8 +5959,8 @@
                 <div class="dr"><div class="dk">Pagamentos registrados</div><div class="dv2">${loan.pagamentos.length}</div></div>
                 <div class="dr" style="border:none"><div class="dk">Saldo em aberto</div><div class="dv2 c-r">${c.isPago ? '—' : fmtMoney(c.valorHoje)}</div></div>
                 </div>
-                <div style="background:var(--bg2);border:1px solid var(--danger);border-radius:var(--rad12);padding:12px;margin-bottom:12px">
-                <div class="fl" style="color:var(--danger)">Digite o ID do contrato para confirmar</div>
+                <div style="background:var(--bg2); border:1px solid var(--danger); border-radius:var(--rad12); padding:12px; margin-bottom:12px">
+                <div class="fl" style="color:var(--danger); font-size:14px">Digite o ID do contrato para confirmar<br>${loan.id}</div>
                 <input class="fi" id="delete-confirm-input" type="text" placeholder="${loan.id}" style="border-color:var(--danger)">
                 </div>
                 <div class="confirm-btns">
@@ -5982,7 +6081,7 @@
             const c = getClient(cid);
             if (!c) return;
             document.getElementById('cd-av').className = `av ${c.color}`;
-            document.getElementById('cd-av').style.cssText = 'width:48px;height:48px;font-size:16px';
+            document.getElementById('cd-av').style.cssText = 'width:48px; height:48px; font-size:16px';
             document.getElementById('cd-av').textContent = c.initials;
             document.getElementById('cd-name').textContent = c.nome;
             document.getElementById('cd-tel').textContent = c.tel;
@@ -6151,7 +6250,7 @@
 
                 box.innerHTML = `
                     <div class="card_comp_pag" style="padding:10px; cursor:pointer" onclick="openAttachPreview('image','${URL_anexo}')">
-                        <img src="${URL_anexo}" style="width:100%; max-height:220px; object-fit:contain; border-radius:8px" onerror="this.onerror=null; this.src='https://placehold.co/300x200?text=ERRO+AO+EXIBIR+ANEXO';">
+                        <img src="${URL_anexo}" style="width:100%; max-height:220px; object-fit:contain; border-radius:8px" onerror="this.onerror=null; this.src='https://placehold.co/300x200?text=ERRO+AO+EXIBIR+ANEXO'; ">
                         <div style="margin-top:8px; font-size:12px; text-align:center">ANEXO ${anexo_id_nome} 📎</div>
                     </div>
                     <div style="margin-top:8px; font-size:12px; color:var(--danger); cursor:pointer; text-align:center" onclick="openRemoveAttach('${anexo_id}', ${anexo_linha}, '${pag_id ? pag_id : ''}', '${mode}')">Deletar</div>
@@ -6251,7 +6350,7 @@
                 <div class="tl-card tl-card-late">
                     <div class="tl-card-top">
                     <div class="tl-card-title">${rangeLabel}</div>
-                    <div style="display:flex;align-items:center;gap:6px">
+                    <div style="display:flex; align-items:center; gap:6px">
                         <div class="tl-card-date">${dateLabel}</div>
                         <div class="tl-juros-chevron" id="${chevId}">${chevSvg}</div>
                     </div>
@@ -6296,7 +6395,7 @@
             }[e.tipo] || '';
 
             const dateFmt = fmtDate(e.date);
-            const dateLbl = e.isToday ? `<span style="color:var(--warn);font-weight:600">Hoje</span> · ${dateFmt}` : dateFmt;
+            const dateLbl = e.isToday ? `<span style="color:var(--warn); font-weight:600">Hoje</span> · ${dateFmt}` : dateFmt;
 
             // Helper to build a row
             const row = (lbl, val, highlight, color) =>
@@ -6432,15 +6531,15 @@
                 ${pag.status ? `<div class="dr" style="border:none"><div class="dk">Status</div><div class="dv2">${pag.status}</div></div>` : ''}
                 <div class="dv mt8"></div>
 
-                <button class="btn-icon w-full mb8" style="justify-content:center;"
-                onclick="closeSheet(document.getElementById('tl-event-sheet'));abrirComprovantePagamento('${lid}','${pid}')">
+                <button class="btn-icon w-full mb8" style="justify-content:center; "
+                onclick="closeSheet(document.getElementById('tl-event-sheet')); abrirComprovantePagamento('${lid}','${pid}')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                 Ver comprovante
                 </button> ${hasAnexo ? `<div class="attach-item mb8">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                     <div class="attach-item-name" onclick="openAttachSheet('pag', '${pid}')"; closeSheet(document.getElementById('tl-event-sheet')); openEmpDetalhe('${lid}')">Comprovante de Pagamento</div>
                     <div class="attach-item-ver">Ver</div>
-                    </div>` : `<button class="btn-icon w-full mb8" style="justify-content:center;color:var(--warn)"
+                    </div>` : `<button class="btn-icon w-full mb8" style="justify-content:center; color:var(--warn)"
                     onclick="closeSheet(document.getElementById('tl-event-sheet')); openAttachSheet('pag', '${pid}')">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                     ⚠ Adicionar anexo de pagamento
@@ -6450,7 +6549,7 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 Editar pagamento
                 </button>
-                <button class="btn-icon w-full" style="justify-content:center;color:var(--danger); border-color:#ff4d6d30" onclick="closeSheet(document.getElementById('tl-event-sheet')); openDeletePagConfirm('${lid}','${pid}')">
+                <button class="btn-icon w-full" style="justify-content:center; color:var(--danger); border-color:#ff4d6d30" onclick="closeSheet(document.getElementById('tl-event-sheet')); openDeletePagConfirm('${lid}','${pid}')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                 Apagar pagamento
                 </button>
@@ -6476,7 +6575,7 @@
             const statusColors = { late: 'var(--danger)', warn: 'var(--warn)', ok: 'var(--acc2)', done: 'var(--acc)' };
 
             document.getElementById('delete-pag-confirm-body').innerHTML = `
-                <div class="warn-box" style="background:#ff4d6d14;border-color:#ff4d6d40;margin-bottom:12px">
+                <div class="warn-box" style="background:#ff4d6d14; border-color:#ff4d6d40; margin-bottom:12px">
                 <div class="wb-t" style="color:var(--danger)">⚠ AÇÃO IRREVERSILVEL</div>
                 <div class="wb-t" style="color:var(--danger)">TODOS OS PAGAMENTOS APÓS A DATA DESSE PAGAMENTO SERÃO APAGADOS TAMBÉM!</div>
                 <div class="wb-d">Este pagamento será apagado permanentemente e o histórico será recalculado.</div>
@@ -6726,7 +6825,7 @@
             }
         }
 
-        // 
+        // Função para confirmar a edição de pagamentos
         function confirmarEditPag(lid, pid) {
             const loan = getLoan(lid);
             const loanSim = structuredClone(loan);
@@ -6771,7 +6870,7 @@
                 <div class="card-sm mb12" style="border-color:var(--acc)">
                     <div class="sc-lbl" style="color:var(--acc)">Depois</div>
                     <div class="dr"><div class="dk">Valor</div><div class="dv2 ${alterouValor ? 'c-g fw6' : ''}">${fmtMoney(novoValor)}</div></div>
-                    <div class="dr" style="border:none"><div class="dk">Data</div><div class="dv2 ${alterouData ? 'c-g fw6' : ''}">${fmtDate(novaData)}${isRetro ? ' <span style="color:var(--warn);font-size:11px">(retroativo)</span>' : ''}</div></div>
+                    <div class="dr" style="border:none"><div class="dk">Data</div><div class="dv2 ${alterouData ? 'c-g fw6' : ''}">${fmtDate(novaData)}${isRetro ? ' <span style="color:var(--warn); font-size:11px">(retroativo)</span>' : ''}</div></div>
                 </div>
                 <div style="background:var(--bg2); border:1px solid var(--acc3); border-radius:var(--rad12); padding:12px; margin-bottom:12px">
                 <div class="fl" style="color:var(--acc3)">Digite o ID do pagamento para confirmar - ${pid}</div>
@@ -6896,7 +6995,7 @@
             if (isRetro) {
                 bodyHTML += `<div class="warn-box" style="margin-bottom:12px"><div class="wb-t">⚠ Pagamento retroativo</div><div class="wb-d">A data informada é anterior a hoje. O histórico será recalculado a partir deste pagamento<br>E TODOS OS PAGAMENTOS APÓS ESTA DATA SERÃO APAGADOS</div></div>`;
             } else {
-                bodyHTML += `<div class="warn-box" style="background:#3d7fff12;border-color:#3d7fff40;margin-bottom:12px"><div class="wb-t" style="color:var(--acc2)">Confirmar pagamento</div><div class="wb-d">Revise os dados antes de registrar.</div></div>`;
+                bodyHTML += `<div class="warn-box" style="background:#3d7fff12; border-color:#3d7fff40; margin-bottom:12px"><div class="wb-t" style="color:var(--acc2)">Confirmar pagamento</div><div class="wb-d">Revise os dados antes de registrar.</div></div>`;
             }
 
             bodyHTML += `
@@ -7112,17 +7211,17 @@
                   </div>
                   <div>
                     <div style="font-size:11px; color:var(--txt2); margin-bottom:6px">VALOR PAGO</div>
-                    <div style="${valorStyle};color:var(--acc)">${fmtMoney(pag.valor)}</div>
+                    <div style="${valorStyle}; color:var(--acc)">${fmtMoney(pag.valor)}</div>
                   </div>
                   <div>
                     <div style="font-size:11px; color:var(--txt2); margin-bottom:6px">${retro ? 'SALDO PREVISTO' : 'SALDO RESTANTE'}</div>
-                    <div style="${valorStyle};color:${pag.status == "PAGAMENTO COMPLETO" ? 'var(--acc)' : 'var(--danger)'}"> ${pag.status == "PAGAMENTO COMPLETO" ? 'QUITADO' : fmtMoney(valorApos)}${retro ? '*' : ''}</div>
+                    <div style="${valorStyle}; color:${pag.status == "PAGAMENTO COMPLETO" ? 'var(--acc)' : 'var(--danger)'}"> ${pag.status == "PAGAMENTO COMPLETO" ? 'QUITADO' : fmtMoney(valorApos)}${retro ? '*' : ''}</div>
                   </div>
                 </div>
 
                 ${!retro && pag.status != "PAGAMENTO COMPLETO" ? `
                 <div style="margin-bottom:10px">
-                    <div class="flex-sb" style="margin-bottom:2px;font-size:11px">
+                    <div class="flex-sb" style="margin-bottom:2px; font-size:11px">
                         <span>Total Pago</span>
                         <span>Restante</span>
                     </div>
@@ -7140,7 +7239,7 @@
                 </div>`
                     : ''}
 
-                <div style="text-align:center; padding-bottom:10px;  ">
+                <div style="text-align:center; padding-bottom:10px; ">
                     ${retro && pag.status != "PAGAMENTO COMPLETO" ? '<div style="font-size:10px; color:var(--txt2); font-weight:1000">* Valores previstos no dia do pagamento</div>' : ''}
                     <div style="font-size:12px; color:var(--txt2); margin-bottom:6px; font-weight:1000">${fmtDate(pag.data)} - ${pag.id}</div>
                 </div>
@@ -7162,7 +7261,7 @@
 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:50px; max-width:250px; min-width:50px; margin:0 auto">
                     <div style="text-align:center; font-size:10px; color:var(--txt2)">PRAZO (${loan.prazo} dias)</div>
-                    <div style="text-align:center; font-size:10px"><span style="color:${diasAtrasoPag > 0 ? 'var(--danger)' : 'var(--acc)'};font-weight:700; background:${diasAtrasoPag > 0 ? 'rgba(255,70,70,.12)' : 'rgba(0,255,140,.10)'}; padding:2px 6px; border-radius:999px; white-space:nowrap">${diasAtrasoPag > 0 && !retro ? 'STATUS ATRASADO' :
+                    <div style="text-align:center; font-size:10px"><span style="color:${diasAtrasoPag > 0 ? 'var(--danger)' : 'var(--acc)'}; font-weight:700; background:${diasAtrasoPag > 0 ? 'rgba(255,70,70,.12)' : 'rgba(0,255,140,.10)'}; padding:2px 6px; border-radius:999px; white-space:nowrap">${diasAtrasoPag > 0 && !retro ? 'STATUS ATRASADO' :
                     diasAtrasoPag > 0 && retro ? 'PAGOU ATRASADO*' :
                         diasAtrasoPag <= 0 && !retro ? 'STATUS EM DIA' :
                             diasAtrasoPag <= 0 && retro ? 'PAGOU EM DIA*' :
@@ -7175,7 +7274,7 @@
                             <div style="text-align:start; font-size:10px; font-weight:100; white-space: nowrap">${dias_corridos}${retro ? '*' : ''}</div>
                         </div>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:50px; max-width:250px; min-width:50px; margin:0 auto; padding-bottom:30px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:50px; max-width:250px; min-width:50px; margin:0 auto; padding-bottom:30px; ">
                     <div style="text-align:center; font-size:10px; font-weight:100">${fmtDate(vencimento)}</div>
                         <div style="display:grid; grid-template-columns:60px auto; gap:10px; max-width:220px; min-width:100px; margin:0 auto">
                             <div style="text-align:start; font-size:10px; color:var(--txt2); white-space: nowrap ">${diasAtrasoPag > 0 ? 'DE ATRASO' :
@@ -7236,7 +7335,7 @@
 
                 <div style="text-align:center; padding-bottom:0px; margin-up:px">
                     <div style="font-size:12px; color:var(--txt2); font-weight:1000">SALDO RESTANTE FINAL</div>
-                    <div style="${valorStyle};color:${pag.status == "PAGAMENTO COMPLETO" ? 'var(--acc)' : 'var(--danger)'}"> ${pag.status == "PAGAMENTO COMPLETO" ? 'QUITADO' : fmtMoney(saldoFuturo)}</div>
+                    <div style="${valorStyle}; color:${pag.status == "PAGAMENTO COMPLETO" ? 'var(--acc)' : 'var(--danger)'}"> ${pag.status == "PAGAMENTO COMPLETO" ? 'QUITADO' : fmtMoney(saldoFuturo)}</div>
                 </div>
                 
                 
@@ -7245,12 +7344,12 @@
 
                 ${retro ? `
                 <div style="margin-bottom:10px">
-                    <div class="flex-sb" style="margin-bottom:2px;font-size:11px">
+                    <div class="flex-sb" style="margin-bottom:2px; font-size:11px">
                         <span>Total Pago</span>
                         <span>Restante</span>
                     </div>
                     <div class="rcpt-progress-bar">
-                        <div class="rcpt-progress-fill" style="width:${progressoPct_retro}%;background:var(--acc)"></div>
+                        <div class="rcpt-progress-fill" style="width:${progressoPct_retro}%; background:var(--acc)"></div>
                     </div>
                     <div class="flex-sb" style="margin-top:2px; font-size:11px">
                         <span>${fmtMoney(totalPagoAgora)}</span>
@@ -7304,6 +7403,14 @@
 
             el.classList.remove('closing');
             el.classList.add('open');
+
+            // === FORÇAR O RESET DA BARRA DE ROLAGEM ===
+            if (el) {
+                const bodyContainer = el.querySelector('.sh-body');
+                if (bodyContainer) {
+                    bodyContainer.scrollTop = 0;
+                }
+            }
 
             history.pushState({ sheet: id }, '', '');
         }
@@ -7400,16 +7507,16 @@
             // Sort by dias numerically
             const sorted = Object.entries(d).sort((a, b) => Number(a[0]) - Number(b[0]));
             document.getElementById('defaults-prazos-list').innerHTML = sorted.map(([dias, pct]) => `
-        <div class="flex-r mb8" id="prazo-row-${dias}" style="gap:8px;align-items:flex-end">
-          <div class="fg" style="flex:1;margin-bottom:0">
+        <div class="flex-r mb8" id="prazo-row-${dias}" style="gap:8px; align-items:flex-end">
+          <div class="fg" style="flex:1; margin-bottom:0">
             <div class="fl">Prazo (dias)</div>
             <input class="fi" id="def-dias-${dias}" type="text" inputmode="numeric" min="1" max="365" value="${dias}" placeholder="Ex: 7" oninput="this.value=this.value.replace(/[^0-9\s]/g, '')">
           </div>
-          <div class="fg" style="flex:1;margin-bottom:0">
+          <div class="fg" style="flex:1; margin-bottom:0">
             <div class="fl">Taxa de lucro (%)</div>
             <input class="fi" id="def-prazo-${dias}" type="text" inputmode="numeric" min="0" max="999" step="1" value="${pct}" placeholder="Ex: 20" oninput="this.value=this.value.replace(/[^0-9\s]/g, '')">
           </div>
-          <div onclick="removePrazoRow('${dias}')" style="flex-shrink:0;width:32px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--danger);margin-bottom:0">
+          <div onclick="removePrazoRow('${dias}')" style="flex-shrink:0; width:32px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--danger); margin-bottom:0">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </div>
         </div>`).join('');
@@ -7442,15 +7549,15 @@
             div.style.gap = '8px';
             div.style.alignItems = 'flex-end';
             div.innerHTML = `
-                <div class="fg" style="flex:1;margin-bottom:0">
+                <div class="fg" style="flex:1; margin-bottom:0">
                 <div class="fl">Prazo (dias)</div>
                 <input class="fi" id="def-dias-${tempKey}" type="text" inputmode="numeric" min="1" max="365" value="${nextDias}" placeholder="Ex: 7" oninput="this.value=this.value.replace(/[^0-9\s]/g, '')">
                 </div>
-                <div class="fg" style="flex:1;margin-bottom:0">
+                <div class="fg" style="flex:1; margin-bottom:0">
                 <div class="fl">Taxa de lucro (%)</div>
                 <input class="fi" id="def-prazo-${tempKey}" type="text" inputmode="numeric" min="0" max="999" step="0.1" placeholder="Ex: 20" oninput="this.value=this.value.replace(/[^0-9\s]/g, '')">
                 </div>
-                <div onclick="removePrazoRow('${tempKey}')" style="flex-shrink:0;width:32px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--danger)">
+                <div onclick="removePrazoRow('${tempKey}')" style="flex-shrink:0; width:32px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--danger)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                 </div>`;
             container.appendChild(div);
@@ -7506,8 +7613,8 @@
                     prazoDiffs += `<div class="dr"><div class="dk">Prazo ${dias} dias</div><div class="dv2 c-r fw6">Removido</div></div>`;
                 } else if (String(antes) !== String(depois)) {
                     prazoDiffs += `<div class="dr"><div class="dk">Prazo ${dias} dias</div>
-                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-                        <div class="dv2 tc2" style="text-decoration:line-through;font-size:11px">${antes}%</div>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px">
+                        <div class="dv2 tc2" style="text-decoration:line-through; font-size:11px">${antes}%</div>
                         <div class="dv2 c-g fw6">${depois}%</div>
                     </div></div>`;
                 }
@@ -7515,8 +7622,8 @@
 
             const mudou = (label, antes, depois, suffix) => String(antes) !== String(depois)
                 ? `<div class="dr"><div class="dk">${label}</div>
-                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-                        <div class="dv2 tc2" style="text-decoration:line-through;font-size:11px">${antes}${suffix}</div>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px">
+                        <div class="dv2 tc2" style="text-decoration:line-through; font-size:11px">${antes}${suffix}</div>
                         <div class="dv2 c-g fw6">${depois}${suffix}</div>
                     </div></div>` : '';
 
@@ -7528,7 +7635,7 @@
             const allDiffs = prazoDiffs + jurosTipoDiff + jurosFixoDiff + jurosPercDiff + calculoTipoDiff;
 
             document.getElementById('defaults-confirm-body').innerHTML = `
-                <div class="warn-box" style="background:#3d7fff12;border-color:#3d7fff40;margin-bottom:12px">
+                <div class="warn-box" style="background:#3d7fff12; border-color:#3d7fff40; margin-bottom:12px">
                     <div class="wb-t" style="color:var(--acc2)">Confirmar alterações</div>
                     <div class="wb-d">Estes valores serão usados como padrão em todos os novos empréstimos.</div>
                     </div>
@@ -7782,7 +7889,7 @@
                 const reader = new FileReader();
                 reader.onload = e => {
                     box.innerHTML = `
-                    <div class="card_comp_pag" style="padding:10px;cursor:pointer" onclick="openAttachPreview('image','${e.target.result}')">
+                    <div class="card_comp_pag" style="padding:10px; cursor:pointer" onclick="openAttachPreview('image','${e.target.result}')">
                         <img src="${e.target.result}" style=" width:100%; max-height:220px; object-fit:contain; border-radius:8px">
                         <div style="margin-top:8px; font-size:12px; text-align:center">${file.name}</div>
                     </div>
@@ -7965,7 +8072,7 @@
 
             if (type === 'image') {
                 // Adicionamos uma classe .zoom-target para o JS monitorar o toque nela
-                content.innerHTML = `<img id="preview-img" class="zoom-target" src="${src}" style="width:100%; height:100%; object-fit:contain; transform-origin: center; transition: transform 0.1s ease-out; will-change: transform;">`;
+                content.innerHTML = `<img id="preview-img" class="zoom-target" src="${src}" style="width:100%; height:100%; object-fit:contain; transform-origin: center; transition: transform 0.1s ease-out; will-change: transform; ">`;
 
                 // Ativa os eventos de zoom na imagem criada
                 setTimeout(() => {
@@ -7973,7 +8080,7 @@
                     initZoom(img);
                 }, 50);
             } else {
-                content.innerHTML = `<iframe src="${src}" style="width:100%; height:100%; border:none; background:white;"></iframe>`;
+                content.innerHTML = `<iframe src="${src}" style="width:100%; height:100%; border:none; background:white; "></iframe>`;
             }
 
             openSheet('attach-preview-modal');
