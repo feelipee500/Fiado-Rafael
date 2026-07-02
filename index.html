@@ -2686,9 +2686,10 @@
                             </div>
                             <!-- DASH STRIP AQUI -->
                             <div class="dash-strip">
-                                <div class="ds-item ds-late" id="card-late" onclick="navTo('emprestimos','late')">
+                                <div class="ds-item ds-late" style="font-weight: 800;" id="card-late"
+                                    onclick="navTo('emprestimos','late')">
                                     <div class="ds-lbl">
-                                        <div class="ds-lbl-dot" style="background:var(--danger)">
+                                        <div class="ds-lbl-dot" style="background:var(--danger);">
                                         </div>
                                         Em Atraso
                                     </div>
@@ -2700,7 +2701,8 @@
                                     </div>
                                 </div>
                                 <!-- warn -->
-                                <div class="ds-item ds-warn" id="card-warn" onclick="navTo('emprestimos','warn')">
+                                <div class="ds-item ds-warn" style="font-weight: 800;" id="card-warn"
+                                    onclick="navTo('emprestimos','warn')">
                                     <div class="ds-lbl">
                                         <div class="ds-lbl-dot" style="background:var(--warn)">
                                         </div>
@@ -2714,7 +2716,8 @@
                                     </div>
                                 </div>
                                 <!-- ok -->
-                                <div class="ds-item ds-ok" id="card-ok" onclick="navTo('emprestimos','ok')">
+                                <div class="ds-item ds-ok" style="font-weight: 800;" id="card-ok"
+                                    onclick="navTo('emprestimos','ok')">
                                     <div class="ds-lbl">
                                         <div class="ds-lbl-dot" style="background:var(--acc2)">
                                         </div>
@@ -2728,7 +2731,8 @@
                                     </div>
                                 </div>
                                 <!-- done -->
-                                <div class="ds-item ds-done" id="card-done" onclick="navTo('emprestimos','done')">
+                                <div class="ds-item ds-done" style="font-weight: 800;" id="card-done"
+                                    onclick="navTo('emprestimos','done')">
                                     <div class="ds-lbl">
                                         <div class="ds-lbl-dot" style="background:var(--acc)">
                                         </div>
@@ -3018,13 +3022,20 @@
                     </div>
                     <div class="flex-r mb12">
                         <div class="av" id="cd-av" style="width:48px; height:48px; font-size:16px"></div>
-                        <div style="flex:1">
-                            <div style="font-size:18px; font-weight:700; font-family:var(--font-d)" id="cd-name"></div>
+                        <div style="margin-bottom:-10px; width: 100%;">
                             <div style="display:flex; align-items:center; justify-content:space-between">
-                                <div class="fs11 tc2" id="cd-tel"></div>
-                                <div id="cd-whatsapp-btn" onclick="openSheet('open-whatsapp')"
-                                    style="display:flex; align-items:center; gap:4px; background:#25D36618; border:1px solid #25D36630; color:#25D366; border-radius:20px; padding:3px 9px; cursor:pointer; font-size:11px; font-weight:600">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                <div
+                                    style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
+                                    <span
+                                        style="font-family:var(--font-d); font-size:20px; font-weight:800; letter-spacing:-.5px; line-height:1.1"
+                                        id="cd-name"></span>
+                                    <span class="fs11 tc2 mt4" id="cd-tel"></span>
+                                    <span class="fs11 tc2 mt2" id="cd-email"></span>
+                                </div>
+
+                                <div id="ed-whatsapp-btn" onclick="openSheet('open-whatsapp')"
+                                    style="display:flex; align-items:center; gap:5px; background:#25D36618; border:1px solid #25D36630; color:#25D366; border-radius:20px; padding:5px 11px; cursor:pointer; font-size:12px; font-weight:600; white-space:nowrap">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                                         <path
                                             d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
                                         <path
@@ -3033,39 +3044,101 @@
                                     WhatsApp
                                 </div>
                             </div>
-                            <div class="fs11 tc2 mt2" id="cd-email"></div>
                         </div>
                     </div>
-                    <div id="cd-desc-wrap" class="card-sm mb12" style="display:none">
+
+                    <!-- DESCRIÇÃO -->
+                    <div id="cd-desc-wrap" class="card-sm mb12" style="display:none; padding-top: 0px;">
                         <div class="sc-lbl">Notas</div>
                         <div class="fs12 tc1" id="cd-desc"></div>
                     </div>
-                    <div class="card mb12">
-                        <div class="sc-lbl">Resumo Financeiro</div>
-                        <div class="dr">
-                            <div class="dk">Total emprestado</div>
-                            <div class="dv2" id="cd-total-emp"></div>
+
+
+                    <!-- STATUS GERAL -->
+                    <div class="card-sm"
+                        style="padding: 3px; display: flex; flex-direction: column; gap: 0px; margin-top: 5px;">
+                        <div
+                            style="display: flex; flex-direction: column; align-items: center; gap: 6px; border-bottom: 1px solid var(--brd); padding-bottom: 4px; margin-top: 1px;">
+                            <span class="fs11 tc2"
+                                style="text-transform: uppercase; letter-spacing: .5px; font-weight: 800;">STATUS
+                                GERAL</span>
                         </div>
-                        <div class="dr">
-                            <div class="dk">Divida Total (Lucro + Juros)</div>
-                            <div class="dv2 c-r" id="cd-total-divida"></div>
+
+
+                        <div
+                            style="display: flex; justify-content: center; align-items: center; gap: 40px; width: 100%; margin-bottom: 20px;">
+                            <div
+                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <span class="fs10 tc2">Lucro<br>Previsto</span>
+                                <span style="font-size: 13px; font-weight: 800; color: var(--acc); white-space:nowrap;"
+                                    id="cd-lucro-prev">R$ 0.000,00</span>
+                            </div>
+                            <div
+                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <span class="fs10 tc2">Valor<br>Emprestado</span>
+                                <span style="font-size: 13px; font-weight: 800; color: var(--acc2); white-space:nowrap;"
+                                    id="cd-total-emp">R$ 000,00</span>
+                            </div>
+                            <div
+                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <span class="fs10 tc2">Juros<br>Acm.</span>
+                                <span
+                                    style="font-size: 13px; font-weight: 800; color: var(--danger); white-space:nowrap;"
+                                    id="cd-juros-acm">R$ 0.000,00</span>
+                            </div>
                         </div>
-                        <div class="dr">
-                            <div class="dk">Total já pago</div>
-                            <div class="dv2 c-g" id="cd-total-pago"></div>
+
+                        <div style="display: flex; align-items: center; margin-bottom: 0px; width: 100%;">
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
+                                <span class="fs10 tc2">Total Pago</span>
+                                <span style="font-size: 15px; font-weight: 1000; color: var(--acc);"
+                                    id="cd-total-pago">R$ -.---,--</span>
+                            </div>
+                            <div
+                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <span class="fs10 tc2" style="font-size: 12px;">Qtd.</span>
+                                <span style="font-size: 12px; font-weight: 800; color: var(--txt1); white-space:nowrap;"
+                                    id="cd-qtd-emp">0</span>
+                            </div>
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center;">
+                                <span class="fs10 tc2">Dívida Total</span>
+                                <span style="font-size: 15px; font-weight: 1000; color: var(--danger);"
+                                    id="cd-total-divida">R$ -.---,--</span>
+                            </div>
                         </div>
-                        <div class="dr">
-                            <div class="dk">Falta pagar</div>
-                            <div class="dv2 c-r" id="cd-falta"></div>
+
+
+                        <!-- progress bar -->
+                        <div style="margin-top:15px; margin-bottom: 0px;">
+                            <div
+                                style="height:4px; background:rgba(255,255,255,.12); border-radius:2px; overflow:hidden">
+                                <div id="cd-progress-bar"
+                                    style="height:100%; border-radius:2px; background:var(--acc); transition:width .4s ease; width:0%">
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="fs10 tc2" id="cd-progress-bar-pag"
+                                    style="font-size: 10px; font-weight: 800; color: var(--txt2);">0%</span>
+                                <span class="fs10 tc2" id="cd-progress-bar-rest"
+                                    style="font-size: 10px; font-weight: 800; color: var(--txt2);">100%</span>
+                            </div>
                         </div>
-                        <div class="dr" style="border:none">
-                            <div class="dk">Lucro previsto</div>
-                            <div class="dv2 c-g" id="cd-lucro-prev"></div>
-                        </div>
-                        <div class="lc-bar">
-                            <div class="lc-fill done" id="cd-pagos"></div>
+
+                        <!-- Display do valor restante -->
+                        <div id="cd-sit-box"
+                            style="position:relative; display: flex; flex-direction: column; align-items: center; margin-top:5px">
+                            <div class="fs11 tc2" style="margin-bottom:2px;" id="cd-valor-hoje-title">Valor a pagar hoje
+                            </div>
+                            <div style="font-size: 13px; font-weight: 1000; color: var(--acc3);"
+                                id="cd-valor-hoje-ignorado">Divida Ignorada - R$ --.---,--</div>
+                            <div style="font-family:var(--font-d); font-size:34px; font-weight:900; letter-spacing:-1.5px; line-height:1"
+                                id="cd-valor-hoje">R$ 0</div>
                         </div>
                     </div>
+
+                    <!-- LISTA DE EMPRESTIMOS -->
                     <div class="sh">
                         <div class="sh-t">Empréstimos</div>
                         <div class="sh-l" onclick="novoEmprestimoParaCliente()">+ Novo</div>
@@ -4153,6 +4226,8 @@
             let max_data = Math.max(...loan.pagamentos.map(pago => pago.data));
             const sortedPags = [...loan.pagamentos].sort((a, b) => a.data - b.data);
             const sortedPags_antes = sortedPags.filter(p => p.data != max_data);
+            const totalPago_antes = sortedPags_antes.reduce((s, p) => s + p.valor, 0);
+            let valor_anterior = 0;
             const pagByDate = {};
             for (const p of sortedPags) {
                 const ds = dateStr(p.data);
@@ -4179,13 +4254,15 @@
                 if (pagByDate[ds]) {
                     for (const p of pagByDate[ds]) {
                         if (saldoCorrente <= 0) break;
+                        if (p.data == max_data) {
+                            valor_anterior = saldoCorrente;
+                        }
                         saldoCorrente = Math.max(0, saldoCorrente - p.valor);
                     }
                 }
             }
 
             const totalPago = sortedPags.reduce((s, p) => s + p.valor, 0);
-            const totalPago_antes = sortedPags_antes.reduce((s, p) => s + p.valor, 0);
             const isPago = saldoCorrente <= 0 || loan.pago != 0;
             const saldoRestante = Math.max(0, saldoCorrente);
             const valorHoje = isPago ? 0 : saldoRestante;
@@ -4200,7 +4277,7 @@
 
             let pago = loan.pago != 0 ? loan.pago : saldoCorrente <= 0 ? max_data + 1 : 0;
 
-            const calc = { emissao, vencimento, valorBase, profitRate, totalPago, saldoRestante, diasAtraso, isPago, jurosDia, totalJuros, valorHoje, diasParaVencer, status, dividaTotal, pago, acumJuros, totalPago_antes };
+            const calc = { emissao, vencimento, valorBase, profitRate, totalPago, saldoRestante, diasAtraso, isPago, jurosDia, totalJuros, valorHoje, diasParaVencer, status, dividaTotal, pago, acumJuros, totalPago_antes, valor_anterior };
 
             return calc;
         }
@@ -4319,7 +4396,7 @@
             // Hoje marker (if not paid)
             if (!c.isPago) {
                 events.push({
-                    date: TODAY + (1000 * 60 * 60 * 11)-1, tipo: 'hoje',
+                    date: TODAY + (1000 * 60 * 60 * 11) - 1, tipo: 'hoje',
                     label: 'Hoje',
                     desc: diasAtraso > 0 ? `${diasAtraso} dia${diasAtraso !== 1 ? 's' : ''} em atraso` :
                         fmtDate(TODAY) == fmtDate(vencimento) ? 'Vence Hoje' :
@@ -4422,10 +4499,19 @@
                     totalEmp += l.valor;
                     totalLucro += c.dividaTotal - l.valor;
                 }
-                if (c.status === 'late') { cntLate++; valLate += c.valorHoje; }
-                else if (c.status === 'warn') { cntWarn++; valWarn += c.valorBase; }
-                else if (c.status === 'ok') { cntOk++; valOk += c.valorBase; }
-                else if (c.status === 'done') { cntDone++; }
+                
+                if (c.status === 'late') {
+                    cntLate++;
+                    valLate += c.valorHoje;
+                } else if (c.status === 'warn') {
+                    cntWarn++;
+                    valWarn += c.valorBase;
+                } else if (c.status === 'ok') {
+                    cntOk++;
+                    valOk += c.valorBase;
+                } else if (c.status === 'done') {
+                    cntDone++;
+                }
             });
 
             const total = DB.loans.length;
@@ -4442,19 +4528,12 @@
             document.getElementById('ds-cnt-warn').textContent = cntWarn;
             document.getElementById('ds-cnt-ok').textContent = cntOk;
             document.getElementById('ds-cnt-done').textContent = cntDone;
-            document.getElementById('ds-late-detail').innerHTML =
-                cntLate
-                    ? `${fmtMoney(valLate)}<br>pendente`
-                    : 'Nenhum atraso';
-            document.getElementById('ds-warn-detail').innerHTML =
-                cntWarn
-                    ? `${fmtMoney(valWarn)}<br>a vencer`
-                    : 'Tudo tranquilo';
-            document.getElementById('ds-ok-detail').innerHTML =
-                cntOk
-                    ? `${fmtMoney(valOk)}<br>em dia`
-                    : '—';
+
+            document.getElementById('ds-late-detail').innerHTML = cntLate ? `${fmtMoney(valLate)}` : '—';
+            document.getElementById('ds-warn-detail').innerHTML = cntWarn ? `${fmtMoney(valWarn)}` : '—';
+            document.getElementById('ds-ok-detail').innerHTML = cntOk ? `${fmtMoney(valOk)}` : '—';
             document.getElementById('ds-done-detail').textContent = cntDone ? `${cntDone} quitado${cntDone !== 1 ? 's' : ''}` : '—';
+
             document.getElementById('card-late').style.display = cntLate ? '' : 'none';
             document.getElementById('card-warn').style.display = cntWarn ? '' : 'none';
             document.getElementById('card-ok').style.display = cntOk ? '' : 'none';
@@ -4467,7 +4546,14 @@
             const lateLoans = DB.loans.filter(l => getLoanCalc(l).status === 'late');
             const warnLoans = DB.loans.filter(l => getLoanCalc(l).status === 'warn');
             const okLoans = DB.loans.filter(l => getLoanCalc(l).status === 'ok');
-            const doneLoans = DB.loans.filter(l => getLoanCalc(l).status === 'done');
+
+            // Filtra os ultimos dois emprestimos pagos
+            const doneLoans = DB.loans
+                .map(l => ({ original: l, calc: getLoanCalc(l) }))
+                .filter(item => item.calc.status === 'done')
+                .sort((a, b) => b.calc.pago - a.calc.pago)
+                .slice(0, 2)
+                .map(item => item.original);
 
             const atenEl = document.getElementById('dash-atencao');
             const atenWrap = document.getElementById('dash-atencao-wrap');
@@ -4562,90 +4648,60 @@
 
             if (!client) return '';
 
-            const fillClass =
-                c.status === 'late'
-                    ? 'late'
-                    : c.status === 'warn'
-                        ? 'warn'
-                        : c.status === 'done'
-                            ? 'done'
-                            : 'ok';
+            const fillClass = c.status === 'late' ? 'late' :
+                c.status === 'warn' ? 'warn' :
+                    c.status === 'done' ? 'done' :
+                        'ok';
 
-            const diasAtrasoOrVenc =
-                c.status === 'late'
-                    ? `<span class="c-r">${c.diasAtraso}d atraso</span>`
-                    : c.status === 'warn'
-                        ? `<span class="c-w">vence em ${c.diasParaVencer}d</span>`
-                        : c.status === 'done'
-                            ? `<span class="c-g">quitado</span>`
-                            : `<span class="c-b">vence em ${c.diasParaVencer}d</span>`;
+            const situacao_status = c.isPago ? 'Situação' :
+                c.diasAtraso > 0 ? 'Atraso' :
+                    c.diasParaVencer == 0 || c.diasParaVencer == 1 ? 'Vence' :
+                        'Vence Em';
 
-            const progressPct = Math.min(100, Math.round((c.totalPago / c.dividaTotal) * 100));
+            const diasAtrasoOrVenc = c.isPago && c.saldoRestante > 0 ? `<span class="c-g">Quitado Man.</span>` :
+                c.isPago && c.saldoRestante <= 0 ? `<span class="c-g">Quitado</span>` :
+                    c.diasAtraso > 0 ? `<span class="c-r">${c.diasAtraso} dia${c.diasAtraso != 1 ? 's' : ''}</span>` :
+                        c.diasParaVencer == 0 ? `<span class="c-w">Hoje</span>` :
+                            c.diasParaVencer == 1 ? `<span class="c-w">Amanha</span>` :
+                                c.diasParaVencer == 2 ? `<span class="c-w">2 dias</span>` :
+                                    `<span class="c-b">${c.diasParaVencer} dias</span>`;
 
-            const prazo = Number(loan.prazo || 0);
+            const progressPct = c.totalPago ? Math.max(2, Math.min(100, Math.round((c.totalPago / c.dividaTotal) * 100))) : 0;
+
+            const prazo = loan.prazo;
             const venc = addDays(loan.emissao, prazo);
 
             return `
             <div class="lc lc-${c.status}" onclick="closeSheet(document.getElementById('notif-sheet')); openEmpDetalhe('${loan.id}')">
                 <div class="lc-top">
-                <div class="flex-r">
-                    ${showClient
-                    ? `<div class="av ${client.color}">
-                        ${client.initials}
-                        </div>`
-                    : ''}
-                    <div>
-                    <div class="lc-name">
-                        ${fmtMoney(c.valorBase)}
-                    </div>
-                    <div class="lc-name">
-                        ${showClient ? client.nome : loan.id}
-                    </div>
-                    <div class="lc-id">
-                        ${fmtDate(loan.emissao)}
-                        ⇨
-                        ${fmtDate(venc)}
-                    </div>
-                    <div class="lc-id">
-                        ${prazo} dias
-                    </div>
+                    <div class="flex-r">${showClient ? `<div class="av ${client.color}">${client.initials}</div>` : ''}<div>
+                        <div class="lc-name">${fmtMoney(c.valorBase)}</div>
+                        <div class="lc-name">${showClient ? client.nome : loan.id}</div>
+                        <div class="lc-id" style="font-weight: 600;">${fmtDate(loan.emissao)}⇨${fmtDate(venc)}</div>
+                        <div class="lc-id" style="font-weight: 600;">${prazo} dias</div>
                     </div>
                 </div>
-                <div class="lc-id">
-                ${loan.id}
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center;">
+                    ${statusPill(c.status)}
+                    <span class="lc-id" style="margin-top: 25px; font-weight: 600; font-size: 13px;">${loan.id}</span>
                 </div>
-                ${statusPill(c.status)}
                 </div>
                 <div class="lc-grid">
-                <div class="lc-mi">
-                    <div class="lc-ml">Pago</div>
-                    <div class="lc-mv">
-                    ${fmtMoney(c.totalPago)}
-                    </div>
+                <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
+                    <div class="lc-ml" style="font-weight: 600;">Pago</div>
+                    <div class="lc-mv" style="font-weight: 600;">${fmtMoney(c.totalPago)}</div>
                 </div>
-                <div class="lc-mi">
-                    <div class="lc-ml">Restante</div>
-                    <div class="lc-mv">
-                    ${fmtMoney(
-                        Math.max(
-                            0,
-                            c.dividaTotal - c.totalPago
-                        )
-                    )}
-                    </div>
+                <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                    <div class="lc-ml" style="font-weight: 600;">Restante</div>
+                    <div class="lc-mv" style="font-weight: 600;">${fmtMoney(Math.max(0, c.dividaTotal - c.totalPago))}</div>
                 </div>
-                <div class="lc-mi">
-                    <div class="lc-ml">Situação</div>
-                    <div class="lc-mv">
-                    ${diasAtrasoOrVenc}
-                    </div>
+                <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center;">
+                    <div class="lc-ml" style="font-weight: 600;">${situacao_status}</div>
+                    <div class="lc-mv" style="font-weight: 600; white-space: nowrap;">${diasAtrasoOrVenc}</div>
                 </div>
                 </div>
                 <div class="lc-bar">
-                <div
-                    class="lc-fill ${fillClass}"
-                    style="width:${progressPct}%"
-                ></div>
+                    <div class="lc-fill ${fillClass}" style="width:${progressPct}%"></div>
                 </div>
             </div>`;
         }
@@ -4677,12 +4733,27 @@
             if (_empFilter !== 'all') {
                 loans = loans.filter(l => getLoanCalc(l).status === _empFilter);
             }
-            // Sort: late, warn, ok, done
-            const order = { late: 0, warn: 1, ok: 2, done: 3 };
-            loans.sort((a, b) => (order[getLoanCalc(a).status] || 2) - (order[getLoanCalc(b).status] || 2));
-            const total = DB.loans.length;
-            document.getElementById('emp-subtitle').textContent = `${total} empréstimos · ${loans.length} exibidos`;
-            document.getElementById('emp-list').innerHTML = loans.length ? loans.map(l => loanCardHTML(l)).join('') : '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><p>Nenhum empréstimo encontrado</p></div>';
+
+            // Ordena os emprestimos em ordem de importancia
+            const statusPriority = { 'late': 1, 'warn': 2, 'ok': 3, 'done': 4 };
+            const sortedLoansValido = loans
+                // Executa o cálculo pesado apenas uma vez por elemento
+                .map(loan => ({
+                    original: loan,
+                    status: getLoanCalc(loan).status
+                }))
+                // Ordena baseado no status pré-calculado
+                .sort((a, b) => {
+                    const weightA = statusPriority[a.status] || 99;
+                    const weightB = statusPriority[b.status] || 99;
+                    return weightA - weightB;
+                })
+                // Retorna o array contendo apenas a estrutura original do empréstimo
+                .map(item => item.original);
+
+            const total = sortedLoansValido.length;
+            document.getElementById('emp-subtitle').textContent = `${total} empréstimos · ${sortedLoansValido.length} exibidos`;
+            document.getElementById('emp-list').innerHTML = sortedLoansValido.length ? sortedLoansValido.map(l => loanCardHTML(l)).join('') : '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><p>Nenhum empréstimo encontrado</p></div>';
         }
         function filterEmprestimos(v) { _empSearchVal = v; renderEmprestimos(_empFilter); }
         function setTabEmp(el, filter) { document.querySelectorAll('#scr-emprestimos .tbtn').forEach(t => t.classList.remove('act')); el.classList.add('act'); renderEmprestimos(filter); }
@@ -6056,10 +6127,10 @@
                 const totalPago = loans.reduce((s, l) => s + l.pagamentos.reduce((ss, p) => ss + p.valor, 0), 0);
                 const hasLate = loans.some(l => getLoanCalc(l).status === 'late');
                 const hasWarn = loans.some(l => getLoanCalc(l).status === 'warn');
-                const statusC = hasLate ? 'late' : hasWarn ? 'warn' : loans.some(l => getLoanCalc(l).status === 'ok') ? 'ok' : 'done';
+                const statusC = loans.length == 0 ? 'ok' : hasLate ? 'late' : hasWarn ? 'warn' : loans.some(l => getLoanCalc(l).status === 'ok') ? 'ok' : 'done';
                 const open = loans.filter(l => !getLoanCalc(l).isPago).length;
 
-                const progressPct = Math.min(100, totalPago / Math.max(0, loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0)) * 100);
+                const progressPct = totalPago == 0 ? 0 : Math.min(100, totalPago / Math.max(0, loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0)) * 100);
 
                 return `<div class="cc" onclick="openClienteDetalhe('${c.id}')">
                     <div class="cc-top">
@@ -6099,61 +6170,111 @@
             _currentClientId = cid;
             const c = getClient(cid);
             if (!c) return;
+
+            // Definir dados do cliente no cabeçario
             document.getElementById('cd-av').className = `av ${c.color}`;
             document.getElementById('cd-av').style.cssText = 'width:48px; height:48px; font-size:16px';
             document.getElementById('cd-av').textContent = c.initials;
             document.getElementById('cd-name').textContent = c.nome;
             document.getElementById('cd-tel').textContent = c.tel;
             document.getElementById('cd-email').textContent = c.email || '';
+
+            // Descrição
             if (c.desc) { document.getElementById('cd-desc').textContent = c.desc; document.getElementById('cd-desc-wrap').style.display = ''; }
             else document.getElementById('cd-desc-wrap').style.display = 'none';
 
             const loans = getClientLoans(cid);
-            let totalEmp = 0, totalPago = 0, dividaTotal = 0, falta = 0, lucro = 0, progressPct = 0;
+            const hasLate = loans.some(l => getLoanCalc(l).status === 'late');
+            const hasWarn = loans.some(l => getLoanCalc(l).status === 'warn');
+            const statusC = loans.length == 0 ? 'ok' : hasLate ? 'late' : hasWarn ? 'warn' : loans.some(l => getLoanCalc(l).status === 'ok') ? 'ok' : 'done';
+            let totalEmp = 0, totalPago = 0, dividaTotal = 0, falta = 0, lucro = 0, progressPct = 0, jurosacm = 0, restante = 0;
             loans.forEach(l => {
                 const calc = getLoanCalc(l);
                 totalEmp += l.valor;
                 totalPago += calc.totalPago;
                 dividaTotal += calc.dividaTotal;
                 falta += Math.max(0, calc.valorHoje);
-                lucro += calc.valorBase - l.valor;
-                progressPct = totalPago / dividaTotal * 100;
+                restante += Math.max(0, calc.saldoRestante);
+                lucro += calc.dividaTotal - l.valor;
+                jurosacm += calc.acumJuros;
             });
 
-            document.getElementById('cd-total-emp').textContent = fmtMoney(totalEmp);
-            document.getElementById('cd-total-divida').textContent = fmtMoney(dividaTotal);
-            document.getElementById('cd-total-pago').textContent = fmtMoney(totalPago);
-            document.getElementById('cd-falta').textContent = fmtMoney(falta);
+            // Definir valores do status geral
             document.getElementById('cd-lucro-prev').textContent = fmtMoney(lucro);
-            document.getElementById('cd-pagos').style = "width:" + progressPct + "%";
+            document.getElementById('cd-total-emp').textContent = fmtMoney(totalEmp);
+            document.getElementById('cd-juros-acm').textContent = fmtMoney(jurosacm);
+            document.getElementById('cd-total-pago').textContent = fmtMoney(totalPago);
+            document.getElementById('cd-total-divida').textContent = fmtMoney(dividaTotal);
+            document.getElementById('cd-qtd-emp').textContent = loans.length;
+
+            // Definir valores da barra de progresso de pagamento
+            const percent_pago = totalPago > 0 ? Math.max(1, Math.round(totalPago / dividaTotal * 100)) : 0;
+            document.getElementById('cd-progress-bar').style.width = (percent_pago != 0 && percent_pago <= 5 ? 5 : percent_pago) + '%';
+            document.getElementById('cd-progress-bar-pag').textContent = percent_pago + '%';
+            document.getElementById('cd-progress-bar-rest').textContent = (100 - percent_pago) + '%';
+
+            // Situação box
+            const sitBox = document.getElementById('cd-sit-box');
+            sitBox.className = 'prev-box mb12 ' + (statusC === 'late' ? 'err-bdr' : statusC === 'warn' ? 'warn-bdr' : statusC === 'done' ? 'done-bdr' : 'ok-bdr');
+            document.getElementById('cd-valor-hoje').textContent = statusC === 'done' ? '✓ Quitado' : fmtMoney(falta);
+            document.getElementById('cd-valor-hoje').className = 'amt-big ' + (statusC === 'done' ? 'c-g' : statusC === 'late' ? 'c-r' : statusC === 'warn' ? 'c-w' : 'c-b');
+
+            if (statusC === 'done' && restante > 0) {
+                document.getElementById('cd-valor-hoje-title').style.display = 'none';
+                document.getElementById('cd-valor-hoje-ignorado').style.display = '';
+
+                document.getElementById('cd-valor-hoje').textContent = `✓ Quitado Manual`;
+                document.getElementById('cd-valor-hoje-ignorado').textContent = `${'Divida Ignorada - ' + fmtMoney(restante)}`;
+            } else if (statusC === 'done' && restante == 0) {
+                document.getElementById('cd-valor-hoje-title').textContent = `Totalmente Pago`;
+                document.getElementById('cd-valor-hoje-title').style.display = '';
+                document.getElementById('cd-valor-hoje-ignorado').style.display = 'none';
+            } else {
+                document.getElementById('cd-valor-hoje-title').textContent = `Valor a Pagar Hoje`;
+                document.getElementById('cd-valor-hoje-title').style.display = '';
+                document.getElementById('cd-valor-hoje-ignorado').style.display = 'none';
+            }
 
 
+            // Ordena os emprestimos em ordem de importancia
+            const statusPriority = { 'late': 1, 'warn': 2, 'ok': 3, 'done': 4 };
+            const sortedLoansValido = loans
+                // Executa o cálculo pesado apenas uma vez por elemento
+                .map(loan => ({
+                    original: loan,
+                    status: getLoanCalc(loan).status
+                }))
+                // Ordena baseado no status pré-calculado
+                .sort((a, b) => {
+                    const weightA = statusPriority[a.status] || 99;
+                    const weightB = statusPriority[b.status] || 99;
+                    return weightA - weightB;
+                })
+                // Retorna o array contendo apenas a estrutura original do empréstimo
+                .map(item => item.original);
 
-            // Sort loans: late, warn, ok, done
-            const order = { late: 0, warn: 1, ok: 2, done: 3 };
-            const sorted = [...loans].sort((a, b) => (order[getLoanCalc(a).status] || 2) - (order[getLoanCalc(b).status] || 2));
-            document.getElementById('cd-emp-list').innerHTML = sorted.length ? sorted.map(l => {
+            document.getElementById('cd-emp-list').innerHTML = sortedLoansValido.length ? sortedLoansValido.map(l => {
                 const calc = getLoanCalc(l);
                 const venc = addDays(l.emissao, l.prazo);
                 const jVal = l.juros_tipo === 'fixo' ? fmtMoney(l.juros_val) + '/dia' : `${l.juros_val}%/dia`;
                 return `<div class="lc lc-${calc.status}" onclick="openEmpDetalhe('${l.id}')">
-          <div class="lc-top">
-            <div><div class="lc-name">${fmtMoney(calc.valorBase)}</div><div class="lc-id">${fmtDate(l.emissao)} ⇨ ${fmtDate(venc)}</div><div class="lc-id">${l.prazo} dias</div></div>
-            <div><div class="lc-id">${l.id}</div></div>
-            ${statusPill(calc.status)}
-          </div>
-          <div class="lc-grid">
-            <div class="lc-mi"><div class="lc-ml">Emprestado</div><div class="lc-mv">${fmtMoney(l.valor)}</div></div>
-            <div class="lc-mi"><div class="lc-ml">Lucro Previsto</div><div class="lc-mv c-g">${fmtMoney(calc.dividaTotal - l.valor)}</div></div>
-            <div class="lc-mi"><div class="lc-ml">Juros/dia</div><div class="lc-mv c-r">${fmtMoney(calc.jurosDia)} ${calc.status == "late" ? "(+" + calc.diasAtraso + "d)" : ""}</div><div class="lc-mv c-r">${calc.status == "late" ? fmtMoney(calc.totalJuros) + " ↩" : ""}</div></div>
-          </div>
-          <div class="lc-grid" style="margin-bottom:8px">
-            <div class="lc-mi"><div class="lc-ml">Pago</div><div class="lc-mv c-g">${fmtMoney(calc.totalPago)}</div></div>
-            <div class="lc-mi"><div class="lc-ml">Restante</div><div class="lc-mv c-r">${fmtMoney(Math.max(0, calc.valorHoje))}</div></div>
-            <div class="lc-mi"><div class="lc-ml">Divida Total</div><div class="lc-mv c-r">${fmtMoney(calc.dividaTotal)}</div></div>
-          </div>
-          <div class="lc-bar"><div class="lc-fill ${calc.status}" style="width:${Math.min(100, Math.round(calc.totalPago / calc.dividaTotal * 100))}%"></div></div>
-        </div>`;
+                <div class="lc-top">
+                    <div><div class="lc-name">${fmtMoney(calc.valorBase)}</div><div class="lc-id">${fmtDate(l.emissao)} ⇨ ${fmtDate(venc)}</div><div class="lc-id">${l.prazo} dias</div></div>
+                    <div><div class="lc-id">${l.id}</div></div>
+                    ${statusPill(calc.status)}
+                </div>
+                <div class="lc-grid">
+                    <div class="lc-mi"><div class="lc-ml">Emprestado</div><div class="lc-mv">${fmtMoney(l.valor)}</div></div>
+                    <div class="lc-mi"><div class="lc-ml">Lucro Previsto</div><div class="lc-mv c-g">${fmtMoney(calc.dividaTotal - l.valor)}</div></div>
+                    <div class="lc-mi"><div class="lc-ml">Juros/dia</div><div class="lc-mv c-r">${fmtMoney(calc.jurosDia)} ${calc.status == "late" ? "(+" + calc.diasAtraso + "d)" : ""}</div><div class="lc-mv c-r">${calc.status == "late" ? fmtMoney(calc.totalJuros) + " ↩" : ""}</div></div>
+                </div>
+                <div class="lc-grid" style="margin-bottom:8px">
+                    <div class="lc-mi"><div class="lc-ml">Pago</div><div class="lc-mv c-g">${fmtMoney(calc.totalPago)}</div></div>
+                    <div class="lc-mi"><div class="lc-ml">Restante</div><div class="lc-mv c-r">${fmtMoney(Math.max(0, calc.valorHoje))}</div></div>
+                    <div class="lc-mi"><div class="lc-ml">Divida Total</div><div class="lc-mv c-r">${fmtMoney(calc.dividaTotal)}</div></div>
+                </div>
+                <div class="lc-bar"><div class="lc-fill ${calc.status}" style="width:${Math.min(100, Math.round(calc.totalPago / calc.dividaTotal * 100))}%"></div></div>
+                </div>`;
             }).join('') : '<div class="empty"><p>Nenhum empréstimo ainda</p></div>';
 
             navTo('cliente-detalhe');
@@ -7030,12 +7151,16 @@
                 loan_retro.pagamentos = loan_retro.pagamentos.filter(p => p.data <= (dt + 12 * 60 * 60 * 1000));
             }
 
+
+            loan_retro.pagamentos = loan_retro.pagamentos.filter(p => p.data <= (dt + 12 * 60 * 60 * 1000));
+
             let loan_pags_no_dia = loan_retro.pagamentos.filter(p => p.data <= (dt + 12 * 60 * 60 * 1000) && p.data >= dt);
-            let max_data = dt + (22 * 60 * 60 * 1000);
+            let max_data = dt + 100001;
             if (loan_pags_no_dia.length > 0) {
                 max_data = Math.max(...loan_pags_no_dia.map(pago => pago.data)) + 1;
             }
             data = max_data;
+            loan_retro.pagamentos.push({ id: 'tmp_' + Date.now(), data: data, valor: valor, status: '', anexo_pag: [] });
 
             const tlEl = document.getElementById('novo-pag-tl-preview');
             if (!valor) {
@@ -7049,7 +7174,6 @@
         function buildNewPagTimeline(loan, novoValor, novaData, retro) {
             if (!novoValor || !novaData) return '<div class="fs12 tc2">Preencha os dados para ver o histórico</div>';
             const loanSim = structuredClone(loan);
-            loanSim.pagamentos.push({ id: 'tmp_' + Date.now(), data: novaData, valor: novoValor, status: '', anexo_pag: [] });
             const events = buildTimeline(loanSim, retro);
             return `<ul class="tl" style="padding-left:0">${renderTimelineHTML(events, null, false)}</ul>`;
         }
@@ -7085,12 +7209,17 @@
                 max_data = Math.max(...loan_pags_no_dia.map(pago => pago.data)) + 1;
             }
             data = max_data;
+            loan_retro.pagamentos.push({ id: 'tmp_' + Date.now(), data: data, valor: valor, status: '', anexo_pag: [] });
 
             const calc = getLoanCalc(loan_retro);
 
             const client = getClient(loan_retro.clientId);
-            const saldoApos = Math.max(0, calc.valorHoje - valor);
+            const valorantes = calc.valor_anterior;
+            const saldoApos = Math.max(0, valorantes - valor); ;
+
             const quitaria = saldoApos <= 0;
+            const jurosacm = calc.valorHoje - saldoApos;
+            console.log(calc);
 
             let bodyHTML = '';
 
@@ -7102,13 +7231,20 @@
 
             bodyHTML += `
                 <div class="card-sm mb12">
-                <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${client.nome}</div></div>
-                <div class="dr"><div class="dk">Contrato</div><div class="dv2">${loan_retro.id}</div></div>
                 <div class="dr"><div class="dk">Data</div><div class="dv2 ${isRetro ? 'c-a' : ''}">${fmtDate(data)}${isRetro ? ' · retroativo' : ''}</div></div>
+                ${isRetro ? `<div class="dr"><div class="dk">Divida Prevista no Dia</div><div class="dv2">${fmtMoney(valorantes)}</div></div>` : `<div class="dr"><div class="dk">Divida Anterior</div><div class="dv2">${fmtMoney(valorantes)}</div></div>`}
+                
                 <div class="dr"><div class="dk">Valor pago</div><div class="dv2 c-g fw6" style="font-size:17px">${fmtMoney(valor)}</div></div>
                 <div class="dr" style="border:none"><div class="dk">Saldo após pagamento</div>
                     <div class="dv2 fw6 ${quitaria ? 'c-g' : 'c-r'}">${quitaria ? '✓ Dívida quitada' : fmtMoney(saldoApos)}</div>
                 </div>
+                ${isRetro && !quitaria ? `<div class="dr" style="border:none"><div class="dk">Juros acm. até hoje</div>
+                        <div class="dv2 fw6 c-r">+${fmtMoney(jurosacm)}</div>
+                    </div>
+                    <div class="dr" style="border:none"><div class="dk">Valor restante hoje</div>
+                        <div class="dv2 fw6 c-r">${fmtMoney(calc.valorHoje)}</div>
+                    </div>`                    
+                    : ''}
                 </div>`;
 
             if (isRetro) {
@@ -7348,17 +7484,17 @@
                 
 
                 <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px">
-                    <div style="text-align:center; font-size:10px; color:var(--txt2)">EMPRÉSTIMO</div>
-                    <div style="text-align:center; font-size:10px; color:var(--txt2)">${!retro ? 'DÍVIDA TOTAL' :
+                    <div style="text-align:center; font-size:10px; color:var(--txt2); font-weight:700;">EMPRÉSTIMO</div>
+                    <div style="text-align:center; font-size:10px; color:var(--txt2); font-weight:700;">${!retro ? 'DÍVIDA TOTAL' :
                     'DÍVIDA PREVISTA'}</div>
-                    <div style="text-align:center; font-size:10px; color:var(--txt2)">${diasAtrasoPag > 0 && !retro ? 'JUROS ACUMULADO' :
+                    <div style="text-align:center; font-size:10px; color:var(--txt2); font-weight:700;">${diasAtrasoPag > 0 && !retro ? 'JUROS ACUMULADO' :
                     diasAtrasoPag > 0 && retro ? 'JUROS PREVISTO' :
                         'JUROS DE ATRASO'}</div>
                 </div>
                 <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:10px">
-                    <div style="text-align:center; font-size:10px; font-weight:100; margin-bottom:12px">${fmtMoney(valorBase)}</div>
+                    <div style="text-align:center; font-size:10px; font-weight:300; margin-bottom:12px">${fmtMoney(valorBase)}</div>
                     <div style="text-align:center; font-size:11px; font-weight:700; letter-spacing:-.2px; font-family:var(--font-d)">${fmtMoney(dividaTotal)}${retro ? '*' : ''}</div>
-                    <div style="text-align:center; font-size:10px; font-weight:100; margin-bottom:12px">${diasAtrasoPag > 0 ? fmtMoney(jurosAcumNoDia) : juros_dia}${retro ? '*' : ''}</div>
+                    <div style="text-align:center; font-size:10px; font-weight:500; margin-bottom:12px">${diasAtrasoPag > 0 ? fmtMoney(jurosAcumNoDia) : juros_dia}${retro ? '*' : ''}</div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:50px; max-width:250px; min-width:50px; margin:0 auto">
@@ -7476,9 +7612,11 @@
 
 
         // ==================== NOTIF ====================
+        let notif_view = false;
         function buildNotif() {
             const late = DB.loans.filter(l => getLoanCalc(l).status === 'late');
             const warn = DB.loans.filter(l => getLoanCalc(l).status === 'warn');
+
             let html = '';
             if (!late.length && !warn.length) { html = '<div class="empty"><p>Nenhuma notificação</p></div>'; }
             late.forEach(l => { const c = getLoanCalc(l); html += loanCardHTML(l, true); });
@@ -7490,9 +7628,27 @@
             }, 600);
         }
 
+        // ==================== NOTIFICATION BADGE ====================
+        function updateNotifBadge() {
+            const fab = document.getElementById('notif-fab');
+            const late = DB.loans.filter(l => getLoanCalc(l).status === 'late').length;
+            const warn = DB.loans.filter(l => getLoanCalc(l).status === 'warn').length;
+            const total = late + warn;
+            if (total > 0 && !notif_view) {
+                fab.className = 'has-notif';
+                document.getElementById('notif-badge').textContent = '!';
+            } else {
+                fab.className = 'no-notif';
+            }
+        }
+
         // ==================== SHEETS / OVERLAYS ====================
         function openSheet(id, animate = true) {
-            if (id === 'notif-sheet') buildNotif();
+            if (id === 'notif-sheet') {
+                notif_view = true;
+                buildNotif();
+            }
+           
 
             const el = document.getElementById(id);
 
@@ -8413,20 +8569,6 @@
             }, 3000);
         }
 
-
-        // ==================== NOTIFICATION BADGE ====================
-        function updateNotifBadge() {
-            const fab = document.getElementById('notif-fab');
-            const late = DB.loans.filter(l => getLoanCalc(l).status === 'late').length;
-            const warn = DB.loans.filter(l => getLoanCalc(l).status === 'warn').length;
-            const total = late + warn;
-            if (total > 0) {
-                fab.className = 'has-notif';
-                document.getElementById('notif-badge').textContent = '!';
-            } else {
-                fab.className = 'no-notif';
-            }
-        }
 
         async function loadDB() {
             console.log("Realizando Fetch inicial...");
