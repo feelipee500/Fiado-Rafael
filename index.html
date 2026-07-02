@@ -1795,20 +1795,24 @@
             background: var(--bg1);
             border: 2px solid var(--brd3);
             border-radius: var(--rad20);
-            padding: 18px;
-            margin-bottom: 12px;
+            padding: 10px;
+            margin-bottom: 5px;
+        }
+
+        .prev-box.done-bdr {
+            border-color: var(--acc);
         }
 
         .prev-box.ok-bdr {
-            border-color: #00e8a230;
+            border-color: var(--acc2);
         }
 
         .prev-box.warn-bdr {
-            border-color: #ffb54740;
+            border-color: var(--acc3);
         }
 
         .prev-box.err-bdr {
-            border-color: #ff4d6d40;
+            border-color: var(--danger);
         }
 
         /* MISC */
@@ -2568,7 +2572,7 @@
             z-index: 999999;
         }
 
-        @media (min-width: 400px) {
+        @media (max-width: 370px) {
             #debug-back {
                 display: block;
             }
@@ -3075,7 +3079,7 @@
 
                 <!-- HERO HEADER — full-width colored banner -->
                 <div id="ed-hero"
-                    style="position:relative; padding:20px 16px 28px; background:var(--bg1); border-bottom:1px solid var(--brd)">
+                    style="position:relative; padding:20px 16px; background:var(--bg1); border-bottom:1px solid var(--brd)">
                     <!-- nav bar -->
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px">
                         <div class="back-btn" id="ed-back-btn" style="margin-bottom:0; color:var(--txt1)">
@@ -3096,10 +3100,16 @@
                         </div>
                     </div>
                     <!-- client + id -->
-                    <div style="margin-bottom:16px">
+                    <div style="margin-bottom:-10px">
                         <div style="display:flex; align-items:center; justify-content:space-between">
-                            <div style="font-family:var(--font-d); font-size:20px; font-weight:800; letter-spacing:-.5px; line-height:1.1"
-                                id="ed-client-name"></div>
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
+                                <span
+                                    style="font-family:var(--font-d); font-size:20px; font-weight:800; letter-spacing:-.5px; line-height:1.1"
+                                    id="ed-client-name"></span>
+                                <span class="fs11 tc2 mt4" id="ed-id"></span>
+                            </div>
+
                             <div id="ed-whatsapp-btn" onclick="openSheet('open-whatsapp')"
                                 style="display:flex; align-items:center; gap:5px; background:#25D36618; border:1px solid #25D36630; color:#25D366; border-radius:20px; padding:5px 11px; cursor:pointer; font-size:12px; font-weight:600; white-space:nowrap">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -3111,144 +3121,202 @@
                                 WhatsApp
                             </div>
                         </div>
-                        <div class="fs11 tc2 mt4" id="ed-id"></div>
-                    </div>
-                    <!-- main value display -->
-                    <div id="ed-sit-box" style="position:relative">
-                        <div class="fs11 tc2" style="margin-bottom:2px">Valor a pagar hoje</div>
-                        <div style="font-family:var(--font-d); font-size:34px; font-weight:900; letter-spacing:-1.5px; line-height:1"
-                            id="ed-valor-hoje">R$ 0</div>
-                        <div style="display:flex; align-items:center; gap:8px; margin-top:6px">
-                            <div class="fs12" id="ed-dias-label" style="font-weight:500"></div>
-                            <div class="fs11 tc2" id="ed-venc-label"></div>
-                        </div>
-                    </div>
-                    <!-- progress bar -->
-                    <div style="margin-top:16px">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px">
-                            <span class="fs11 tc2">Total pago: <span id="ed-total-pago"
-                                    style="color:var(--txt1); font-weight:500"></span></span>
-                            <span class="fs11 tc2">Meta: <span id="ed-valor-comb"
-                                    style="color:var(--txt1); font-weight:500"></span></span>
-                        </div>
-                        <div style="height:4px; background:rgba(255,255,255,.12); border-radius:2px; overflow:hidden">
-                            <div id="ed-progress-bar"
-                                style="height:100%; border-radius:2px; background:var(--acc); transition:width .4s ease; width:0%">
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <div class="pw" style="padding-top:14px">
-
-                    <!-- Quick stats grid -->
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px">
-                        <div class="card-sm" style="display:flex; flex-direction:column; gap:2px">
-                            <span class="fs10 tc2"
-                                style="text-transform:uppercase; letter-spacing:.6px; font-weight:600">Emprestado</span>
-                            <span
-                                style="font-family:var(--font-d); font-size:17px; font-weight:700; letter-spacing:-.4px"
-                                id="ed-valor-emp"></span>
-                        </div>
-                        <div class="card-sm" style="display:flex; flex-direction:column; gap:2px">
-                            <span class="fs10 tc2"
-                                style="text-transform:uppercase; letter-spacing:.6px; font-weight:600">Saldo
-                                restante</span>
-                            <span
-                                style="font-family:var(--font-d); font-size:17px; font-weight:700; letter-spacing:-.4px"
-                                id="ed-saldo"></span>
-                        </div>
-                        <div class="card-sm" style="display:flex; flex-direction:column; gap:2px">
-                            <span class="fs10 tc2"
-                                style="text-transform:uppercase; letter-spacing:.6px; font-weight:600">Emissão</span>
-                            <span style="font-size:14px; font-weight:500" id="ed-data-emissao"></span>
-                        </div>
-                        <div class="card-sm" style="display:flex; flex-direction:column; gap:2px">
-                            <span class="fs10 tc2"
-                                style="text-transform:uppercase; letter-spacing:.6px; font-weight:600">Vencimento</span>
-                            <span style="font-size:14px; font-weight:500" id="ed-data-venc"></span>
-                        </div>
-                    </div>
-
-                    <!-- Prazo + Juros strip -->
-                    <div
-                        style="background:var(--bg2); border:1px solid var(--brd); border-radius:var(--rad12); padding:12px 14px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between">
-                        <div style="display:flex; align-items:center; gap:6px">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--txt2)"
-                                stroke-width="2" stroke-linecap="round">
-                                <rect x="3" y="4" width="18" height="18" rx="2" />
-                                <line x1="16" y1="2" x2="16" y2="6" />
-                                <line x1="8" y1="2" x2="8" y2="6" />
-                                <line x1="3" y1="10" x2="21" y2="10" />
-                            </svg>
-                            <span class="fs12 tc2">Prazo</span>
-                            <span class="fs12 fw6" id="ed-prazo"></span>
-                        </div>
-                        <div style="width:1px; height:18px; background:var(--brd)"></div>
-                        <div style="display:flex; align-items:center; gap:6px">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--danger)"
-                                stroke-width="2" stroke-linecap="round">
-                                <circle cx="12" cy="12" r="10" />
-                                <line x1="12" y1="8" x2="12" y2="12" />
-                                <line x1="12" y1="16" x2="12.01" y2="16" />
-                            </svg>
-                            <span class="fs12 tc2">Juros/dia</span>
-                            <span class="fs12 fw6 c-r" id="ed-juros-dia"></span>
-                        </div>
-                    </div>
-
-                    <!-- Comprovante de envio — compact -->
-                    <div
-                        style="background:var(--bg2); border:1px solid var(--brd); border-radius:var(--rad12); padding:12px 14px; margin-bottom:14px">
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px">
+                <div class="pw" style="padding-top:10px">
+                    <!-- DADOS INICIAIS -->
+                    <div class="card-sm" style="padding: 3px; display: flex; flex-direction: column; gap: 10px;">
+                        <div
+                            style="display: flex; flex-direction: column; align-items: center; gap: 6px; border-bottom: 1px solid var(--brd); padding-bottom: 3px;">
                             <span class="fs11 tc2"
-                                style="text-transform:uppercase; letter-spacing:.6px; font-weight:600">Meu comprovante
-                                PIX</span>
-                            <div id="ed-comp-envio-btn" class="fs11 fw6" style="color:var(--acc); cursor:pointer"
-                                onclick="openAttachSheet('loan')">+ Anexar</div>
+                                style="text-transform: uppercase; letter-spacing: .5px; font-weight: 800;">DADOS
+                                INICIAIS</span>
                         </div>
-                        <div id="ed-comp-envio-list"></div>
+
+                        <div style="display: flex; align-items: center; margin-bottom: 2px; width: 100%;">
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
+                                <span class="fs10 tc2">Emissão</span>
+                                <span style="font-size: 13px; font-weight: 800;" id="ed-data-emissao">--/--/----</span>
+                            </div>
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <span class="fs10 tc2">Prazo</span>
+                                <span style="font-size: 13px; font-weight: 800; color: var(--acc2);" id="ed-prazo">0
+                                    dias</span>
+                            </div>
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center;">
+                                <span class="fs10 tc2">Vencimento</span>
+                                <span style="font-size: 13px; font-weight: 800;" id="ed-data-venc">--/--/----</span>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; margin-bottom: 2px; width: 100%;">
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
+                                <span class="fs10 tc2">Enviado</span>
+                                <span style="font-size: 13px; font-weight: 800;" id="ed-valor-emp">R$ 0.000,00</span>
+                            </div>
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <span class="fs10 tc2">A Receber</span>
+                                <span style="font-size: 13px; font-weight: 800;" id="ed-valor-receber">R$
+                                    0.000,00</span>
+                                <span style="font-size: 10px; font-weight: 800; color:var(--acc)"
+                                    id="ed-valor-lucro">+R$ 000,00</span>
+                            </div>
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center;">
+                                <span class="fs10 tc2">Juros</span>
+                                <span style="font-size: 13px; font-weight: 800;" id="ed-juros-dia">---</span>
+                            </div>
+                        </div>
+
+                        <!-- Comprovante de envio -->
+                        <div style="background:var(--bg2); border:1px solid var(--brd); border-radius:var(--rad12); padding:3px 3px; margin-bottom:0px; display: flex; flex-direction: column; align-items: center;"
+                            onclick="openAttachSheet('loan')">
+                            <div id="ed-comp-envio-btn" class="fs11 fw6" style="color:var(--acc3); cursor:pointer">+
+                                Anexar Comprovante de Envio</div>
+                            <div id="ed-comp-envio-list"></div>
+                        </div>
+                    </div>
+
+
+
+                    <!-- STATUS ATUAL -->
+                    <div class="card-sm"
+                        style="padding: 3px; display: flex; flex-direction: column; gap: 0px; margin-top: 5px;">
+                        <div
+                            style="display: flex; flex-direction: column; align-items: center; gap: 6px; border-bottom: 1px solid var(--brd); padding-bottom: 4px; margin-top: 1px;">
+                            <span class="fs11 tc2"
+                                style="text-transform: uppercase; letter-spacing: .5px; font-weight: 800;">STATUS
+                                ATUAL</span>
+                        </div>
+
+                        <div
+                            style="display: flex; justify-content: center; align-items: center; gap: 60px; width: 100%; margin-bottom: 10px; margin-top: 10px;">
+                            <div
+                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <span class="fs10 tc2" id="ed-tempo-total-aberto-title">Em Aberto</span>
+                                <span style="font-size: 13px; font-weight: 800;" id="ed-tempo-total-aberto">--
+                                    dias</span>
+                            </div>
+                            <div
+                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <span class="fs10 tc2" id="ed-juros-dias-atraso-title">De Atraso</span>
+                                <span style="font-size: 13px; font-weight: 800; color: var(--danger);"
+                                    id="ed-juros-dias-atraso">-- dias</span>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; margin-bottom: 0px; width: 100%;">
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
+                                <span class="fs10 tc2">Total Pago</span>
+                                <span style="font-size: 17px; font-weight: 1000; color: var(--acc);"
+                                    id="ed-total-pago">R$ -.---,--</span>
+                            </div>
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <span class="fs10 tc2" id="ed-juros-acumulado-title">Juros Acm.</span>
+                                <span style="font-size: 13px; font-weight: 800; color: var(--danger);"
+                                    id="ed-juros-acumulado">R$ ---,--</span>
+                            </div>
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center;">
+                                <span class="fs10 tc2">Dívida Total</span>
+                                <span style="font-size: 17px; font-weight: 1000; color: var(--danger);"
+                                    id="ed-valor-comb">R$ -.---,--</span>
+                            </div>
+                        </div>
+
+
+                        <!-- progress bar -->
+                        <div style="margin-top:2px; margin-bottom: 0px;">
+                            <div
+                                style="height:4px; background:rgba(255,255,255,.12); border-radius:2px; overflow:hidden">
+                                <div id="ed-progress-bar"
+                                    style="height:100%; border-radius:2px; background:var(--acc); transition:width .4s ease; width:0%">
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="fs10 tc2" id="ed-progress-bar-pag"
+                                    style="font-size: 10px; font-weight: 800; color: var(--txt2);">0%</span>
+                                <span class="fs10 tc2" id="ed-progress-bar-rest"
+                                    style="font-size: 10px; font-weight: 800; color: var(--txt2);">100%</span>
+                            </div>
+                        </div>
+
+                        <!-- Display do valor restante -->
+                        <div id="ed-sit-box"
+                            style="position:relative; display: flex; flex-direction: column; align-items: center; margin-top:5px">
+                            <div class="fs11 tc2" style="margin-bottom:2px;" id="ed-valor-hoje-title">Valor a pagar hoje
+                            </div>
+                            <div style="font-size: 13px; font-weight: 1000; color: var(--acc3);"
+                                id="ed-valor-hoje-ignorado">Divida Ignorada - R$ --.---,--</div>
+                            <div style="font-family:var(--font-d); font-size:34px; font-weight:900; letter-spacing:-1.5px; line-height:1"
+                                id="ed-valor-hoje">R$ 0</div>
+                        </div>
                     </div>
 
                     <!-- Registrar pagamento -->
                     <div id="ed-pag-form-wrap"
-                        style="background:var(--bg2); border:1px solid var(--brd); border-radius:var(--rad16); padding:14px; margin-bottom:14px">
-                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px">
+                        style="background:var(--bg2); border:1px solid var(--brd); border-radius:var(--rad16); padding:14px; margin-bottom:14px; margin-top: 5px; display: flex; flex-direction: column;">
+
+                        <div
+                            style="display:flex; align-items:center; justify-content: center; gap:8px; margin-bottom:12px">
                             <div
-                                style="width:30px; height:30px; border-radius:50%; background:#00e8a218; display:flex; align-items:center; justify-content:center">
+                                style="width:30px; height:30px; border-radius:50%; background:#00e8a218; display:flex; align-items:center; justify-content:center; flex-shrink: 0;">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--acc)"
                                     stroke-width="2.5" stroke-linecap="round">
                                     <polyline points="20 6 9 17 4 12" />
                                 </svg>
                             </div>
-                            <span style="font-size:14px; font-weight:700; font-family:var(--font-d)">Registrar
+                            <span
+                                style="font-size:14px; font-weight:700; font-family:var(--font-d); text-align: center;">Registrar
                                 Pagamento</span>
+                            <div
+                                style="width:30px; height:30px; border-radius:50%; background:#00e8a218; display:flex; align-items:center; justify-content:center; flex-shrink: 0;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--acc)"
+                                    stroke-width="2.5" stroke-linecap="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            </div>
                         </div>
-                        <div class="fr">
-                            <div class="fg">
-                                <div class="fl">Valor pago (R$)</div>
+
+                        <div class="fr" style="display: flex; gap: 12px; width: 100%;">
+                            <div class="fg" style="flex: 1;">
+                                <div class="fl" style="text-align: start; font-size: 14px;">Valor pago (R$)</div>
                                 <input class="fi" id="ed-pag-valor" type="text" inputmode="numeric" min="0" step="1"
-                                    placeholder="0,00"
+                                    placeholder="R$ 0.000,00" style="width: 100%; text-align: start;"
                                     oninput="this.value=this.value.replace(/[^0-9.,]/g,''); onPagValorChange()">
                             </div>
-                            <div class="fg">
-                                <div class="fl">Data</div>
-                                <input class="fi" id="ed-pag-data" type="date" onchange="onPagDataChange()">
+                            <div class="fg" style="flex: 1;">
+                                <div class="fl" style="text-align: start; font-size: 14px;">Data</div>
+                                <input class="fi" id="ed-pag-data" type="date" style="width: 100%; text-align: center;"
+                                    onchange="onPagDataChange()">
                             </div>
                         </div>
-                        <div id="ed-pag-retro-wrap" style="display:none">
-                            <div class="warn-box mt8" id="ed-pag-retro-wrap-retro">
+
+                        <div id="ed-pag-retro-wrap" style="display:none; flex-direction: column; align-items: center;">
+                            <div class="warn-box mt8" id="ed-pag-retro-wrap-retro" style="text-align: center;">
                                 <div class="wb-t">⚠ Pagamento retroativo</div>
                                 <div class="wb-d">A data informada é anterior a hoje, pagamentos após esta data serão
                                     apagados. O histórico abaixo mostra o impacto desta alteração.</div>
                             </div>
-                            <div class="sc-lbl mt12" style="justify-content:center; display:flex; align-items:center">
-                                Histórico recalculado</div>
-                            <div class="card-sm mb12" id="novo-pag-tl-preview">
+                            <div class="sc-lbl mt12"
+                                style="justify-content:center; display:flex; align-items:center; text-align: center;">
+                                Histórico recalculado
+                            </div>
+                            <div class="card-sm mb12" id="novo-pag-tl-preview" style="text-align: center; width: 100%;">
                                 <div class="fs12 tc2">Preencha o valor para ver o histórico</div>
                             </div>
                         </div>
-                        <button class="btn-p mt8" onclick="doRegistrarPagamento()">Confirmar Pagamento</button>
+
+                        <button class="btn-p mt8" style="width: 100%; text-align: center;"
+                            onclick="doRegistrarPagamento()">Confirmar Pagamento</button>
                     </div>
 
                     <!-- Timeline -->
@@ -3731,8 +3799,7 @@
                     </svg></div>
             </div>
             <div class="sh-body" style="padding-bottom:8px">
-                <div class="menu-item" id="emp-menu-mark-paid"
-                    onclick="closeSheet(document.getElementById('emp-menu-sheet')); openMarkPaidConfirm()">
+                <div class="menu-item" id="emp-menu-mark-paid" onclick="openMarkPaidConfirm()">
                     <div class="menu-item-left">
                         <div class="menu-icon mi-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="1.8" stroke-linecap="round">
@@ -4080,7 +4147,7 @@
             const vencimento = addDays(emissao, loan.prazo);
             const profitRate = (loan.valor_receber - loan.valor) / loan.valor * 100;
             const valorBase = loan.valor_receber;
-            const diasParaVencer = diffDays(TODAY, vencimento);
+            const diasParaVencer = diffDays(TODAY - (12 * 60 * 60 * 1000), vencimento);
 
             // Walk day-by-day (same as buildTimeline) to get accurate saldo
             let max_data = Math.max(...loan.pagamentos.map(pago => pago.data));
@@ -4097,9 +4164,10 @@
             const jdv = loan.juros_tipo === 'fixo' ? loan.juros_val : valorBase * loan.juros_val / 100;
             let diasAtraso = 0;
             let acumJuros = 0;
-            const totalDays = diffDays(emissao, TODAY) + 1;
+            const endDate = loan.pago ? loan.pago : TODAY;
+            const totalDays = diffDays(emissao, endDate);
 
-            for (let d = 1; d <= totalDays; d++) {
+            for (let d = 0; d <= totalDays; d++) {
                 const dia = addDays(emissao, d);
                 const ds = dateStr(dia);
 
@@ -4118,7 +4186,7 @@
 
             const totalPago = sortedPags.reduce((s, p) => s + p.valor, 0);
             const totalPago_antes = sortedPags_antes.reduce((s, p) => s + p.valor, 0);
-            const isPago = saldoCorrente <= 0 || loan.pago == 1;
+            const isPago = saldoCorrente <= 0 || loan.pago != 0;
             const saldoRestante = Math.max(0, saldoCorrente);
             const valorHoje = isPago ? 0 : saldoRestante;
             const dividaTotal = valorBase + acumJuros;
@@ -4127,12 +4195,14 @@
 
             let status = 'ok';
             if (isPago) status = 'done';
-            else if (TODAY > vencimento) status = 'late';
+            else if (TODAY - (12 * 60 * 60 * 1000) > vencimento) status = 'late';
             else if (diasParaVencer <= 2) status = 'warn';
 
-            let pago = isPago ? 1 : 0;
+            let pago = loan.pago != 0 ? loan.pago : saldoCorrente <= 0 ? max_data + 1 : 0;
 
-            return { emissao, vencimento, valorBase, profitRate, totalPago, saldoRestante, diasAtraso, isPago, jurosDia, totalJuros, valorHoje, diasParaVencer, status, dividaTotal, pago, acumJuros, totalPago_antes };
+            const calc = { emissao, vencimento, valorBase, profitRate, totalPago, saldoRestante, diasAtraso, isPago, jurosDia, totalJuros, valorHoje, diasParaVencer, status, dividaTotal, pago, acumJuros, totalPago_antes };
+
+            return calc;
         }
 
         function getJurosDiaValue(loan, saldoBase) {
@@ -4140,7 +4210,7 @@
             return saldoBase * loan.juros_val / 100;
         }
 
-        function buildTimeline(loan) {
+        function buildTimeline(loan, retro) {
             const c = getLoanCalc(loan);
             const emissao = loan.emissao;
             const vencimento = addDays(emissao, loan.prazo);
@@ -4173,7 +4243,7 @@
             const lastPagDate = sortedPags.length
                 ? sortedPags.reduce((last, p) => p.data > last ? p.data : last, emissao)
                 : emissao;
-            const endDate = c.isPago ? lastPagDate : TODAY;
+            const endDate = c.isPago ? c.pago : TODAY;
 
             let diasAtraso = 0;
             let acumJuros = 0;
@@ -4186,8 +4256,9 @@
                 const ds = dateStr(dia);
                 const isAfterVenc = dia > vencimento;
 
+
                 // Apply juros before payments on this day (if past venc and not yet paid)
-                if (isAfterVenc && saldoCorrente > 0 && dia < TODAY + (12 * 60 * 60 * 1000)) {
+                if (isAfterVenc && saldoCorrente > 0 && dia < endDate) {
                     diasAtraso++;
                     acumJuros += jdv;
                     const saldoAntes = saldoCorrente;
@@ -4221,6 +4292,7 @@
                 }
             }
 
+
             // Vencimento marker — inserted at vencimento date
             {
                 // Calc pago até o vencimento
@@ -4247,11 +4319,11 @@
             // Hoje marker (if not paid)
             if (!c.isPago) {
                 events.push({
-                    date: TODAY + (1000 * 60 * 60 * 11), tipo: 'hoje',
+                    date: TODAY + (1000 * 60 * 60 * 11)-1, tipo: 'hoje',
                     label: 'Hoje',
-                    desc: TODAY > vencimento
-                        ? `${diasAtraso} dia${diasAtraso !== 1 ? 's' : ''} em atraso`
-                        : `Vence em ${c.diasParaVencer} dia${c.diasParaVencer !== 1 ? 's' : ''}`,
+                    desc: diasAtraso > 0 ? `${diasAtraso} dia${diasAtraso !== 1 ? 's' : ''} em atraso` :
+                        fmtDate(TODAY) == fmtDate(vencimento) ? 'Vence Hoje' :
+                            `Vence em ${c.diasParaVencer} dia${c.diasParaVencer !== 1 ? 's' : ''}`,
                     valor: saldoCorrente,
                     acumJuros,
                     diasAtraso,
@@ -4263,20 +4335,27 @@
             // Quitação marker
             if (c.isPago) {
                 const lastPag = sortedPags.length > 0 ? sortedPags[sortedPags.length - 1] : null;
-                // If manually marked paid (loan.pago==1) with no payments, use today or emissao as reference date
-                const quitadoDate = lastPag ? lastPag.data : (loan.pago == 1 ? TODAY : emissao);
                 events.push({
-                    date: quitadoDate, tipo: 'quitado',
+                    date: c.pago, tipo: 'quitado',
                     label: 'Dívida quitada',
-                    desc: c.totalPago > 0 ? `Total recebido: ${fmtMoney(c.totalPago)}` : 'Quitado manualmente',
+                    desc: loan.pago != 0 ? 'Quitado manualmente' : `Total recebido: ${fmtMoney(c.totalPago)}`,
                     valor: c.totalPago, saldoAntes: 0, saldoDepois: 0,
                     color: 'td-g'
                 });
             }
 
+
             // Sort chronologically; within same day: juros → pagamento → quitado → hoje
             const typeOrder = { emissao: 0, juros: 1, pagamento: 2, vencimento: 3, quitado: 4, hoje: 5 };
             events.sort((a, b) => a.date - b.date || (typeOrder[a.tipo] || 0) - (typeOrder[b.tipo] || 0));
+
+            // Verificar se é preview de historico de pagamento no dia atual
+            if (!retro) {
+                const ultimoPagamentoIndex = events.findLastIndex(event => event.tipo === 'pagamento');
+                const events_x = ultimoPagamentoIndex !== -1 ? events.slice(ultimoPagamentoIndex) : events;
+                return events_x;
+            }
+
             return events;
         }
 
@@ -4501,12 +4580,7 @@
                             ? `<span class="c-g">quitado</span>`
                             : `<span class="c-b">vence em ${c.diasParaVencer}d</span>`;
 
-            const progressPct = c.isPago
-                ? 100
-                : Math.min(
-                    100,
-                    Math.round((c.totalPago / c.dividaTotal) * 100)
-                );
+            const progressPct = Math.min(100, Math.round((c.totalPago / c.dividaTotal) * 100));
 
             const prazo = Number(loan.prazo || 0);
             const venc = addDays(loan.emissao, prazo);
@@ -5502,67 +5576,6 @@
         }
 
 
-        // function setModoCalculo_edit(modo) {
-        //     const btnPadrao = document.getElementById('btn-modo-padrao-edit');
-        //     const btnManual = document.getElementById('btn-modo-manual-edit');
-        //     const inputModo = document.getElementById('ee-modo-calculo-edit');
-
-        //     const selectPrazo = document.getElementById('ee-prazo-edit');
-        //     const inputPrazoManual = document.getElementById('ee-prazo-manual-edit');
-
-        //     // Elementos da Linha de Valores
-        //     const wrapValor = document.getElementById('wrap-ee-valor-edit');
-        //     const wrapReceber = document.getElementById('wrap-ee-receber-edit');
-        //     const customPrazoWrap = document.getElementById('custom-prazo-wrap-edit');
-
-        //     inputModo.value = modo;
-
-        //     if (modo === 'padrao') {
-        //         // Estilo dos botões alternadores
-        //         btnPadrao.className = "btn-p";
-        //         btnPadrao.style.background = "";
-        //         btnPadrao.style.color = "";
-        //         btnManual.className = "btn-s";
-        //         btnManual.style.background = "transparent";
-        //         btnManual.style.border = "none";
-        //         btnManual.style.boxShadow = "none";
-
-        //         // Controle dos Prazos
-        //         selectPrazo.style.display = "block";
-        //         inputPrazoManual.style.display = "none";
-
-        //         // COMPORTAMENTO DINÂMICO: Esconde o valor a receber e faz o valor emprestado ocupar 100%
-        //         wrapReceber.style.display = "none";
-        //         wrapValor.style.flex = "1 1 100%";
-        //     } else {
-        //         // Estilo dos botões alternadores
-        //         btnManual.className = "btn-p";
-        //         btnManual.style.background = "";
-        //         btnManual.style.color = "";
-        //         btnPadrao.className = "btn-s";
-        //         btnPadrao.style.background = "transparent";
-        //         btnPadrao.style.border = "none";
-        //         btnPadrao.style.boxShadow = "none";
-
-        //         // Controle dos Prazos
-        //         selectPrazo.style.display = "none";
-        //         inputPrazoManual.style.display = "block";
-        //         customPrazoWrap.style.display = "none";
-
-        //         // COMPORTAMENTO DINÂMICO: Mostra o valor a receber e divide o espaço igualmente (50% / 50%)
-        //         wrapReceber.style.display = "block";
-        //         wrapValor.style.flex = "1 1 calc(50% - 6px)"; // Ajusta considerando metade do gap de 12px
-        //         wrapReceber.style.flex = "1 1 calc(50% - 6px)";
-        //     }
-
-        //     // Limpa campos específicos para evitar resíduos ao alternar
-        //     document.getElementById('ee-receber-manual-edit').value = '';
-        //     selectPrazo.value = '';
-        //     inputPrazoManual.value = '';
-
-        //     updateNovoPreview_edit();
-        // }
-
         function updateNovoPreview_edit() {
             const loan = getLoan(_currentLoanId);
             if (!loan) return;
@@ -5653,7 +5666,7 @@
             loanSim.juros_tipo = novoTipo;
             loanSim.juros_val = novoJuros;
             const cSim = getLoanCalc(loanSim, true);
-            _pendingEditEmp_pago = cSim.pago;
+            _pendingEditEmp_pago = 0;
 
             // Impact diff rows
             const row = (lbl, antes, depois, color) => {
@@ -5685,8 +5698,8 @@
             document.getElementById('ee-venc-label').textContent = `Vence ${fmtDate(novaVenc)}`;
 
             // Timeline
-            const events = buildTimeline(loanSim);
-            tlWrap.innerHTML = `<ul class="tl" style="padding-left:0">${renderTimelineHTML(events, null)}</ul>`;
+            const events = buildTimeline(loanSim, true);
+            tlWrap.innerHTML = `<ul class="tl" style="padding-left:0">${renderTimelineHTML(events, null, false)}</ul>`;
         }
 
         function validarECalcularManual_edit() {
@@ -5726,18 +5739,20 @@
             const loan = getLoan(_currentLoanId);
             if (!loan) return;
             const c = getLoanCalc(loan);
+
             const isPago = c.isPago;
             document.getElementById('emp-menu-mark-lbl').textContent = isPago ? 'Desmarcar como pago' : 'Marcar como pago';
             document.getElementById('emp-menu-mark-sub').textContent = isPago ? 'Remove a quitação manual' : 'Quita manualmente sem registrar pagamento';
+
             const icon = document.querySelector('#emp-menu-mark-paid .menu-icon');
             icon.className = isPago ? 'menu-icon mi-amber' : 'menu-icon mi-green';
+
             openSheet('emp-menu-sheet');
         }
 
         function openEditEmp() {
             const loan = getLoan(_currentLoanId);
             if (!loan) return;
-            //setModoCalculo_edit('manual');
             document.getElementById('ee-valor-edit').value = loan.valor;
             document.getElementById('ee-receber-manual-edit').value = loan.valor_receber;
             document.getElementById('ee-data-edit').value = dateStr(loan.emissao);
@@ -5838,16 +5853,12 @@
             catch (err) {
                 console.log("Erro ao editar emprestimo");
                 console.log(err);
-
             }
-
 
             // Salvar backup local
             backup_local();
 
-
             Object.assign(loan, _pendingEditEmp);
-
 
             _pendingEditEmp = null;
             _pendingEditEmp_pago = null;
@@ -5861,9 +5872,15 @@
             const loan = getLoan(_currentLoanId);
             if (!loan) return;
             const c = getLoanCalc(loan);
+
+            if (c.saldoRestante <= 0) {
+                showToast('A divida já está totalmente paga!', 'err');
+                return;
+            }
+
             const client = getClient(loan.clientId);
-            const isPago = loan.pago == 1;
-            const novoEstado = isPago ? 0 : 1;
+            const isPago = loan.pago != 0;
+            const novoEstado = isPago ? 0 : TODAY;
 
             document.getElementById('mark-paid-title').textContent = isPago ? 'Desmarcar como Pago' : 'Marcar como Pago';
             document.getElementById('mark-paid-body').innerHTML = `
@@ -5887,6 +5904,8 @@
                 <button class="cbtn-n" onclick="closeSheet(document.getElementById('mark-paid-confirm-sheet'))">Cancelar</button>
                 <button class="cbtn-y" onclick="edit_pago(${novoEstado})">${isPago ? 'Desmarcar' : 'Confirmar ✓'}</button>
                 </div>`;
+
+            closeSheet(document.getElementById('emp-menu-sheet'));
             openSheet('mark-paid-confirm-sheet');
         }
 
@@ -6153,32 +6172,106 @@
             const calc = getLoanCalc(l);
             const venc = addDays(l.emissao, l.prazo);
 
-            const loan_anexo = l.anexo_envio[0] ? l.anexo_envio[0].anexo_id : '';
-
+            // Topo
             document.getElementById('ed-id').textContent = l.id;
             document.getElementById('ed-client-name').textContent = c.nome;
             document.getElementById('ed-status-pill').innerHTML = statusPill(calc.status);
 
-            // Situação box
-            const sitBox = document.getElementById('ed-sit-box');
-            sitBox.className = 'prev-box mb12 ' + (calc.status === 'late' ? 'err-bdr' : calc.status === 'warn' ? 'warn-bdr' : 'ok-bdr');
-            document.getElementById('ed-valor-hoje').textContent = calc.isPago ? '✓ Quitado' : fmtMoney(calc.valorHoje);
-            document.getElementById('ed-valor-hoje').className = 'amt-big ' + (calc.isPago ? 'c-g' : calc.status === 'late' ? 'c-r' : calc.status === 'warn' ? 'c-w' : 'c-g');
-            document.getElementById('ed-dias-label').textContent = calc.isPago ? 'Totalmente pago' : calc.status === 'late' ? `${calc.diasAtraso} dia${calc.diasAtraso !== 1 ? 's' : ''} de atraso` : `${calc.diasParaVencer} dia${calc.diasParaVencer !== 1 ? 's' : ''} para vencer`;
-            document.getElementById('ed-venc-label').textContent = `Venceu ${fmtDate(venc)}`;
-
-            // Resumo
-            document.getElementById('ed-valor-emp').textContent = fmtMoney(l.valor);
-            document.getElementById('ed-valor-comb').textContent = fmtMoney(calc.valorBase);
+            // Dados iniciais
             document.getElementById('ed-data-emissao').textContent = fmtDate(l.emissao);
             document.getElementById('ed-prazo').textContent = `${l.prazo} dias`;
             document.getElementById('ed-data-venc').textContent = fmtDate(venc);
+            document.getElementById('ed-valor-emp').textContent = fmtMoney(l.valor);
+            document.getElementById('ed-valor-receber').textContent = fmtMoney(calc.valorBase);
+            document.getElementById('ed-valor-lucro').textContent = '+' + fmtMoney(calc.valorBase - l.valor);
             document.getElementById('ed-juros-dia').textContent = l.juros_tipo === 'fixo' ? fmtMoney(l.juros_val) + '/dia' : `${l.juros_val}%/dia`;
-            document.getElementById('ed-total-pago').textContent = fmtMoney(calc.totalPago);
-            document.getElementById('ed-saldo').textContent = calc.isPago ? 'Quitado' : fmtMoney(Math.max(0, calc.valorHoje));
 
             // Comprovantes
-            renderAttachList('ed-comp-envio-list', loan_anexo);
+            const loan_anexo = l.anexo_envio[0] ? l.anexo_envio[0].anexo_id : '';
+            renderAttachList(loan_anexo);
+
+            // Status Atual
+            // Definir dias em aberto
+            const dias_corridos = calc.diasParaVencer > 0 ?
+                l.prazo - calc.diasParaVencer :
+                l.prazo + Math.abs(calc.diasParaVencer);
+            const dias_corridos_emp = !calc.isPago ? dias_corridos : diffDays(l.emissao, calc.pago);
+            document.getElementById('ed-tempo-total-aberto').textContent = `${dias_corridos_emp} dia${dias_corridos_emp !== 1 ? 's' : ''}`;
+
+            // Tratar titulos e cores dos dias, caso não pago
+            if (!calc.isPago) {
+                document.getElementById('ed-tempo-total-aberto-title').textContent = 'Em Aberto';
+                document.getElementById('ed-juros-dias-atraso-title').textContent =
+                    calc.diasAtraso > 0 ? 'De Atraso' :
+                        calc.diasParaVencer == 0 || calc.diasParaVencer == 1 ? 'Vence' :
+                            'Vence em';
+
+                // Definir dias atrasados ou para vencer
+                document.getElementById('ed-juros-dias-atraso').textContent =
+                    calc.diasAtraso > 0 ? `${calc.diasAtraso} dia${calc.diasAtraso !== 1 ? 's' : ''}` :
+                        calc.diasParaVencer == 0 ? 'Hoje' :
+                            calc.diasParaVencer == 1 ? 'Amanha' :
+                                `${calc.diasParaVencer} dia${calc.diasParaVencer !== 1 ? 's' : ''}`;
+                document.getElementById('ed-juros-dias-atraso').style.color =
+                    calc.diasAtraso > 0 ? `var(--danger)` :
+                        calc.diasParaVencer == 0 || calc.diasParaVencer == 1 ? `var(--acc3)` : `var(--acc2)`;
+            } else {
+                // Caso ja estiver pago
+                document.getElementById('ed-tempo-total-aberto-title').textContent = 'Ficou Aberto';
+                document.getElementById('ed-juros-dias-atraso-title').textContent =
+                    calc.diasAtraso > 0 ? 'Atrasou' :
+                        dias_corridos_emp == l.prazo ? 'Pagou no' :
+                            'Venceria em';
+
+                // Definir dias atrasados ou para vencer
+                const venceriaEm = diffDays(calc.pago - (12 * 60 * 60 * 1000), calc.vencimento);
+                document.getElementById('ed-juros-dias-atraso').textContent =
+                    calc.diasAtraso > 0 ? `${calc.diasAtraso} dia${calc.diasAtraso !== 1 ? 's' : ''}` :
+                        dias_corridos_emp == l.prazo ? 'Vencimento' : `${venceriaEm} dia${venceriaEm !== 1 ? 's' : ''}`;
+                document.getElementById('ed-juros-dias-atraso').style.color =
+                    calc.diasAtraso > 0 ? `var(--danger)` :
+                        `var(--acc2)`;
+            }
+
+            // Definir Valores Atuais
+            document.getElementById('ed-valor-comb').textContent = fmtMoney(calc.dividaTotal);
+            document.getElementById('ed-total-pago').textContent = fmtMoney(calc.totalPago);
+
+            // Definir juros acumulado se houver
+            document.getElementById('ed-juros-acumulado').textContent = fmtMoney(calc.acumJuros);
+            if (calc.acumJuros > 0) {
+                document.getElementById('ed-juros-acumulado').style.color = 'var(--danger)';
+            } else {
+                document.getElementById('ed-juros-acumulado').style.color = 'var(--txt1)';
+            }
+
+            // Definir valores da barra de progresso de pagamento
+            const percent_pago = calc.totalPago > 0 ? Math.max(1, Math.round(calc.totalPago / calc.dividaTotal * 100)) : 0;
+            document.getElementById('ed-progress-bar').style.width = (percent_pago != 0 && percent_pago <= 5 ? 5 : percent_pago) + '%';
+            document.getElementById('ed-progress-bar-pag').textContent = percent_pago + '%';
+            document.getElementById('ed-progress-bar-rest').textContent = (100 - percent_pago) + '%';
+
+            // Situação box
+            const sitBox = document.getElementById('ed-sit-box');
+            sitBox.className = 'prev-box mb12 ' + (calc.status === 'late' ? 'err-bdr' : calc.status === 'warn' ? 'warn-bdr' : calc.status === 'done' ? 'done-bdr' : 'ok-bdr');
+            document.getElementById('ed-valor-hoje').textContent = calc.isPago ? '✓ Quitado' : fmtMoney(calc.valorHoje);
+            document.getElementById('ed-valor-hoje').className = 'amt-big ' + (calc.isPago ? 'c-g' : calc.status === 'late' ? 'c-r' : calc.status === 'warn' ? 'c-w' : 'c-b');
+
+            if (calc.isPago && calc.saldoRestante > 0) {
+                document.getElementById('ed-valor-hoje-title').style.display = 'none';
+                document.getElementById('ed-valor-hoje-ignorado').style.display = '';
+
+                document.getElementById('ed-valor-hoje').textContent = `✓ Quitado Manual`;
+                document.getElementById('ed-valor-hoje-ignorado').textContent = `${'Divida Ignorada - ' + fmtMoney(calc.saldoRestante)}`;
+            } else if (calc.isPago && calc.saldoRestante == 0) {
+                document.getElementById('ed-valor-hoje-title').textContent = `Totalmente Pago`;
+                document.getElementById('ed-valor-hoje-title').style.display = '';
+                document.getElementById('ed-valor-hoje-ignorado').style.display = 'none';
+            } else {
+                document.getElementById('ed-valor-hoje-title').textContent = `Valor a Pagar Hoje`;
+                document.getElementById('ed-valor-hoje-title').style.display = '';
+                document.getElementById('ed-valor-hoje-ignorado').style.display = 'none';
+            }
 
 
             // Pagamento form
@@ -6200,21 +6293,23 @@
             navTo('emp-detalhe');
         }
 
-        function renderAttachList(elId, file) {
-            // file = id_google_drive
-            const el = document.getElementById(elId);
-            if (!file) {
-                el.innerHTML = '<div class="fs12 tc2 mb4">Nenhum arquivo</div>';
+        function renderAttachList(file) {
+            const el_lista = document.getElementById('ed-comp-envio-list');
+            const el_btn = document.getElementById('ed-comp-envio-btn');
 
-                document.getElementById('ed-comp-envio-btn').style.display = 'block';
+            if (!file) {
+                el_lista.style.display = 'none';
+                el_btn.style.display = '';
                 return;
             }
 
-            const f = Array.isArray(file) ? file[0] : file;
-            document.getElementById('ed-comp-envio-btn').style.display = 'none';
-            el.innerHTML = `<div class="attach-item" onclick="openAttachSheet('loan')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-              <div class="attach-item-name">Arquivo</div>
+            el_lista.style.display = '';
+            el_btn.style.display = 'none';
+
+            el_lista.innerHTML = `
+            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 2px; gap: 10px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--txt1)" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              <div class="attach-item-name">Comprovante de Envio</div>
               <div class="attach-item-ver">Ver</div>
             </div>`;
         }
@@ -6314,9 +6409,9 @@
 
 
         function renderTimeline(loan) {
-            const events = buildTimeline(loan);
+            const events = buildTimeline(loan, true);
             const el = document.getElementById('ed-timeline');
-            el.innerHTML = renderTimelineHTML(events, loan.id);
+            el.innerHTML = renderTimelineHTML(events, loan.id, true);
         }
 
         function _jurosGroupHTML(jurosEvents, groupId) {
@@ -6381,9 +6476,11 @@
             </div>`;
         }
 
-        function tlEventHTML(e, loanId) {
+        function tlEventHTML(e, loanId, anexos) {
             const isPag = e.tipo === 'pagamento';
             const clickAttr = isPag && loanId ? `onclick="openTlEvent('${loanId}','${e.pId}')"` : '';
+
+            const anexos_on = anexos ? anexos : false;
 
             const iconSvg = {
                 emissao: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>',
@@ -6435,9 +6532,15 @@
                     const loan = getLoan(loanId);
                     const pag = loan && loan.pagamentos.find(p => p.id === e.pId);
                     const has = pag && pag.anexo_pag[0];
-                    return has
-                        ? `<span class="tl-anexo-tag ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Anexo OK</span>`
-                        : `<span class="tl-anexo-tag miss"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Sem anexo</span>`;
+
+                    if (anexos_on) {
+                        return has
+                            ? `<span class="tl-anexo-tag ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Anexo OK</span>`
+                            : `<span class="tl-anexo-tag miss"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Sem anexo</span>`;
+                    } else {
+                        return '';
+                    }
+
                 })() : '';
                 rows = [
                     row('Divida', fmtMoney(e.saldoAntes), false, 'var(--txt1)'),
@@ -6451,7 +6554,7 @@
                     ? rows.concat([`<div class="tl-card-row" style="margin-top:4px">${anexoBadge}</div>`])
                     : rows;
                 // Override rows with badge included
-                if (anexoBadge) rows.push(`<div style="margin-top:2px">${anexoBadge}</div>`);
+                if (anexoBadge) rows.push(`<div style="margin-top:-10px; display:flex; align-items:center; justify-content: center;">${anexoBadge}</div>`);
 
             } else if (e.tipo === 'vencimento') {
                 dotClass = e.quitouAntes ? 'td-g' : 'td-a';
@@ -6499,7 +6602,7 @@
                 cardClass = 'tl-card-done';
                 title = '✅ Dívida quitada';
                 rows = [
-                    row('Total recebido', fmtMoney(e.valor), true, 'var(--acc)'),
+                    row(e.desc, e.desc == 'Quitado manualmente' ? '' : fmtMoney(e.valor), true, 'var(--acc)'),
                 ];
             } else {
                 dotClass = 'td-gr'; cardClass = ''; title = e.label; rows = [];
@@ -6727,7 +6830,7 @@
         }
 
         // Shared renderer: converts events array → grouped HTML (juros collapsed)
-        function renderTimelineHTML(events, loanId) {
+        function renderTimelineHTML(events, loanId, anexos) {
             const chunks = [];
             let i = 0;
             while (i < events.length) {
@@ -6744,7 +6847,7 @@
                 if (chunk.tipo === 'juros-group') {
                     html += _jurosGroupHTML(chunk.events, `jg-${loanId || 'p'}-${grpIdx++}-${Date.now()}`);
                 } else {
-                    html += tlEventHTML(chunk.event, loanId);
+                    html += tlEventHTML(chunk.event, loanId, anexos);
                 }
             }
             return html;
@@ -6755,9 +6858,9 @@
             const loanSim = structuredClone(loan);
             const idx = loanSim.pagamentos.findIndex(p => p.id === excludePid);
             if (idx >= 0) loanSim.pagamentos[idx] = { ...loanSim.pagamentos[idx], valor: novoValor, data: novaData };
-            const events = buildTimeline(loanSim);
+            const events = buildTimeline(loanSim, true);
 
-            return `<ul class="tl" style="padding-left:0">${renderTimelineHTML(events, null)}</ul>`;
+            return `<ul class="tl" style="padding-left:0">${renderTimelineHTML(events, null, false)}</ul>`;
         }
 
         let _valor_edit;
@@ -6940,16 +7043,15 @@
                 return;
             }
 
-
-            tlEl.innerHTML = buildNewPagTimeline(loan_retro, valor, data);
+            tlEl.innerHTML = buildNewPagTimeline(loan_retro, valor, data, isRetro);
         }
 
-        function buildNewPagTimeline(loan, novoValor, novaData) {
+        function buildNewPagTimeline(loan, novoValor, novaData, retro) {
             if (!novoValor || !novaData) return '<div class="fs12 tc2">Preencha os dados para ver o histórico</div>';
             const loanSim = structuredClone(loan);
             loanSim.pagamentos.push({ id: 'tmp_' + Date.now(), data: novaData, valor: novoValor, status: '', anexo_pag: [] });
-            const events = buildTimeline(loanSim);
-            return `<ul class="tl" style="padding-left:0">${renderTimelineHTML(events, null)}</ul>`;
+            const events = buildTimeline(loanSim, retro);
+            return `<ul class="tl" style="padding-left:0">${renderTimelineHTML(events, null, false)}</ul>`;
         }
 
         function doRegistrarPagamento() {
@@ -7013,7 +7115,7 @@
                 bodyHTML += `
                 <div class="sc-lbl mt8">Histórico recalculado</div>
                 <div class="card-sm mb12">
-                ${buildNewPagTimeline(loan_retro, valor, data + (22 * 60 * 60 * 1000))}
+                ${buildNewPagTimeline(loan_retro, valor, data + (22 * 60 * 60 * 1000), isRetro)}
                 </div>`;
             }
 
@@ -7963,7 +8065,7 @@
                     const loan = getLoan(_currentLoanId);
                     if (mode == 'loan') {
                         const loan_anexo = loan.anexo_envio[0] ? loan.anexo_envio[0].anexo_id : '';
-                        renderAttachList('ed-comp-envio-list', loan_anexo);
+                        renderAttachList(loan_anexo);
 
                         openAttachSheet('loan', _currentLoanId, false);
                     } else {
@@ -8027,7 +8129,7 @@
                 const loan = getLoan(_currentLoanId);
                 if (mode == 'loan') {
                     const loan_anexo = loan.anexo_envio[0] ? loan.anexo_envio[0].anexo_id : '';
-                    renderAttachList('ed-comp-envio-list', loan_anexo);
+                    renderAttachList(loan_anexo);
 
                     openAttachSheet('loan', _currentLoanId, false);
                 } else {
