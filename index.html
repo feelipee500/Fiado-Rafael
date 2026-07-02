@@ -2645,7 +2645,7 @@
 
                     <!-- Hero card: total a receber -->
                     <div class="dash-hero">
-                        <div class="dash-hero-lbl">Total a Receber</div>
+                        <div class="dash-hero-lbl"> Pendente Em Aberto</div>
                         <div class="dash-hero-val" id="ds-total-recv">R$ 0</div>
                         <div class="dash-hero-sub" id="ds-hero-sub">—</div>
                         <div class="dash-hero-row">
@@ -2654,12 +2654,22 @@
                                 <div class="dhr-lbl">Emprestado</div>
                             </div>
                             <div class="dhr-item">
-                                <div class="dhr-val c-g" id="dhr-lucro">R$ 0</div>
-                                <div class="dhr-lbl">Lucro previsto</div>
+                                <div class="dhr-val" id="dhr-total-emp">0</div>
+                                <div class="dhr-lbl">Qtd</div>
                             </div>
                             <div class="dhr-item">
-                                <div class="dhr-val" id="dhr-total-emp">0</div>
-                                <div class="dhr-lbl">Empréstimos</div>
+                                <div class="dhr-val" id="dhr-emprest-total">R$ 0</div>
+                                <div class="dhr-lbl">Total a Receber</div>
+                            </div>
+                        </div>
+                        <div class="dash-hero-row">
+                            <div class="dhr-item">
+                                <div class="dhr-val c-g" id="dhr-pagos-total">R$ 0</div>
+                                <div class="dhr-lbl">Total Recebido</div>
+                            </div>
+                            <div class="dhr-item">
+                                <div class="dhr-val c-g" id="dhr-lucro-real">R$ 0</div>
+                                <div class="dhr-lbl">Lucro Real</div>
                             </div>
                         </div>
                     </div>
@@ -4488,7 +4498,7 @@
             const d = new Date(TODAY).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
             document.getElementById('dash-date').textContent = d.charAt(0).toUpperCase() + d.slice(1);
 
-            let totalRecv = 0, totalEmp = 0, totalLucro = 0;
+            let totalRecv = 0, totalEmp = 0, totalpagos = 0, totaldivida = 0;
             let cntLate = 0, cntWarn = 0, cntOk = 0, cntDone = 0;
             let valLate = 0, valWarn = 0, valOk = 0;
 
@@ -4496,10 +4506,12 @@
                 const c = getLoanCalc(l);
                 if (!c.isPago) {
                     totalRecv += c.valorHoje;
-                    totalEmp += l.valor;
-                    totalLucro += c.dividaTotal - l.valor;
                 }
-                
+
+                totalEmp += l.valor;
+                totaldivida += c.dividaTotal;
+                totalpagos += c.totalPago;
+
                 if (c.status === 'late') {
                     cntLate++;
                     valLate += c.valorHoje;
@@ -4519,9 +4531,14 @@
             // Hero
             document.getElementById('ds-total-recv').textContent = fmtMoney(totalRecv);
             document.getElementById('ds-hero-sub').textContent = `${total - cntDone} em aberto · ${cntDone} quitado${cntDone !== 1 ? 's' : ''}`;
+
             document.getElementById('dhr-emprest').textContent = fmtMoney(totalEmp);
-            document.getElementById('dhr-lucro').textContent = fmtMoney(totalLucro);
             document.getElementById('dhr-total-emp').textContent = total;
+            document.getElementById('dhr-emprest-total').textContent = fmtMoney(totaldivida);
+
+            document.getElementById('dhr-pagos-total').textContent = fmtMoney(totalpagos);
+            document.getElementById('dhr-lucro-real').textContent = fmtMoney(Math.max(0, totalpagos - totalEmp));
+
 
             // Status cards
             document.getElementById('ds-cnt-late').textContent = cntLate;
@@ -7215,7 +7232,7 @@
 
             const client = getClient(loan_retro.clientId);
             const valorantes = calc.valor_anterior;
-            const saldoApos = Math.max(0, valorantes - valor); ;
+            const saldoApos = Math.max(0, valorantes - valor);;
 
             const quitaria = saldoApos <= 0;
             const jurosacm = calc.valorHoje - saldoApos;
@@ -7243,7 +7260,7 @@
                     </div>
                     <div class="dr" style="border:none"><div class="dk">Valor restante hoje</div>
                         <div class="dv2 fw6 c-r">${fmtMoney(calc.valorHoje)}</div>
-                    </div>`                    
+                    </div>`
                     : ''}
                 </div>`;
 
@@ -7648,7 +7665,7 @@
                 notif_view = true;
                 buildNotif();
             }
-           
+
 
             const el = document.getElementById(id);
 
