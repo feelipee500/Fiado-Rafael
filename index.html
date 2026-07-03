@@ -2674,8 +2674,8 @@
                                 <div class="dhr-lbl">Total Recebido</div>
                             </div>
                             <div class="dhr-item">
-                                <div class="dhr-val c-g" id="dhr-lucro-real">R$ 0</div>
-                                <div class="dhr-lbl">Lucro Real</div>
+                                <div class="dhr-val c-g" id="dhr-lucro-relat">R$ 0</div>
+                                <div class="dhr-lbl">Lucro Relativo</div>
                             </div>
                         </div>
                     </div>
@@ -4504,7 +4504,7 @@
             const d = new Date(TODAY).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
             document.getElementById('dash-date').textContent = d.charAt(0).toUpperCase() + d.slice(1);
 
-            let totalRecv = 0, totalEmp = 0, totalpagos = 0, totaldivida = 0;
+            let totalRecv = 0, totalEmp = 0, totalpagos = 0, totaldivida = 0, lucrorelativo = 0;
             let cntLate = 0, cntWarn = 0, cntOk = 0, cntDone = 0;
             let valLate = 0, valWarn = 0, valOk = 0;
 
@@ -4517,6 +4517,7 @@
                 totalEmp += l.valor;
                 totaldivida += c.dividaTotal;
                 totalpagos += c.totalPago;
+                lucrorelativo += c.totalPago >= l.valor ? c.totalPago - l.valor : 0;
 
                 if (c.status === 'late') {
                     cntLate++;
@@ -4543,7 +4544,7 @@
             document.getElementById('dhr-emprest-total').textContent = fmtMoney(totaldivida);
 
             document.getElementById('dhr-pagos-total').textContent = fmtMoney(totalpagos);
-            document.getElementById('dhr-lucro-real').textContent = fmtMoney(Math.max(0, totalpagos - totalEmp));
+            document.getElementById('dhr-lucro-relat').textContent = fmtMoney(lucrorelativo);
 
 
             // Status cards
