@@ -6818,6 +6818,9 @@
             const calcSim = getLoanCalc(loanSim);
             const calcNow = getLoanCalc(loan);
 
+            let id_x = pid.split('_');
+            id_x = id_x[1] + '_' + id_x[2];
+
             const statusLabels = { late: 'Em atraso', warn: 'Vence logo', ok: 'Em dia', done: 'Quitado' };
             const statusColors = { late: 'var(--danger)', warn: 'var(--warn)', ok: 'var(--acc2)', done: 'var(--acc)' };
 
@@ -6856,8 +6859,8 @@
                 </div>
                 </div>
                 <div style="background:var(--bg2); border:1px solid var(--acc3); border-radius:var(--rad12); padding:12px; margin-bottom:12px">
-                <div class="fl" style="color:var(--acc3)">Digite o ID do pagamento para confirmar - ${pid}</div>
-                <input class="fi" id="del-pag-id-input" type="text" placeholder="C00_E00_P00" style="border-color:var(--acc3)">
+                <div class="fl" style="color:var(--acc3)">Digite o ID do pagamento para confirmar - ${id_x}</div>
+                <input class="fi" id="del-pag-id-input" type="text" placeholder="E00_P00" style="border-color:var(--acc3)">
                 </div>
                 <div class="confirm-btns">
                 <button class="cbtn-n" onclick="closeSheet(document.getElementById('delete-pag-confirm-sheet'))">Cancelar</button>
@@ -6872,8 +6875,10 @@
             const pag = loan.pagamentos.find(p => p.id === pid);
             if (!loan || !pag) return;
 
+            let id_x = pid.split('_');
+            id_x = id_x[1] + '_' + id_x[2];
             const typed = document.getElementById('del-pag-id-input')?.value?.trim();
-            if (typed !== pid) { showToast('ID incorreto, tente novamente', 'err'); return; }
+            if (typed !== id_x) { showToast('ID incorreto, tente novamente', 'err'); return; }
 
             showLoading(['APAGANDO PAGAMENTO...', 'ATUALIZANDO DADOS...', 'APAGANDO ANEXOS...', 'COLETANDO NOVOS VALORES...', 'TERMINANDO...']);
 
@@ -7102,6 +7107,9 @@
             const alterouValor = novoValor !== valorAnterior;
             const alterouData = novaData !== dataAnterior;
 
+            let id_x = pid.split('_');
+            id_x = id_x[1] + '_' + id_x[2];
+
             _pendingEditPag = { lid, pid, valor: novoValor, data: data };
 
             document.getElementById('edit-pag-confirm-body').innerHTML = `
@@ -7120,8 +7128,8 @@
                     <div class="dr" style="border:none"><div class="dk">Data</div><div class="dv2 ${alterouData ? 'c-g fw6' : ''}">${fmtDate(novaData)}${isRetro ? ' <span style="color:var(--warn); font-size:11px">(retroativo)</span>' : ''}</div></div>
                 </div>
                 <div style="background:var(--bg2); border:1px solid var(--acc3); border-radius:var(--rad12); padding:12px; margin-bottom:12px">
-                <div class="fl" style="color:var(--acc3)">Digite o ID do pagamento para confirmar - ${pid}</div>
-                <input class="fi" id="edit-pag-id-input" type="text" placeholder="C00_E00_P00" style="border-color:var(--acc3)">
+                <div class="fl" style="color:var(--acc3)">Digite o ID do pagamento para confirmar - ${id_x}</div>
+                <input class="fi" id="edit-pag-id-input" type="text" placeholder="E00_P00" style="border-color:var(--acc3)">
                 </div>
                     <div class="confirm-btns">
                     <button class="cbtn-n" onclick="closeSheet(document.getElementById('edit-pag-confirm-sheet'))">Cancelar</button>
@@ -7137,7 +7145,9 @@
             if (!_pendingEditPag) return;
             const { lid, pid, valor: novoValor, data: novaData } = _pendingEditPag;
             const typed = document.getElementById('edit-pag-id-input')?.value?.trim();
-            if (typed !== pid) { showToast('ID incorreto, tente novamente', 'err'); return; }
+            let id_x = pid.split('_');
+            id_x = id_x[1] + '_' + id_x[2];
+            if (typed !== id_x) { showToast('ID incorreto, tente novamente', 'err'); return; }
 
             closeSheet(document.getElementById('edit-pag-confirm-sheet'));
             closeSheet(document.getElementById('edit-pag-sheet'));
