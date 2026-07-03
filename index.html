@@ -3196,6 +3196,7 @@
                                 <span
                                     style="font-family:var(--font-d); font-size:20px; font-weight:800; letter-spacing:-.5px; line-height:1.1"
                                     id="ed-client-name"></span>
+                                <span class="fs11 tc2 mt4" id="ed-desc"></span>
                                 <span class="fs11 tc2 mt4" id="ed-id"></span>
                             </div>
 
@@ -6364,6 +6365,7 @@
 
             // Topo
             document.getElementById('ed-id').textContent = l.id;
+            document.getElementById('ed-desc').textContent = c.desc;
             document.getElementById('ed-client-name').textContent = c.nome;
             document.getElementById('ed-status-pill').innerHTML = statusPill(calc.status);
 
@@ -8726,7 +8728,12 @@
 
 
         // VARIAVEIS GLOBAIS
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
+        // Meu Script
+        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
+
+        // Script do Rafael
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbytXLOQJ_dSnl4l0rds_NQZLl3IzWNZBzoXk7mKNGWCWZCmUNBdYW08BVoVWrTZy8_1/exec";
+
         var DB = {};
 
 
@@ -8751,15 +8758,7 @@
             _navStack.push({ scr: 'dash' });
         }
 
-
-
-        // ==================== INIT ====================
-        document.addEventListener('DOMContentLoaded', async () => {
-            await iniciar_site();
-
-        });
-
-
+        iniciar_site();
         setupKeyboardAutoClose();
 
 
