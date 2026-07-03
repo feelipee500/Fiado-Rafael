@@ -4860,11 +4860,18 @@
             const qtd_emps = 0;
 
             // Criar o novo id do Cliente atual
-            const ids_total_c = DB.ids_total_c;
-            let novo_id = "C" + String(ids_total_c + 1).padStart(2, '0');
+            let novo_id = 'C00';
+            const ids_total_c = DB.ids_total_c + 1;
+            if (ids_total_c <= 99) {
+                novo_id = "C" + String(ids_total_c).padStart(2, '0');
+            } else {
+                novo_id = String(ids_total_c);
+            }
+
             const id = novo_id;
 
-            const cliente = { ids_total_c, id, nome, tel, email, desc, initials, color, qtd_emps };
+
+            const cliente = { ids_total_c, id, nome, tel, email, desc, initials, color, qtd_emps, time: DB.time };
 
             try {
                 console.log("Adicionando novo cliente na planilha...");
@@ -4888,8 +4895,11 @@
                 console.log("Erro ao adicionar o novo Cliente");
                 console.log(err);
 
-                DB.clients.push({ id, nome, tel, email, desc, initials, color });
-                DB.time = Date.now();
+                showToast("Erro ao adicionar o novo Cliente", 'err');
+                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                setTimeout(() => {
+                    return window.location.reload(true);
+                }, 5000);
             }
 
             // Salvar backup local
@@ -4967,7 +4977,7 @@
             const qtd_emps = c.qtd_emps;
             const ids_total_c = DB.ids_total_c;
 
-            const cliente = { ids_total_c, id, nome, tel, email, desc, initials, color, qtd_emps, lin };
+            const cliente = { ids_total_c, id, nome, tel, email, desc, initials, color, qtd_emps, lin, time: DB.time };
 
             try {
                 console.log("Editando o cliente na planilha...");
@@ -4991,8 +5001,11 @@
                 console.log("Erro ao editar o Cliente");
                 console.log(err);
 
-                c = { id, nome, tel, email, desc, initials, color, qtd_emps, lin };
-                DB.time = Date.now();
+                showToast("Erro ao editar o Cliente", 'err');
+                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                setTimeout(() => {
+                    return window.location.reload(true);
+                }, 5000);
             }
 
             // Salvar backup local
@@ -5050,7 +5063,7 @@
             const lins_pags = c.lins_pags;
             const completo_x = completo ? true : false;
 
-            const dados_apagar = { id, lin, lins_emps, lins_pags, completo_x };
+            const dados_apagar = { id, lin, lins_emps, lins_pags, completo_x, time: DB.time };
 
             try {
                 console.log("DELETANDO cliente da planilha...");
@@ -5074,6 +5087,11 @@
                 console.log("Erro ao deletar Cliente");
                 console.log(err);
 
+                showToast("Erro ao deletar Cliente", 'err');
+                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                setTimeout(() => {
+                    return window.location.reload(true);
+                }, 5000);
             }
 
             // Salvar backup local
@@ -5595,7 +5613,12 @@
             const valor_receber = d.valor_receber;
 
             // Criar o novo id do emprestimo atual
-            let novo_id = clientId + "_E" + String(novo_qtd_emps).padStart(2, '0');
+            let novo_id = clientId + "_E00";
+            if (novo_qtd_emps <= 99) {
+                novo_id = clientId + "_E" + String(novo_qtd_emps).padStart(2, '0');
+            } else {
+                novo_id = clientId + "_" + String(novo_qtd_emps);
+            }
 
             const id = novo_id;
             const pago = 0;
@@ -5603,7 +5626,7 @@
 
             const qtd_emps = d.qtd_emps + 1;
 
-            const loan = { id, clientId, valor, valor_receber, prazo, juros_tipo, juros_val, emissao, pago, qtd_pags, lin_cliente, novo_qtd_emps };
+            const loan = { id, clientId, valor, valor_receber, prazo, juros_tipo, juros_val, emissao, pago, qtd_pags, lin_cliente, novo_qtd_emps, time: DB.time };
 
             try {
                 console.log("Adicionando empréstimo na planilha...");
@@ -5628,6 +5651,12 @@
             catch (err) {
                 console.log("Erro ao adicionar novo emprestimo");
                 console.log(err);
+
+                showToast("Erro ao adicionar novo emprestimo", 'err');
+                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                setTimeout(() => {
+                    return window.location.reload(true);
+                }, 5000);
             }
 
 
@@ -5920,7 +5949,7 @@
             const lin = loan.lin;
             const lins_pags = loan.lins_pags;
 
-            const new_loan = { id, clientId, valor, valor_receber, prazo, juros_tipo, juros_val, emissao, pago, qtd_pags, lin };
+            const new_loan = { id, clientId, valor, valor_receber, prazo, juros_tipo, juros_val, emissao, pago, qtd_pags, lin, time: DB.time };
 
             if (lins_pags.length > 0) {
                 new_loan.lins_pags = lins_pags;
@@ -5948,6 +5977,12 @@
             catch (err) {
                 console.log("Erro ao editar emprestimo");
                 console.log(err);
+
+                showToast("Erro ao editar emprestimo", 'err');
+                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                setTimeout(() => {
+                    return window.location.reload(true);
+                }, 5000);
             }
 
             // Salvar backup local
@@ -6014,7 +6049,7 @@
             const lin = loan.lin;
             const novo_pago = novoEstado;
 
-            const novo_pago_x = { id, lin, novo_pago };
+            const novo_pago_x = { id, lin, novo_pago, time: DB.time };
 
             try {
                 console.log("ALTERANDO SE PAGO...");
@@ -6038,6 +6073,11 @@
                 console.log("Erro ao ALTERAR PAGO");
                 console.log(err);
 
+                showToast("Erro ao ALTERAR PAGO", 'err');
+                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                setTimeout(() => {
+                    return window.location.reload(true);
+                }, 5000);
             }
 
             // Salvar backup local
@@ -6096,7 +6136,7 @@
             const lin = loan.lin;
             const lins_pags = loan.lins_pags;
 
-            const dados_apagar = { id, lin };
+            const dados_apagar = { id, lin, time: DB.time };
 
             if (lins_pags.length > 0) {
                 dados_apagar.lins_pags = lins_pags;
@@ -6125,6 +6165,11 @@
                 console.log("Erro ao deletar Emprestimo");
                 console.log(err);
 
+                showToast("Erro ao deletar Emprestimo", 'err');
+                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                setTimeout(() => {
+                    return window.location.reload(true);
+                }, 5000);
             }
 
             // Salvar backup local
@@ -6234,8 +6279,8 @@
             // Definir valores da barra de progresso de pagamento
             const percent_pago = totalPago > 0 ? Math.max(1, Math.round(totalPago / dividaTotal * 100)) : 0;
             document.getElementById('cd-progress-bar').style.width = (percent_pago != 0 && percent_pago <= 5 ? 5 : percent_pago) + '%';
-            document.getElementById('cd-progress-bar-pag').textContent = percent_pago + '%';
-            document.getElementById('cd-progress-bar-rest').textContent = (100 - percent_pago) + '%';
+            document.getElementById('cd-progress-bar-pag').textContent = Math.min(100, percent_pago) + '%';
+            document.getElementById('cd-progress-bar-rest').textContent = Math.max(0, (100 - percent_pago)) + '%';
 
             // Situação box
             const sitBox = document.getElementById('cd-sit-box');
@@ -6393,8 +6438,8 @@
             // Definir valores da barra de progresso de pagamento
             const percent_pago = calc.totalPago > 0 ? Math.max(1, Math.round(calc.totalPago / calc.dividaTotal * 100)) : 0;
             document.getElementById('ed-progress-bar').style.width = (percent_pago != 0 && percent_pago <= 5 ? 5 : percent_pago) + '%';
-            document.getElementById('ed-progress-bar-pag').textContent = percent_pago + '%';
-            document.getElementById('ed-progress-bar-rest').textContent = (100 - percent_pago) + '%';
+            document.getElementById('ed-progress-bar-pag').textContent = Math.min(100, percent_pago) + '%';
+            document.getElementById('ed-progress-bar-rest').textContent = Math.max(0, (100 - percent_pago)) + '%';
 
             // Situação box
             const sitBox = document.getElementById('ed-sit-box');
@@ -6781,25 +6826,22 @@
 
                 <button class="btn-icon w-full mb8" style="justify-content:center; "
                 onclick="closeSheet(document.getElementById('tl-event-sheet')); abrirComprovantePagamento('${lid}','${pid}')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                Ver comprovante
-                </button> ${hasAnexo ? `<div class="attach-item mb8">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                    <div class="attach-item-name" onclick="openAttachSheet('pag', '${pid}')"; closeSheet(document.getElementById('tl-event-sheet')); openEmpDetalhe('${lid}')">Comprovante de Pagamento</div>
-                    <div class="attach-item-ver">Ver</div>
-                    </div>` : `<button class="btn-icon w-full mb8" style="justify-content:center; color:var(--warn)"
-                    onclick="closeSheet(document.getElementById('tl-event-sheet')); openAttachSheet('pag', '${pid}')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                    ⚠ Adicionar anexo de pagamento
-                    </button>`}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    <div>Ver Recibo</div> 
+                </button> 
+
+                <button class="btn-icon w-full mb8" style="justify-content:center" onclick="closeSheet(document.getElementById('tl-event-sheet')); openAttachSheet('pag', '${pid}')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke=${hasAnexo ? 'var(--acc)' : 'var(--warn)'} stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                    ${hasAnexo ? `<div style="color:var(--acc)">Ver Anexo</div>` : `<div style="color:var(--warn)">Adicionar Anexo</div>`}
+                </button>
 
                 <button class="btn-icon w-full mb8" style="justify-content:center" onclick="closeSheet(document.getElementById('tl-event-sheet')); openEditPag('${lid}','${pid}')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                Editar pagamento
+                Editar
                 </button>
                 <button class="btn-icon w-full" style="justify-content:center; color:var(--danger); border-color:#ff4d6d30" onclick="closeSheet(document.getElementById('tl-event-sheet')); openDeletePagConfirm('${lid}','${pid}')">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                Apagar pagamento
+                Apagar
                 </button>
             `;
             openSheet('tl-event-sheet', animate);
@@ -6893,7 +6935,7 @@
             const id = pid;
             const data_busca = pag.data;
 
-            const dados_apagar = { id, lins_pags, data_busca };
+            const dados_apagar = { id, lins_pags, data_busca, time: DB.time };
 
             try {
                 console.log("Apagando pagamento...");
@@ -6917,6 +6959,12 @@
             catch (err) {
                 console.log("Erro ao apagar o pagamento");
                 console.log(err);
+
+                showToast("Erro ao apagar o pagamento", 'err');
+                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                setTimeout(() => {
+                    return window.location.reload(true);
+                }, 5000);
             }
 
             // Salvar backup local
@@ -7336,12 +7384,17 @@
             const status = totalPagoDepois >= calc.dividaTotal ? "PAGAMENTO COMPLETO" : "PAGAMENTO PARCIAL";
 
             // Criar o novo id do pagamento atual
-            let novo_id = loan.id + "_P" + String(qtd_pags + 1).padStart(2, '0');;
+            let novo_id = loan.id + "_P00"
+            if (qtd_pags + 1 <= 99) {
+                novo_id = loan.id + "_P" + String(qtd_pags + 1).padStart(2, '0');
+            } else {
+                novo_id = loan.id + "_" + String(qtd_pags + 1);
+            }
 
             const pid = pid_old ? pid_old : novo_id;
             const lin_loan = loan.lin;
 
-            const pagamento = { id: pid, data, valor, status, anexo_pag: [], totalPagoAntes, geradoEm, removidos_lins };
+            const pagamento = { id: pid, data, valor, status, anexo_pag: [], totalPagoAntes, geradoEm, removidos_lins, time: DB.time };
 
             if (!pid_old) {
                 pagamento.lin_loan = lin_loan;
@@ -7371,14 +7424,11 @@
                 console.log("Erro ao adicionar o pagamento");
                 console.log(err);
 
-
-                // Se retroativo: apaga todos os pagamentos com data APÓS a data deste pagamento
-                if (isRetro) {
-                    const removidos = structuredClone(loan.pagamentos.filter(p => p.data > dtPag));
-                    loan.pagamentos = loan_retro.pagamentos.filter(p => p.data <= dtPag);
-                }
-                loan.pagamentos.push(pagamento);
-                DB.time = Date.now();
+                showToast("Erro ao adicionar o pagamento", 'err');
+                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                setTimeout(() => {
+                    return window.location.reload(true);
+                }, 5000);
             }
 
             // Salvar backup local
@@ -7680,6 +7730,7 @@
         function openSheet(id, animate = true) {
             if (id === 'notif-sheet') {
                 notif_view = true;
+
                 buildNotif();
             }
 
@@ -7710,7 +7761,7 @@
         function closeSheet(el, animate = true) {
             if (el.classList.contains('closing')) return;
 
-            // SE O MODAL QUE ESTÁ FECHANDO FOR O DE PREVIEW, DESLIGA O ZOOM IMEDIATAMENTE
+            // SE O MODAL QUE ESTÁ FECHANDO FOR O DE PREVIEW DE ANEXOS, DESLIGA O ZOOM IMEDIATAMENTE
             if (el.id === 'attach-preview-modal') {
                 destroyZoom();
             }
@@ -7939,7 +7990,7 @@
                     <button class="cbtn-y" ${!allDiffs ? 'disabled style="opacity:.4"' : ''} onclick="att_padroes()">Salvar ✓</button>
                 </div>`;
 
-            _pendingDefaults = { prazos: novosPrazos, juros_tipo: novoTipo, juros_val: novoVal, juros_fixo_val: novoFixoVal, juros_perc_val: novoPercVal, calculo_tipo: novocalculo };
+            _pendingDefaults = { prazos: novosPrazos, juros_tipo: novoTipo, juros_val: novoVal, juros_fixo_val: novoFixoVal, juros_perc_val: novoPercVal, calculo_tipo: novocalculo, time: DB.time };
 
             openSheet('defaults-confirm-sheet');
         }
@@ -7973,6 +8024,12 @@
             catch (err) {
                 console.log("Erro ao atualizar padrões");
                 console.log(err);
+
+                showToast("Erro ao atualizar padrões", 'err');
+                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                setTimeout(() => {
+                    return window.location.reload(true);
+                }, 5000);
             }
 
             // Salvar backup local
@@ -8229,7 +8286,8 @@
                     nome: file_name,
                     tipo: attachFile.type,
                     base64: base64,
-                    data_ref
+                    data_ref,
+                    time: DB.time
                 };
 
 
@@ -8275,7 +8333,12 @@
                     console.log(err);
 
                     hideLoading();
-                    showToast('Erro ao salvar anexo!');
+
+                    showToast('Erro ao salvar anexo!', 'err');
+                    showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                    setTimeout(() => {
+                        return window.location.reload(true);
+                    }, 5000);
                 }
             };
 
@@ -8292,7 +8355,8 @@
 
             const dadosParaEnvio = {
                 id_anexo: anexo_id,
-                lin: linha
+                lin: linha,
+                time: DB.time
             }
 
             try {
@@ -8338,9 +8402,13 @@
             catch (err) {
                 console.log("Erro ao apagar o Anexo");
                 console.log(err);
-
                 hideLoading();
-                showToast('Erro ao apagar anexo!');
+
+                showToast("Erro ao apagar o Anexo", 'err');
+                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                setTimeout(() => {
+                    return window.location.reload(true);
+                }, 5000);
             }
 
         }
@@ -8628,8 +8696,9 @@
             catch (err) {
                 console.error(err);
                 console.log("Fetch inicial - Erro");
-                console.log("Usando DB ficticio");
+                console.log("Usando DB local");
 
+                DB = pegarJsonDoLocalStorage("DB_Local");
 
                 showNotif('Erro ao sincronizar', 'err');
             }
@@ -8642,24 +8711,51 @@
             console.log(DB);
         }
 
+        function pegarJsonDoLocalStorage(chave) {
+            const item = localStorage.getItem(chave);
+
+            if (!item) return null; // Não achou nada? Retorna nulo.
+
+            try {
+                return JSON.parse(item); // Tenta converter para objeto
+            } catch (erro) {
+                console.error("Erro ao converter o JSON do localStorage:", erro);
+                return null; // Se o texto estiver corrompido, evita que o site quebre
+            }
+        }
+
 
         // VARIAVEIS GLOBAIS
         const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
-
         var DB = {};
 
 
-        // ==================== INIT ====================
-        document.addEventListener('DOMContentLoaded', async () => {
+        // Função para iniciar o site
+        async function iniciar_site() {
             showLoading(['Iniciando…', 'Carregando dados…', 'Preparando o painel…', 'Calculando saldos…']);
             await loadDB();
-            //await new Promise(r => setTimeout(r, 2000));
             hideLoading();
+
+            if (!DB) {
+                showToast("Erro ao iniciar", 'err');
+                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                setTimeout(() => {
+                    return window.location.reload(true);
+                }, 5000);
+            }
+
             renderDash();
             updateNotifBadge();
             // Seed initial history state
             history.replaceState({ scr: 'dash' }, '', '');
             _navStack.push({ scr: 'dash' });
+        }
+
+
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', async () => {
+            await iniciar_site();
 
         });
 
