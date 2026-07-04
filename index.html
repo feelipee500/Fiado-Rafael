@@ -7089,32 +7089,53 @@
 
 
             const calcSim = getLoanCalc(loanSim);
-            const venc = addDays(loan.emissao, loan.prazo) - (21 * 60 * 60 * 1000);
             const isLate = calcSim.status == "late";
 
-            const jDia = loan.juros_tipo === 'fixo' ? loan.juros_val : calcSim.valorBase * loan.juros_val / 100;
-            const diasAtrasoNoPag = Math.max(0, diffDays(venc, dtPag));
-            const jurosNoPag = diasAtrasoNoPag * jDia;
-            const valorNoPag = Math.max(0, calcSim.valorBase - calcSim.totalPago_antes) + jurosNoPag;
+            const valorNoPag = calcSim.valor_anterior;
             const saldoApos = Math.max(0, valorNoPag - vValor);
 
+            const quitaria = saldoApos <= 0;
+
             // Calcular valores no dia de hoje
-            const diasAtrasoHoje = Math.max(0, diffDays(venc, TODAY));
-            const jurosTotal = Math.max(0, diasAtrasoHoje * jDia);
-            const jurosRestante = jurosTotal - jurosNoPag;
-            const valorHoje = isLate ? Math.max(0, saldoApos + jurosRestante) : saldoApos;
+            const jurosRestante = calcSim.valorHoje - saldoApos;
+            const valorHoje = calcSim.valorHoje;
             const quitado = saldoApos <= 0;
 
             const impactEl = document.getElementById('epag-impact-section');
             if (impactEl) {
                 impactEl.innerHTML = `
-                <div class="dr"><div class="dk">Valor previsto em ${fmtDate(dtPag)}</div><div class="dv2 c-a">${fmtMoney(valorNoPag)}</div></div>
+                <div class="dr">
+                    <div class="dk">Valor previsto em ${fmtDate(dtPag)}</div>
+                    <div class="dv2 c-a">${fmtMoney(valorNoPag)}</div>
+                </div>
                 ${vValor > 0 ? `
-                <div class="dr"><div class="dk">Saldo após pagamento</div><div class="dv2 ${quitado ? 'c-g' : 'c-r'}">${quitado ? '✓ Quitado' : fmtMoney(saldoApos)}</div></div>${isLate && !quitado ? `
-                <div class="dr"><div class="dk">Juros até hoje</div><div class="dv2 c-r">+ ${fmtMoney(jurosTotal)}</div></div>
-                <div class="dr" style="border:none"><div class="dk">Total a pagar hoje</div><div class="dv2 c-r fw6" style="font-size:15px">${fmtMoney(valorHoje)}</div></div>
-                ` : `<div class="dr" style="border:none"><div class="dk">Situação</div><div class="dv2 ${quitado ? 'c-g' : 'c-b'}">${quitado ? '✓ Dívida quitada' : 'Em dia'}</div></div>`}
-                ` : '<div class="dr" style="border:none"><div class="dk tc2 fs12">Preencha o valor para ver o impacto</div></div>'}`;
+                    <div class="dr">
+                        <div class="dk">Valor Pago</div>
+                        <div class="dv2 c-g">${fmtMoney(vValor)}</div>
+                    </div>
+                    <div class="dr">
+                        <div class="dk">Saldo após pagamento</div>
+                        <div class="dv2 ${quitado ? 'c-g' : 'c-r'}">${quitado ? '✓ Quitado' : fmtMoney(saldoApos)}</div>
+                    </div>
+                    ${isLate && !quitado ? `
+                    <div class="dr">
+                        <div class="dk">Juros até hoje</div>
+                        <div class="dv2 c-r">+ ${fmtMoney(jurosRestante)}</div>
+                    </div>
+                    <div class="dr" style="border:none">
+                        <div class="dk">Total a pagar hoje</div>
+                        <div class="dv2 c-r fw6" style="font-size:15px">${fmtMoney(valorHoje)}</div>
+                    </div>
+                    ` : `
+                    <div class="dr" style="border:none">
+                        <div class="dk">Situação</div>
+                        <div class="dv2 ${quitado ? 'c-g' : 'c-b'}">${quitado ? '✓ Dívida quitada' : 'Em dia'}</div>
+                    </div>
+                    `} ` : `
+                <div class="dr" style="border:none">
+                    <div class="dk tc2 fs12">Preencha o valor para ver o impacto</div>
+                </div>
+                `} `
             }
 
             // Rebuild timeline
@@ -7157,6 +7178,7 @@
             const dataAnterior = pag.data;
             const alterouValor = novoValor !== valorAnterior;
             const alterouData = novaData !== dataAnterior;
+
 
             let id_x = pid.split('_');
             id_x = id_x[1] + '_' + id_x[2];
@@ -7303,7 +7325,6 @@
 
             const quitaria = saldoApos <= 0;
             const jurosacm = calc.valorHoje - saldoApos;
-            console.log(calc);
 
             let bodyHTML = '';
 
