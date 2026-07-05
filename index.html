@@ -313,7 +313,7 @@
             background: var(--bg2);
             border: 1px solid var(--brd);
             border-radius: var(--rad12);
-            padding: 12px 14px;
+            padding: 1px 4px;
         }
 
         /* STAT GRID */
@@ -807,7 +807,7 @@
         }
 
         .erd-compact-card {
-            padding: 12px !important;
+            padding: 10px !important;
             margin-bottom: 8px;
         }
 
@@ -817,6 +817,76 @@
 
         .mb6 {
             margin-bottom: 6px;
+        }
+
+        /* Gráfico comparativo de meses */
+        .erd-month-chart {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 6px;
+        }
+
+        .erd-month-col {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 8px 6px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .erd-month-col:active {
+            background: var(--bg2);
+        }
+
+        .erd-month-col.act {
+            background: var(--bg2);
+            border: 1px solid var(--acc2);
+        }
+
+        .erd-month-lbl {
+            font-size: 11px;
+            color: var(--txt2);
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 2px;
+        }
+
+        .erd-month-col.act .erd-month-lbl {
+            color: var(--txt0);
+            font-weight: 800;
+        }
+
+        .erd-mm-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .erd-mm-track {
+            height: 4px;
+            background: var(--bg2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .erd-mm-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width .3s ease;
+        }
+
+        .erd-mm-val {
+            font-size: 9.5px;
+            color: var(--txt1);
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .edb-row {
@@ -1943,7 +2013,6 @@
             text-transform: uppercase;
             letter-spacing: .8px;
             font-weight: 600;
-            margin: 16px 0 8px;
         }
 
         /* AMOUNT HIGHLIGHT */
@@ -2815,21 +2884,6 @@
                     <div class="ptitle">Visão Geral</div>
                     <div class="psub" id="dash-date">—</div>
 
-                    <div class="period-filter-chip" id="dash-period-btn" onclick="openPeriodSheet()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" />
-                            <line x1="16" y1="2" x2="16" y2="6" />
-                            <line x1="8" y1="2" x2="8" y2="6" />
-                            <line x1="3" y1="10" x2="21" y2="10" />
-                        </svg>
-                        <span id="dash-period-label">Todo o período</span>
-                        <svg class="pfc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9" />
-                        </svg>
-                    </div>
-
                     <!-- Hero card: total a receber -->
                     <div class="dash-hero">
                         <div class="dash-hero-lbl"> Pendente Em Aberto</div>
@@ -2999,35 +3053,35 @@
                             <input class="srch" placeholder="Buscar cliente ou ID…"
                                 oninput="filterEmprestimos(this.value)">
                         </div>
-                        <div class="period-filter-chip" id="emp-period-btn" onclick="openPeriodSheet()"
-                            style="flex-shrink:0; margin-bottom:12px;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="4" width="18" height="18" rx="2" />
-                                <line x1="16" y1="2" x2="16" y2="6" />
-                                <line x1="8" y1="2" x2="8" y2="6" />
-                                <line x1="3" y1="10" x2="21" y2="10" />
-                            </svg>
-                            <span id="emp-period-label">Período</span>
-                        </div>
-                    </div>
-                    <div class="tbar">
-                        <div class="tbtn act" onclick="setTabEmp(this,'all')">Todos</div>
-                        <div class="tbtn" onclick="setTabEmp(this,'ok')">Em Dia</div>
-                        <div class="tbtn" onclick="setTabEmp(this,'warn')">Vencendo</div>
-                        <div class="tbtn" onclick="setTabEmp(this,'late')">Atrasados</div>
-                        <div class="tbtn" onclick="setTabEmp(this,'done')">Pagos</div>
                     </div>
 
                     <!-- DASHBOARD DE RESULTADO (dos empréstimos filtrados) -->
                     <div id="emp-result-dash" class="mb8">
+                        <div class="card-sm erd-compact-card">
+                            <div class="flex-sb">
+                                <div class="sc-lbl mb6" id="erd-bars-title">Comparativo dos Últimos Meses</div>
+                                <div class="period-filter-chip" id="emp-period-btn" onclick="openPeriodSheet()"
+                                    style="flex-shrink:0;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" />
+                                        <line x1="16" y1="2" x2="16" y2="6" />
+                                        <line x1="8" y1="2" x2="8" y2="6" />
+                                        <line x1="3" y1="10" x2="21" y2="10" />
+                                    </svg>
+                                    <span id="emp-period-label">Período</span>
+                                </div>
+                            </div>
+                            <div id="erd-bars"></div>
+                        </div>
+
                         <div class="dash-hero erd-hero-compact">
                             <div class="dash-hero-lbl">Resultado do Período</div>
-                            <div class="dash-hero-val" id="erd-lucro-prev">R$ 0</div>
+                            <div class="dash-hero-val" id="erd-a-receber">R$ 0</div>
                             <div class="dash-hero-sub" id="erd-sub">—</div>
                             <div class="dash-hero-row">
                                 <div class="dhr-item">
-                                    <div class="dhr-val" id="erd-emprestado">R$ 0</div>
+                                    <div class="dhr-val c-b" id="erd-emprestado">R$ 0</div>
                                     <div class="dhr-lbl">Emprestado</div>
                                 </div>
                                 <div class="dhr-item">
@@ -3035,18 +3089,18 @@
                                     <div class="dhr-lbl">Recebido</div>
                                 </div>
                                 <div class="dhr-item">
-                                    <div class="dhr-val" id="erd-qtd">0</div>
-                                    <div class="dhr-lbl">Qtd.</div>
+                                    <div class="dhr-val c-g" id="erd-lucro-relativo">0</div>
+                                    <div class="dhr-lbl">Lucro Relativo</div>
                                 </div>
                             </div>
                             <div class="dash-hero-row">
                                 <div class="dhr-item">
-                                    <div class="dhr-val c-r" id="erd-a-receber">R$ 0</div>
-                                    <div class="dhr-lbl">A Receber</div>
+                                    <div class="dhr-val c-r" id="erd-a-receber-total">R$ 0</div>
+                                    <div class="dhr-lbl">Total a Receber</div>
                                 </div>
                                 <div class="dhr-item">
-                                    <div class="dhr-val c-g" id="erd-lucro-relativo">R$ 0</div>
-                                    <div class="dhr-lbl">Lucro Relativo</div>
+                                    <div class="dhr-val c-g" id="erd-lucro-prev">R$ 0</div>
+                                    <div class="dhr-lbl">Lucro Previsto</div>
                                 </div>
                                 <div class="dhr-item">
                                     <div class="dhr-val" id="erd-lucro-real">R$ 0</div>
@@ -3056,15 +3110,18 @@
                         </div>
 
                         <div class="card-sm erd-compact-card">
-                            <div class="sc-lbl mb6">Emprestado × Recebido × Lucro</div>
-                            <div id="erd-bars"></div>
-                        </div>
-
-                        <div class="card-sm erd-compact-card">
                             <div class="sc-lbl mb6">Composição por Status</div>
                             <div class="emp-dash-statusbar" id="erd-statusbar"></div>
                             <div class="emp-dash-legend" id="erd-legend"></div>
                         </div>
+                    </div>
+
+                    <div class="tbar">
+                        <div class="tbtn act" onclick="setTabEmp(this,'all')">Todos</div>
+                        <div class="tbtn" onclick="setTabEmp(this,'ok')">Em Dia</div>
+                        <div class="tbtn" onclick="setTabEmp(this,'warn')">Vencendo</div>
+                        <div class="tbtn" onclick="setTabEmp(this,'late')">Atrasados</div>
+                        <div class="tbtn" onclick="setTabEmp(this,'done')">Pagos</div>
                     </div>
 
                     <div id="emp-list"></div>
@@ -3303,8 +3360,9 @@
                                     <span
                                         style="font-family:var(--font-d); font-size:20px; font-weight:800; letter-spacing:-.5px; line-height:1.1"
                                         id="cd-name"></span>
-                                    <span class="fs11 tc2 mt4" id="cd-tel"></span>
-                                    <span class="fs11 tc2 mt2" id="cd-email"></span>
+                                    <span class="fs12 tc2 mt4" id="cd-tel"></span>
+                                    <span class="fs12 tc2 mt2" id="cd-email"></span>
+                                    <span class="fs12 tc2 mt2" id="cd-desc"></span>
                                 </div>
 
                                 <div id="ed-whatsapp-btn" onclick="openSheet('open-whatsapp')"
@@ -3896,21 +3954,21 @@
                 <div class="sc-lbl">Período rápido</div>
                 <div class="fs12 tc1 mb12">Filtra os empréstimos pela data de emissão.</div>
                 <div class="tbar" id="period-preset-tabs">
-                    <div class="tbtn" data-mode="all" onclick="selectPeriodPreset('all')">Tudo</div>
-                    <div class="tbtn" data-mode="this-month" onclick="selectPeriodPreset('this-month')">Este Mês
-                    </div>
                     <div class="tbtn" data-mode="last-month" onclick="selectPeriodPreset('last-month')">Mês Passado
                     </div>
+                    <div class="tbtn" data-mode="this-month" onclick="selectPeriodPreset('this-month')">Este Mês
+                    </div>
+                    <div class="tbtn" data-mode="all" onclick="selectPeriodPreset('all')">Tudo</div>
                 </div>
                 <div class="sc-lbl mt16">Período personalizado</div>
                 <div class="fr">
                     <div class="fg">
                         <div class="fl">De</div>
-                        <input class="fi" id="period-start" type="date">
+                        <input class="fi" id="period-start" type="date" onchange="att_periods('period-start')">
                     </div>
                     <div class="fg">
                         <div class="fl">Até</div>
-                        <input class="fi" id="period-end" type="date">
+                        <input class="fi" id="period-end" type="date" onchange="att_periods('period-end')">
                     </div>
                 </div>
                 <div class="confirm-btns mt12">
@@ -4542,68 +4600,86 @@
         let _empFilter = 'all';
 
         // ==================== FILTRO DE PERÍODO ====================
-        // mode: 'all' | 'this-month' | 'last-month' | 'custom'
-        let _periodFilter = { mode: 'all', start: null, end: null };
+        // mode: 'all' | 'month' | 'custom'
+        let _periodFilter = { mode: 'all', year: null, month: null, start: null, end: null };
 
-        function computePeriodRange(mode) {
-            const today = new Date(TODAY);
-            if (mode === 'this-month') {
-                const start = new Date(today.getFullYear(), today.getMonth(), 1).getTime();
-                const end = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999).getTime();
-                return { start, end };
-            }
-            if (mode === 'last-month') {
-                const start = new Date(today.getFullYear(), today.getMonth() - 1, 1).getTime();
-                const end = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59, 999).getTime();
-                return { start, end };
-            }
-            return { start: null, end: null };
+        const MESES_PT = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        const MESES_PT_ABREV = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+        // Retorna { year, month } (mês 0-indexado) de hoje
+        function todayYM() {
+            const d = new Date(TODAY);
+            return { year: d.getFullYear(), month: d.getMonth() };
+        }
+
+        // Soma/subtrai meses de um par year/month, normalizando virada de ano
+        function addMonths(year, month, offset) {
+            const d = new Date(year, month + offset, 1);
+            return { year: d.getFullYear(), month: d.getMonth() };
+        }
+
+        // Retorna o intervalo (início e fim) de um mês específico
+        function monthRange(year, month) {
+            const start = new Date(year, month, 1).getTime();
+            const end = new Date(year, month + 1, 0, 23, 59, 59, 999).getTime();
+            return { start, end };
         }
 
         function loanInPeriod(loan) {
             if (_periodFilter.mode === 'all') return true;
             if (_periodFilter.start == null || _periodFilter.end == null) return true;
+            //const calc = getLoanCalc(loan);
+            //const dataLimit = calc.pago ? calc.pago : TODAY;
+
+            //return (loan.emissao >= _periodFilter.start && loan.emissao <= _periodFilter.end) || (dataLimit >= _periodFilter.start && dataLimit <= _periodFilter.end);
             return loan.emissao >= _periodFilter.start && loan.emissao <= _periodFilter.end;
         }
 
         function periodLabelText() {
             if (_periodFilter.mode === 'all') return 'Todo o período';
-            if (_periodFilter.mode === 'this-month') return 'Este Mês';
-            if (_periodFilter.mode === 'last-month') return 'Mês Passado';
             if (_periodFilter.mode === 'custom') {
                 return `${fmtDate(_periodFilter.start)} – ${fmtDate(_periodFilter.end)}`;
+            }
+            if (_periodFilter.mode === 'month') {
+                const t0 = todayYM();
+                if (_periodFilter.year === t0.year && _periodFilter.month === t0.month) return 'Este Mês';
+                const p = addMonths(t0.year, t0.month, -1);
+                if (_periodFilter.year === p.year && _periodFilter.month === p.month) return 'Mês Passado';
+                return `${MESES_PT[_periodFilter.month]} ${_periodFilter.year}`;
             }
             return 'Período';
         }
 
         function updatePeriodUI() {
-            const active = _periodFilter.mode !== 'all';
+            const active = _periodFilter.mode === 'all';
             const label = periodLabelText();
 
-            const dashLbl = document.getElementById('dash-period-label');
             const empLbl = document.getElementById('emp-period-label');
             const cliLbl = document.getElementById('cli-period-label');
             const cdLbl = document.getElementById('cd-period-label');
-            if (dashLbl) dashLbl.textContent = label;
             if (empLbl) empLbl.textContent = label;
             if (cliLbl) cliLbl.textContent = label;
             if (cdLbl) cdLbl.textContent = label;
 
-            const dashBtn = document.getElementById('dash-period-btn');
-            const empBtn = document.getElementById('emp-period-btn');
-            const cliBtn = document.getElementById('cli-period-btn');
-            const cdBtn = document.getElementById('cd-period-btn');
-            if (dashBtn) dashBtn.classList.toggle('act', active);
-            if (empBtn) empBtn.classList.toggle('act', active);
-            if (cliBtn) cliBtn.classList.toggle('act', active);
-            if (cdBtn) cdBtn.classList.toggle('act', active);
-
+            const t0 = todayYM();
+            const lastM = addMonths(t0.year, t0.month, -1);
             document.querySelectorAll('#period-preset-tabs .tbtn').forEach(t => {
-                t.classList.toggle('act', t.dataset.mode === _periodFilter.mode);
+                const bm = t.dataset.mode;
+                let isActive = false;
+                if (bm === 'all') isActive = _periodFilter.mode === 'all';
+                else if (bm === 'this-month') isActive = _periodFilter.mode === 'month' && _periodFilter.year === t0.year && _periodFilter.month === t0.month;
+                else if (bm === 'last-month') isActive = _periodFilter.mode === 'month' && _periodFilter.year === lastM.year && _periodFilter.month === lastM.month;
+                t.classList.toggle('act', isActive);
             });
 
             const startInput = document.getElementById('period-start');
             const endInput = document.getElementById('period-end');
+
+            startInput.value = dateStr(TODAY);
+            startInput.max = dateStr(TODAY);
+            endInput.value = dateStr(TODAY);
+            endInput.max = dateStr(TODAY);
+
             if (_periodFilter.mode === 'custom') {
                 if (startInput) startInput.value = dateStr(_periodFilter.start);
                 if (endInput) endInput.value = dateStr(_periodFilter.end);
@@ -4615,6 +4691,23 @@
             openSheet('period-sheet');
         }
 
+        function att_periods (el) {
+            const startInput = document.getElementById('period-start');
+            const endInput = document.getElementById('period-end');
+            const data_start = startInput.value;
+            const data_end = endInput.value;
+            const data_start_time = parseDate(data_start);
+            const data_end_time = parseDate(data_end);
+
+            if (el = 'period-start') {
+                endInput.value = data_end_time < data_start_time ? dateStr(data_start_time) : endInput.value;
+                endInput.min = dateStr(data_start_time);
+            } else if (el = 'period-end') {
+                startInput.value = data_start_time > data_end_time  ? dateStr(data_end_time) : startInput.value;
+                startInput.max = dateStr(data_end_time);
+            }
+        }
+
         function applyPeriodFilter() {
             updatePeriodUI();
             if (_currentScreen === 'dash') renderDash();
@@ -4624,12 +4717,35 @@
         }
 
         function selectPeriodPreset(mode) {
-            const range = computePeriodRange(mode);
-            _periodFilter = { mode, start: range.start, end: range.end };
+            if (mode === 'all') {
+                _periodFilter = { mode: 'all', year: null, month: null, start: null, end: null };
+            } else if (mode === 'this-month') {
+                const t0 = todayYM();
+                const r = monthRange(t0.year, t0.month);
+                _periodFilter = { mode: 'month', year: t0.year, month: t0.month, start: r.start, end: r.end };
+            } else if (mode === 'last-month') {
+                const t0 = todayYM();
+                const p = addMonths(t0.year, t0.month, -1);
+                const r = monthRange(p.year, p.month);
+                _periodFilter = { mode: 'month', year: p.year, month: p.month, start: r.start, end: r.end };
+            }
             document.getElementById('period-start').value = '';
             document.getElementById('period-end').value = '';
             applyPeriodFilter();
             closeSheet(document.getElementById('period-sheet'));
+        }
+
+        // Seleciona um mês específico (usado ao clicar em uma coluna do gráfico comparativo)
+        function selectChartMonth(year, month) {
+            if (year != 3000 && month != 12) {
+                const r = monthRange(year, month);
+                _periodFilter = { mode: 'month', year, month, start: r.start, end: r.end };
+                applyPeriodFilter();
+            } else {
+                _periodFilter = { mode: 'all', year: null, month: null, start: null, end: null };
+                applyPeriodFilter();
+            }
+
         }
 
         function applyCustomPeriod() {
@@ -4643,13 +4759,13 @@
             let end = parseDate(endVal);
             end = new Date(end).setHours(23, 59, 59, 999);
             if (start > end) { const tmp = start; start = end; end = tmp; }
-            _periodFilter = { mode: 'custom', start, end };
+            _periodFilter = { mode: 'custom', year: null, month: null, start, end };
             applyPeriodFilter();
             closeSheet(document.getElementById('period-sheet'));
         }
 
         function clearPeriodFilter() {
-            _periodFilter = { mode: 'all', start: null, end: null };
+            _periodFilter = { mode: 'all', year: null, month: null, start: null, end: null };
             document.getElementById('period-start').value = '';
             document.getElementById('period-end').value = '';
             applyPeriodFilter();
@@ -5164,7 +5280,7 @@
 
         // ==================== EMPRESTIMOS ====================
         let _empSearchVal = '';
-        function renderEmprestimos(filter) {
+        function renderEmprestimos(filter, render_all = true) {
             _empFilter = filter || 'all';
             updatePeriodUI();
             // update tab
@@ -5182,14 +5298,15 @@
                     map[t.textContent.trim()] === _empFilter
                 );
             });
-            let loans = DB.loans.filter(loanInPeriod);
-            if (_empSearchVal) loans = loans.filter(l => {
+            let loansBase = [...DB.loans];
+            if (_empSearchVal) loansBase = loansBase.filter(l => {
                 const c = getClient(l.clientId);
                 return (c && c.nome.toLowerCase().includes(_empSearchVal.toLowerCase())) || l.id.toLowerCase().includes(_empSearchVal.toLowerCase());
             });
             if (_empFilter !== 'all') {
-                loans = loans.filter(l => getLoanCalc(l).status === _empFilter);
+                loansBase = loansBase.filter(l => getLoanCalc(l).status === _empFilter);
             }
+            let loans = loansBase.filter(loanInPeriod);
 
             // Ordena os emprestimos em ordem de importancia
             const statusPriority = { 'late': 1, 'warn': 2, 'ok': 3, 'done': 4 };
@@ -5212,11 +5329,128 @@
             document.getElementById('emp-subtitle').textContent = `${total} empréstimos · ${sortedLoansValido.length} exibidos`;
             document.getElementById('emp-list').innerHTML = sortedLoansValido.length ? sortedLoansValido.map(l => loanCardHTML(l)).join('') : '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><p>Nenhum empréstimo encontrado</p></div>';
 
-            renderEmpResultDashboard(loans);
+            if (render_all) {
+                renderEmpResultDashboard(loans, loansBase);
+            }
+
         }
 
         // Dashboard de resultado financeiro dos empréstimos filtrados (busca + status + período)
-        function renderEmpResultDashboard(loans) {
+        // Constrói o mini gráfico comparativo de 3 meses (Emprestado/Recebido/Lucro) para o bloco de resultado
+        function buildMonthChart(loansBase) {
+            const t0 = todayYM();
+            const ref = _periodFilter.mode === 'month'
+                ? { year: _periodFilter.year, month: _periodFilter.month }
+                : t0;
+
+            const isRefCurrent = (ref.year === t0.year && ref.month === t0.month);
+            let months;
+            if (isRefCurrent) {
+                months = [addMonths(ref.year, ref.month, -1), ref];
+            } else {
+                months = [addMonths(ref.year, ref.month, -1), ref, addMonths(ref.year, ref.month, 1)];
+            }
+            months.push({ year: 3000, month: 12 });
+
+            // Calcula os 4 indicadores de cada mês:
+            // Emprestado e A Receber -> empréstimos EMITIDOS naquele mês
+            // Recebido -> pagamentos EFETUADOS naquele mês (independente do mês de emissão do empréstimo)
+            // Lucro Real -> Recebido - Emprestado
+            let monthData = months.map(m => {
+                const r = monthRange(m.year, m.month);
+                let emprestado = 0, aReceber = 0, recebido = 0, loanCount = 0, pagCount = 0;
+                loansBase.forEach(l => {
+                    if ((l.emissao >= r.start && l.emissao <= r.end) || (m.year == 3000 && m.month == 12)) {
+                        loanCount++;
+                        emprestado += l.valor;
+                        aReceber += getLoanCalc(l).dividaTotal;
+
+                        (l.pagamentos || []).forEach(p => {
+                            pagCount++;
+                            recebido += p.valor;
+                        });
+
+                    }
+
+                    // (l.pagamentos || []).forEach(p => {
+                    //     if (p.data >= r.start && p.data <= r.end) {
+                    //         pagCount++;
+                    //         recebido += p.valor;
+                    //     } else if (m.year == 3000 && m.month == 12) {
+                    //         pagCount++;
+                    //         recebido += p.valor;
+                    //     }
+                    // });
+
+                });
+                const lucroReal = recebido - emprestado;
+                const isRef = (m.year === ref.year && m.month === ref.month && _periodFilter.mode != 'all') || (_periodFilter.mode == 'all' && m.year == 3000);
+                const hasData = loanCount > 0 || pagCount > 0;
+                return { year: m.year, month: m.month, emprestado, aReceber, recebido, lucroReal, isRef, hasData };
+            });
+
+            // Remove meses sem nenhum dado, exceto o mês atualmente selecionado (mantido como referência visual)
+            monthData = monthData.filter(d => d.hasData || d.isRef);
+
+            if (!monthData.length) {
+                return `<div class="empty" style="padding:16px 0;"><p>Nenhum dado para comparar</p></div>`;
+            }
+
+            const all_only = monthData.filter(d => d.year == 3000);
+            const globalMax_all = Math.max(1, ...all_only.flatMap(d => [d.emprestado, d.aReceber, d.recebido, Math.abs(d.lucroReal)]));
+            const pct_all = v => v > 0 ? Math.max(4, Math.round(v / globalMax_all * 100)) : 0;
+
+            const month_only = monthData.filter(d => d.year != 3000);
+            const globalMax = Math.max(1, ...month_only.flatMap(d => [d.emprestado, d.aReceber, d.recebido, Math.abs(d.lucroReal)]));
+            const fmtSigned = v => (v < 0 ? '-' : '') + fmtMoney(Math.abs(v));
+            const pct = v => v > 0 ? Math.max(5, Math.round(v / globalMax * 100)) : 0;
+
+            const mmItem = (value, color, signed, isAll) => {
+                const txt = signed ? fmtSigned(value) : fmtMoney(value);
+
+                let w = 0;
+                if (!isAll) {
+                    w = signed ? pct(Math.abs(value)) : pct(value);
+                } else {
+                    w = signed ? pct_all(Math.abs(value)) : pct_all(value);
+                }
+
+                return `
+                <div class="erd-mm-item">
+                    <div class="erd-mm-track"><div class="erd-mm-fill" style="width:${w}%; background:${color}"></div></div>
+                    <div class="erd-mm-val" style="color:${color}" title="${txt}">${txt}</div>
+                </div>`;
+            };
+
+            const colsHTML = monthData.map(d => {
+                let all_card = d.year == 3000;
+                let label = 'mês';
+                if (!all_card) {
+                    label = MESES_PT_ABREV[d.month] + (d.year !== t0.year ? `/${String(d.year).slice(2)}` : '');
+                } else {
+                    label = 'TUDO';
+                }
+
+                const lucroColor = d.lucroReal >= 0 ? 'var(--acc)' : 'var(--warn)';
+                return `<div class="erd-month-col ${d.isRef ? 'act' : ''}" onclick="selectChartMonth(${d.year},${d.month})" ${all_card ? 'style="background-color: var(--bg3)"' : ''}>
+                    <div class="erd-month-lbl">${label}</div>
+                    ${mmItem(d.emprestado, 'var(--acc2)', false, all_card)}
+                    ${mmItem(d.aReceber, 'var(--danger)', false, all_card)}
+                    ${mmItem(d.recebido, 'var(--acc)', false, all_card)}
+                    ${mmItem(d.lucroReal, lucroColor, true, all_card)}
+                </div>`;
+            }).join('');
+
+            return `<div class="erd-month-chart">${colsHTML}</div>
+                <div class="emp-dash-legend" style="justify-content:center; margin-top:10px;">
+                    <div class="edl-item"><span class="edl-dot" style="background:var(--acc2)"></span>Emprestado</div>
+                    <div class="edl-item"><span class="edl-dot" style="background:var(--danger)"></span>A Receber</div>
+                    <div class="edl-item"><span class="edl-dot" style="background:var(--acc)"></span>Recebido</div>
+                    <div class="edl-item"><span class="edl-dot" style="background:linear-gradient(90deg, var(--acc) 50%, var(--warn) 50%)"></span>Lucro Real</div>
+                </div>`;
+        }
+
+        function renderEmpResultDashboard(loans, loansBase) {
             let emprestado = 0, recebido = 0, dividaTotal = 0, lucroContratado = 0, lucroRelativo = 0;
             let cntLate = 0, cntWarn = 0, cntOk = 0, cntDone = 0;
 
@@ -5241,46 +5475,54 @@
             const fmtSigned = v => (v < 0 ? '-' : '') + fmtMoney(Math.abs(v));
 
             document.getElementById('erd-lucro-prev').textContent = fmtMoney(lucroContratado);
-            document.getElementById('erd-sub').textContent = qtd
-                ? `${qtd} empréstimo${qtd !== 1 ? 's' : ''} · ${periodLabelText()}`
-                : `Nenhum empréstimo neste filtro · ${periodLabelText()}`;
+            document.getElementById('erd-sub').textContent = aReceber > 0 ? 'Restante a Receber' : 'Dividas Quitadas';
 
-            document.getElementById('erd-emprestado').textContent = fmtMoney(emprestado);
-            document.getElementById('erd-qtd').textContent = qtd;
-            document.getElementById('erd-recebido').textContent = fmtMoney(recebido);
             document.getElementById('erd-a-receber').textContent = fmtMoney(aReceber);
 
+            document.getElementById('erd-emprestado').textContent = fmtMoney(emprestado);
+            document.getElementById('erd-recebido').textContent = fmtMoney(recebido);
             document.getElementById('erd-lucro-relativo').textContent = fmtMoney(lucroRelativo);
+            document.getElementById('erd-a-receber-total').textContent = fmtMoney(dividaTotal);
 
             const lucroRealEl = document.getElementById('erd-lucro-real');
             lucroRealEl.textContent = fmtSigned(lucroReal);
             lucroRealEl.classList.remove('c-g', 'c-r');
-            lucroRealEl.classList.add(lucroReal >= 0 ? 'c-g' : 'c-r');
+            lucroRealEl.classList.add(lucroReal >= 0 ? 'c-g' : 'c-w');
 
-            // Barras comparativas: Emprestado x Recebido x Lucro Contratado
-            const maxVal = Math.max(emprestado, recebido, lucroContratado, 1);
-            const barRow = (label, value, color) => {
-                const pct = value > 0 ? Math.max(3, Math.round(value / maxVal * 100)) : 0;
-                return `<div class="edb-row">
-                    <div class="edb-row-top">
-                        <span class="edb-row-lbl"><span class="edb-row-dot" style="background:${color}"></span>${label}</span>
-                        <span class="edb-row-val">${fmtMoney(value)}</span>
-                    </div>
-                    <div class="edb-bar-track"><div class="edb-bar-fill" style="width:${pct}%; background:${color}"></div></div>
-                </div>`;
-            };
-            document.getElementById('erd-bars').innerHTML =
-                barRow('Emprestado', emprestado, 'var(--acc2)') +
-                barRow('Recebido', recebido, 'var(--acc)') +
-                barRow('Lucro Previsto', lucroContratado, 'var(--acc3)');
+            // Emprestado x Recebido x Lucro: comparativo de 3 meses, ou só o período (se personalizado)
+            const barsTitleEl = document.getElementById('erd-bars-title');
+            const barsEl = document.getElementById('erd-bars');
+
+            if (_periodFilter.mode === 'custom') {
+                barsTitleEl.textContent = 'Emprestado × Recebido × Lucro do Período';
+                const maxVal = Math.max(emprestado, recebido, lucroContratado, 1);
+                const barRow = (label, value, color) => {
+                    const pct = value > 0 ? Math.max(3, Math.round(value / maxVal * 100)) : 0;
+                    return `<div class="edb-row">
+                        <div class="edb-row-top">
+                            <span class="edb-row-lbl"><span class="edb-row-dot" style="background:${color}"></span>${label}</span>
+                            <span class="edb-row-val">${fmtMoney(value)}</span>
+                        </div>
+                        <div class="edb-bar-track"><div class="edb-bar-fill" style="width:${pct}%; background:${color}"></div></div>
+                    </div>`;
+                };
+                barsEl.innerHTML =
+                    barRow('Emprestado', emprestado, 'var(--acc2)') +
+                    barRow('Total a Receber', dividaTotal, 'var(--danger)') +
+                    barRow('Recebido', recebido, 'var(--acc)') +
+                    barRow('Lucro Previsto', lucroContratado, 'var(--acc3)');
+            } else {
+                barsTitleEl.textContent = 'Comparativo dos Últimos Meses';
+                barsEl.innerHTML = buildMonthChart(loansBase);
+            }
 
             // Composição por status (barra + legenda)
             const statusBarEl = document.getElementById('erd-statusbar');
             const legendEl = document.getElementById('erd-legend');
             const segs = [
-                { count: cntLate, color: 'var(--danger)', label: 'Atrasados' },
-                { count: cntWarn, color: 'var(--warn)', label: 'Vencendo' },
                 { count: cntOk, color: 'var(--acc2)', label: 'Em Dia' },
+                { count: cntWarn, color: 'var(--warn)', label: 'Vencendo' },
+                { count: cntLate, color: 'var(--danger)', label: 'Atrasados' },
                 { count: cntDone, color: 'var(--acc)', label: 'Pagos' },
             ];
             statusBarEl.innerHTML = qtd
@@ -5293,7 +5535,7 @@
                 </div>`).join('');
         }
         function filterEmprestimos(v) { _empSearchVal = v; renderEmprestimos(_empFilter); }
-        function setTabEmp(el, filter) { document.querySelectorAll('#scr-emprestimos .tbtn').forEach(t => t.classList.remove('act')); el.classList.add('act'); renderEmprestimos(filter); }
+        function setTabEmp(el, filter) { document.querySelectorAll('#scr-emprestimos .tbtn').forEach(t => t.classList.remove('act')); el.classList.add('act'); renderEmprestimos(filter, false); }
 
         // ==================== NOVO ====================
         let _novoSelectedClientId = null;
@@ -6761,10 +7003,7 @@
             document.getElementById('cd-name').textContent = c.nome;
             document.getElementById('cd-tel').textContent = c.tel;
             document.getElementById('cd-email').textContent = c.email || '';
-
-            // Descrição
-            if (c.desc) { document.getElementById('cd-desc').textContent = c.desc; document.getElementById('cd-desc-wrap').style.display = ''; }
-            else document.getElementById('cd-desc-wrap').style.display = 'none';
+            document.getElementById('cd-desc').textContent = c.desc || '';
 
             updatePeriodUI();
             const loans = getClientLoans(cid).filter(loanInPeriod);
@@ -8373,7 +8612,7 @@
             t.textContent = msg; t.className = type || '';
             t.style.display = 'block';
             clearTimeout(window._toastT);
-            window._toastT = setTimeout(() => { t.style.display = 'none'; }, 2400);
+            window._toastT = setTimeout(() => { t.style.display = 'none'; }, 3000);
         }
 
         /**
