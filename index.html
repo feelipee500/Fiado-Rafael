@@ -462,6 +462,104 @@
             background: var(--txt2);
         }
 
+        .pill-xs {
+            padding: 2px 7px;
+            font-size: 11px;
+            gap: 3px;
+        }
+
+        .pill-xs::before {
+            width: 5px;
+            height: 5px;
+        }
+
+        /* LOAN CARD VIEW TOGGLE */
+        .lc-mode-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+            background: var(--bg2);
+            border: 1px solid var(--brd);
+            border-radius: 20px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--txt1);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: border-color .15s, color .15s;
+            flex-shrink: 0;
+        }
+
+        .lc-mode-toggle svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        .lc-mode-toggle.act {
+            border-color: var(--acc2);
+            color: var(--acc2);
+        }
+
+        /* GENERIC SMALL PILL ACTION BUTTON (ex: Adicionar Anexo) */
+        .chip-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg2);
+            border: 1px solid var(--brd);
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--acc3);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity .15s;
+        }
+
+        .chip-btn:active {
+            opacity: .8;
+        }
+
+        .chip-btn svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        /* FILE PICKER (caixa tracejada de seleção de arquivo) */
+        .file-picker-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--bg2);
+            border: 1px dashed var(--brd3);
+            border-radius: var(--rad12);
+            padding: 14px;
+            cursor: pointer;
+            color: var(--txt1);
+            font-size: 13px;
+        }
+
+        .file-picker-btn svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .btn-p:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        .btn-p:disabled:active {
+            transform: none;
+        }
+
         /* LOAN CARDS */
         .lc {
             background: var(--bg1);
@@ -561,6 +659,90 @@
 
         .lc-fill.done {
             background: var(--acc);
+        }
+
+        /* MINIMAL LOAN CARD */
+        .lcm {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg1);
+            border: 1px solid var(--brd);
+            border-left: 3px solid var(--brd);
+            border-radius: var(--rad12, 12px);
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: border-color .15s, background .15s;
+        }
+
+        .lcm:active {
+            border-color: var(--brd3);
+            background: var(--bg2);
+        }
+
+        .lcm.lcm-late {
+            border-left-color: var(--danger);
+        }
+
+        .lcm.lcm-warn {
+            border-left-color: var(--warn);
+        }
+
+        .lcm.lcm-ok {
+            border-left-color: var(--acc2);
+        }
+
+        .lcm.lcm-done {
+            border-left-color: var(--acc);
+        }
+
+        .lcm-av {
+            width: 26px;
+            height: 26px;
+            font-size: 12px;
+        }
+
+        .lcm-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .lcm-name {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .lcm-name .lcm-val {
+            color: var(--txt2);
+            font-weight: 500;
+            font-size: 11px;
+        }
+
+        .lcm-sub {
+            font-size: 10px;
+            color: var(--txt2);
+            margin-top: 1px;
+        }
+
+        .lcm-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 3px;
+            flex-shrink: 0;
+        }
+
+        .lcm-days {
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
         }
 
 
@@ -773,6 +955,94 @@
         }
 
         .srch::placeholder {
+            color: var(--txt2);
+        }
+
+        .srch-clear {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--txt2);
+        }
+
+        .srch-clear svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        .srch-clear:active {
+            color: var(--txt0);
+        }
+
+        /* SEARCH CLIENT DROPDOWN */
+        .emp-search-dd {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: auto;
+            right: 0;
+            width: max(240px, 100%);
+            background: var(--bg1);
+            border: 1px solid var(--brd);
+            border-radius: var(--rad12);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+            max-height: 280px;
+            overflow-y: auto;
+            z-index: 40;
+            display: none;
+        }
+
+        .emp-search-dd.open {
+            display: block;
+        }
+
+        .emp-search-dd-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--brd);
+            transition: background .15s;
+        }
+
+        .emp-search-dd-item:last-child {
+            border-bottom: none;
+        }
+
+        .emp-search-dd-item:active {
+            background: var(--bg2);
+        }
+
+        .emp-search-dd-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .emp-search-dd-name {
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .emp-search-dd-sub {
+            font-size: 11px;
+            color: var(--txt2);
+            margin-top: 1px;
+        }
+
+        .emp-search-dd-empty {
+            padding: 16px 12px;
+            text-align: center;
+            font-size: 12px;
             color: var(--txt2);
         }
 
@@ -2935,6 +3205,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <!-- DASH STRIP AQUI -->
                             <div class="dash-strip">
                                 <div class="ds-item ds-late" style="font-weight: 800;" id="card-late"
@@ -3000,6 +3271,11 @@
                         </div>
                     </div>
 
+                    <!-- Alternar exibição dos empréstimos -->
+                    <div style="display:flex; justify-content:center; margin-bottom:-25px; margin-left: 80px;">
+                        <div class="lc-mode-toggle" onclick="toggleLoanCardMode()"></div>
+                    </div>
+
                     <!-- Atenção -->
                     <div id="dash-atencao-wrap">
                         <div class="sh">
@@ -3041,19 +3317,30 @@
             <!-- ========== TELA 2: EMPRÉSTIMOS ========== -->
             <div id="scr-emprestimos" class="scr">
                 <div class="pw">
-                    <div class="ptitle">Empréstimos</div>
-                    <div class="psub" id="emp-subtitle">—</div>
-                    <div style="display:flex; gap:8px; align-items:center;">
-                        <div class="srch-wrap" style="flex:1; margin-bottom:12px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                        <div class="ptitle">Empréstimos</div>
+                        <div class="srch-wrap" style="flex:1; max-width:170px; margin-bottom:0;">
                             <svg class="srch-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-linecap="round">
                                 <circle cx="11" cy="11" r="8" />
                                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
                             </svg>
-                            <input class="srch" placeholder="Buscar cliente ou ID…"
-                                oninput="filterEmprestimos(this.value)">
+                            <input class="srch" id="emp-search-input" placeholder="Buscar Cliente…"
+                                style="padding:8px 28px 8px 32px; font-size:12px;"
+                                onchange="handleEmpSearchInput(this.value, 'emp-search-dd'); openEmpSearchDropdown('emp-search-dd')" onfocus="openEmpSearchDropdown('emp-search-dd')"
+                                onblur="setTimeout(closeEmpSearchDropdown, 150)">
+                            <div class="srch-clear" id="emp-search-clear" style="display: flex"
+                                onmousedown="event.preventDefault()" onclick="clearEmpSearch('emp-search-input')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                    stroke-linecap="round">
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            </div>
+                            <div class="emp-search-dd" id="emp-search-dd"></div>
                         </div>
                     </div>
+                    <div class="psub" id="emp-subtitle">—</div>
 
                     <!-- DASHBOARD DE RESULTADO (dos empréstimos filtrados) -->
                     <div id="emp-result-dash" class="mb8">
@@ -3122,8 +3409,8 @@
                         <div class="tbtn" onclick="setTabEmp(this,'warn')">Vencendo</div>
                         <div class="tbtn" onclick="setTabEmp(this,'late')">Atrasados</div>
                         <div class="tbtn" onclick="setTabEmp(this,'done')">Pagos</div>
+                        <div class="lc-mode-toggle" onclick="toggleLoanCardMode()" id="emp-btn-card"></div>
                     </div>
-
                     <div id="emp-list"></div>
                 </div>
             </div>
@@ -3304,9 +3591,8 @@
 
             <!-- ========== TELA 4: CLIENTES ========== -->
             <div id="scr-clientes" class="scr">
-                <div class="pw">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top: 20px;">
                     <div class="ptitle">Clientes</div>
-                    <div class="psub" id="cli-subtitle">—</div>
                     <div class="period-filter-chip" id="cli-period-btn" onclick="openPeriodSheet()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
@@ -3321,14 +3607,36 @@
                             <polyline points="6 9 12 15 18 9" />
                         </svg>
                     </div>
-                    <div class="srch-wrap">
+                </div>
+
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top: 5px;">
+                    <div class="psub" id="cli-subtitle">—</div>
+                    <div class="srch-wrap" style="flex:1; max-width:170px; margin-bottom:0;">
                         <svg class="srch-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-linecap="round">
                             <circle cx="11" cy="11" r="8" />
                             <line x1="21" y1="21" x2="16.65" y2="16.65" />
                         </svg>
-                        <input class="srch" placeholder="Buscar cliente…" oninput="filterClientes(this.value)">
+                        <input class="srch" id="cli-search-input" placeholder="Buscar Cliente…"
+                            style="padding:8px 28px 8px 32px; font-size:12px;"
+                            onchange="handleEmpSearchInput(this.value, 'cli-search-dd')" onfocus="openEmpSearchDropdown('cli-search-dd')"
+                            onblur="setTimeout(closeEmpSearchDropdown, 150)">
+                        <div class="srch-clear" id="cli-search-clear" style="display: flex"
+                            onmousedown="event.preventDefault()" onclick="clearEmpSearch('cli-search-input')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </div>
+                        <div class="emp-search-dd" id="cli-search-dd"></div>
                     </div>
+                </div>
+
+                
+                <div class="pw">
+                    
+
                     <div id="cli-list"></div>
                 </div>
             </div>
@@ -3381,24 +3689,23 @@
 
                     <!-- ANEXOS CLIENTE -->
                     <div class="card-sm"
-                        style="padding: 3px; display: flex; flex-direction: column; gap: 0px; margin-top: 5px;">
-                        <div
-                            style="display: flex; flex-direction: column; align-items: center; gap: 6px; border-bottom: 1px solid var(--brd); padding-bottom: 4px; margin-top: 1px;">
+                        style="padding: 10px; display: flex; flex-direction: column; gap: 8px; margin-top: 5px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
                             <span class="fs11 tc2"
-                                style="text-transform: uppercase; letter-spacing: .5px; font-weight: 800;">ANEXOS DO
-                                CLIENTE</span>
+                                style="text-transform: uppercase; letter-spacing: .5px; font-weight: 800;">Anexos do
+                                Cliente</span>
+                            <div class="chip-btn" onclick="openClienteAnexoSheet()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19" />
+                                    <line x1="5" y1="12" x2="19" y2="12" />
+                                </svg>
+                                <span>Adicionar</span>
+                            </div>
                         </div>
 
                         <!-- ANEXOS -->
-                        <div
-                            style="display: flex; justify-content: center; align-items: center; width: 100%; margin-top: 3px; gap: 20px">
-                            <div
-                                style="background:var(--bg2); border:1px solid var(--brd); border-radius:var(--rad12); padding:3px 3px; display: flex; flex-direction: column; align-items: center;">
-                                <div id="cd-anexos-list" style="color: var(--acc3);"
-                                    onclick="showNotif('Calma ae, ainda não fiz essa parte', 'warn')">+ Adicionar Anexos
-                                    do Cliente</div>
-                            </div>
-                        </div>
+                        <div id="cd-anexos-list"></div>
                     </div>
 
 
@@ -3489,22 +3796,26 @@
                     <!-- LISTA DE EMPRESTIMOS -->
                     <div class="sh">
                         <div class="sh-t">Empréstimos</div>
+
+                        <div class="period-filter-chip" style="margin-top: 10px; margin-bottom: 0px;" id="cd-period-btn"
+                            onclick="openPeriodSheet()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg>
+                            <span id="cd-period-label">Todo o período</span>
+                            <svg class="pfc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                        </div>
+
                         <div class="sh-l" onclick="novoEmprestimoParaCliente()">+ Novo</div>
                     </div>
-                    <div class="period-filter-chip" id="cd-period-btn" onclick="openPeriodSheet()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" />
-                            <line x1="16" y1="2" x2="16" y2="6" />
-                            <line x1="8" y1="2" x2="8" y2="6" />
-                            <line x1="3" y1="10" x2="21" y2="10" />
-                        </svg>
-                        <span id="cd-period-label">Todo o período</span>
-                        <svg class="pfc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9" />
-                        </svg>
-                    </div>
+
                     <div id="cd-emp-list"></div>
                 </div>
             </div>
@@ -3846,11 +4157,14 @@
             <div class="sh-handle"></div>
             <div class="sh-hdr">
                 <div class="sh-title">Notificações</div>
-                <div class="sh-close" onclick="closeSheet(document.getElementById('notif-sheet'))"><svg
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg></div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="lc-mode-toggle" onclick="toggleLoanCardMode()"></div>
+                    <div class="sh-close" onclick="closeSheet(document.getElementById('notif-sheet'))"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg></div>
+                </div>
             </div>
             <div class="sh-body" id="notif-body"></div>
         </div>
@@ -3933,6 +4247,46 @@
                     style="display:none" onchange="onAttachFileSelected(this)">
                 <div id="attach-files-list" class="mt8"></div>
                 <div id="attach-add" class="mt8"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Anexo do Cliente Sheet -->
+    <div class="overlay" id="client-attach-sheet" data-backdrop="client-attach-sheet">
+        <div class="sheet" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title">Adicionar Anexo do Cliente</div>
+                <div class="sh-close" onclick="closeSheet(document.getElementById('client-attach-sheet'))"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></div>
+            </div>
+            <div class="sh-body">
+                <input type="file" id="client-attach-file-input" accept=".pdf,.jpg,.jpeg,.png,.webp"
+                    style="display:none" onchange="onClientAttachFileSelected(this)">
+
+                <div id="client-attach-preview"></div>
+
+                <div id="client-attach-picker" class="file-picker-btn"
+                    onclick="document.getElementById('client-attach-file-input').click()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    Selecionar arquivo / imagem
+                </div>
+
+                <div class="fg mt12">
+                    <div class="fl">Nome do Anexo</div>
+                    <input class="fi" id="client-attach-name-input" type="text"
+                        placeholder="Ex: RG, Comprovante de Residência…" oninput="updateClientAttachSaveState()">
+                </div>
+
+                <button class="btn-p mt12" id="client-attach-save-btn" disabled onclick="salvarAnexoCliente()">Salvar
+                    Anexo</button>
             </div>
         </div>
     </div>
@@ -4707,7 +5061,7 @@
             openSheet('period-sheet');
         }
 
-        function att_periods (el) {
+        function att_periods(el) {
             const startInput = document.getElementById('period-start');
             const endInput = document.getElementById('period-end');
             const data_start = startInput.value;
@@ -4719,7 +5073,7 @@
                 endInput.value = data_end_time < data_start_time ? dateStr(data_start_time) : endInput.value;
                 endInput.min = dateStr(data_start_time);
             } else if (el = 'period-end') {
-                startInput.value = data_start_time > data_end_time  ? dateStr(data_end_time) : startInput.value;
+                startInput.value = data_start_time > data_end_time ? dateStr(data_end_time) : startInput.value;
                 startInput.max = dateStr(data_end_time);
             }
         }
@@ -5146,22 +5500,23 @@
             const atenEl = document.getElementById('dash-atencao');
             const atenWrap = document.getElementById('dash-atencao-wrap');
             atenWrap.style.display = lateLoans.length ? '' : 'none';
-            atenEl.innerHTML = lateLoans.map(l => loanCardHTML(l, true)).join('');
+            atenEl.innerHTML = renderLoanCards(lateLoans, true);
 
             const proxEl = document.getElementById('dash-prox');
             const proxWrap = document.getElementById('dash-prox-wrap');
             proxWrap.style.display = warnLoans.length ? '' : 'none';
-            proxEl.innerHTML = warnLoans.map(l => loanCardHTML(l, true)).join('');
+            proxEl.innerHTML = renderLoanCards(warnLoans, true);
 
             const okEl = document.getElementById('dash-ok');
             const okWrap = document.getElementById('dash-ok-wrap');
             okWrap.style.display = okLoans.length ? '' : 'none';
-            okEl.innerHTML = okLoans.map(l => loanCardHTML(l, true)).join('');
+            okEl.innerHTML = renderLoanCards(okLoans, true);
 
             const doneEl = document.getElementById('dash-done');
             const doneWrap = document.getElementById('dash-done-wrap');
             doneWrap.style.display = doneLoans.length ? '' : 'none';
-            doneEl.innerHTML = doneLoans.map(l => loanCardHTML(l, true)).join('');
+            doneEl.innerHTML = renderLoanCards(doneLoans, true);
+            syncLoanModeToggles();
         }
 
         function renderDonut(total, late, warn, ok, done) {
@@ -5228,6 +5583,79 @@
             }
 
             document.getElementById('donut-svg').innerHTML = svgHTML;
+        }
+
+        // ==================== LOAN CARD VIEW MODE (padrão / minimalista) ====================
+        let _loanCardMode = 'full';
+        try { _loanCardMode = localStorage.getItem('loanCardMode') || 'full'; } catch (e) { }
+
+        // HTML do botão de alternância — pode ser inserido em qualquer tela que exiba loan cards
+        function loanModeToggleHTML() {
+            return `<div class="lc-mode-toggle" onclick="toggleLoanCardMode()">${loanModeToggleIconHTML()}<span>${_loanCardMode === 'mini' ? 'Compacto' : 'Detalhado'}</span></div>`;
+        }
+
+        function loanModeToggleIconHTML() {
+            return _loanCardMode === 'mini'
+                ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="6" rx="1"/><rect x="3" y="14" width="18" height="6" rx="1"/></svg>`
+                : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`;
+        }
+
+        // Atualiza todos os botões de alternância presentes na tela (podem existir vários simultaneamente)
+        function syncLoanModeToggles() {
+            document.querySelectorAll('.lc-mode-toggle').forEach(btn => {
+                btn.classList.toggle('act', _loanCardMode === 'mini');
+                btn.innerHTML = `${loanModeToggleIconHTML()}<span>${_loanCardMode === 'mini' ? 'Compacto' : 'Detalhado'}</span>`;
+                document.getElementById('emp-btn-card').innerHTML = `${loanModeToggleIconHTML()}<span>${_loanCardMode === 'mini' ? 'C' : 'D'}</span>`;
+            });
+        }
+
+        function toggleLoanCardMode() {
+            _loanCardMode = _loanCardMode === 'mini' ? 'full' : 'mini';
+            try { localStorage.setItem('loanCardMode', _loanCardMode); } catch (e) { }
+            syncLoanModeToggles();
+            refreshLoanCardViews();
+        }
+
+        // Re-renderiza qualquer tela/sheet visível que exiba loan cards, para refletir o novo modo
+        function refreshLoanCardViews() {
+            if (_currentScreen === 'dash') renderDash();
+            else if (_currentScreen === 'emprestimos') renderEmprestimos(_empFilter, false);
+            if (document.getElementById('notif-sheet')?.classList.contains('open')) buildNotif();
+        }
+
+        // Dispatcher central: gera a lista de cards no modo atualmente selecionado
+        function renderLoanCards(loans, showClient = true) {
+            if (!loans || !loans.length) return '';
+            return loans.map(l => _loanCardMode === 'mini' ? loanCardMiniHTML(l, showClient) : loanCardHTML(l, showClient)).join('');
+        }
+
+        // Versão minimalista do card — menos informações, tamanho reduzido
+        function loanCardMiniHTML(loan, showClient = true) {
+            const c = getLoanCalc(loan);
+            const client = getClient(loan.clientId);
+
+            if (!client) return '';
+
+            const diasAtrasoOrVenc = c.isPago && c.saldoRestante > 0 ? `<span class="c-g">Quitado Man.</span>` :
+                c.isPago && c.saldoRestante <= 0 ? `<span class="c-g">Quitado</span>` :
+                    c.diasAtraso > 0 ? `<span class="c-r">${c.diasAtraso}d atraso</span>` :
+                        c.diasParaVencer == 0 ? `<span class="c-w">Hoje</span>` :
+                            c.diasParaVencer == 1 ? `<span class="c-w">Amanha</span>` :
+                                c.diasParaVencer == 2 ? `<span class="c-w">2 dias</span>` :
+                                    `<span class="c-b">${c.diasParaVencer} dias</span>`;
+
+            return `
+            <div class="lcm lcm-${c.status}" onclick="closeSheet(document.getElementById('notif-sheet')); openEmpDetalhe('${loan.id}')">
+                ${showClient ? `<div class="av lcm-av ${client.color}">${client.initials}</div>` : ''}
+                <div class="lcm-info">
+                    <div class="lcm-name">${showClient ? client.nome : loan.id}<span class="lcm-val">${fmtMoney(c.valorBase)}</span></div>
+                    <div class="lcm-sub">${loan.id} · ${fmtMoney(Math.max(0, c.dividaTotal - c.totalPago))} restante</div>
+                </div>
+                <div class="lcm-right">
+                    <span class="pill pill-xs ${{ late: 'p-late', warn: 'p-warn', ok: 'p-ok', done: 'p-done' }[c.status] || 'p-pend'}">${{ late: 'Atrasado', warn: 'Vence logo', ok: 'Em dia', done: 'Pago' }[c.status] || c.status}</span>
+                    <span class="lcm-days">${diasAtrasoOrVenc}</span>
+                </div>
+            </div>`;
         }
 
         function loanCardHTML(loan, showClient = true) {
@@ -5343,7 +5771,8 @@
 
             const total = sortedLoansValido.length;
             document.getElementById('emp-subtitle').textContent = `${total} empréstimos · ${sortedLoansValido.length} exibidos`;
-            document.getElementById('emp-list').innerHTML = sortedLoansValido.length ? sortedLoansValido.map(l => loanCardHTML(l)).join('') : '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><p>Nenhum empréstimo encontrado</p></div>';
+            document.getElementById('emp-list').innerHTML = sortedLoansValido.length ? renderLoanCards(sortedLoansValido) : '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><p>Nenhum empréstimo encontrado</p></div>';
+            syncLoanModeToggles();
 
             if (render_all) {
                 renderEmpResultDashboard(loans, loansBase);
@@ -5552,6 +5981,91 @@
         }
         function filterEmprestimos(v) { _empSearchVal = v; renderEmprestimos(_empFilter); }
         function setTabEmp(el, filter) { document.querySelectorAll('#scr-emprestimos .tbtn').forEach(t => t.classList.remove('act')); el.classList.add('act'); renderEmprestimos(filter, false); }
+
+        // ==================== BUSCA: DROPDOWN DE CLIENTES ====================
+        let _cliSearchVal;
+        function handleEmpSearchInput(v, el) {
+            if (el == 'emp-search-dd') {
+                _empSearchVal = v;
+                filterEmprestimos(v);
+            } else {
+                _cliSearchVal = v;
+                filterClientes(v);
+            }
+            
+            renderEmpSearchDropdown(v, el);
+            document.getElementById(el)?.classList.add('open');
+        }
+
+        function openEmpSearchDropdown(el) {
+            if (el == 'emp-search-dd') {
+                renderEmpSearchDropdown(_empSearchVal, el);
+            } else {
+                renderEmpSearchDropdown(_cliSearchVal, el);
+            }
+            
+            document.getElementById(el)?.classList.add('open');
+        }
+
+        function closeEmpSearchDropdown() {
+            document.getElementById('emp-search-dd')?.classList.remove('open');
+            document.getElementById('cli-search-dd')?.classList.remove('open');
+        }
+
+        function clearEmpSearch(el) {
+            if(el == 'emp-search-input') {
+                _empSearchVal = '';
+            } else {
+                _cliSearchVal = '';
+            }
+
+            const input = document.getElementById(el);
+            if (input) input.value = '';
+            handleEmpSearchInput('');
+            input?.focus();
+        }
+
+        function renderEmpSearchDropdown(filterText, el) {
+            const dd = document.getElementById(el);
+            if (!dd) return;
+            const term = (filterText || '').toLowerCase().trim();
+            const clients = DB.clients.filter(c => !term || c.nome.toLowerCase().includes(term));
+
+            if (!clients.length) {
+                dd.innerHTML = `<div class="${el}-empty">Nenhum cliente encontrado</div>`;
+                return;
+            }
+
+            dd.innerHTML = clients.map(c => {
+                const n = getClientLoans(c.id).length;
+                return `
+                <div class="emp-search-dd-item" onmousedown="event.preventDefault(); selectEmpSearchClient('${c.id}', '${el}')">
+                    <div class="av ${c.color}" style="width:32px; height:32px; font-size:11px">${c.initials}</div>
+                    <div class="emp-search-dd-info">
+                        <div class="emp-search-dd-name">${c.nome}</div>
+                        <div class="emp-search-dd-sub">${n} empréstimo${n !== 1 ? 's' : ''}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function selectEmpSearchClient(clientId, el) {
+            const c = getClient(clientId);
+            if (!c) return;
+
+            let input;
+            if (el == 'emp-search-dd') {
+                input = document.getElementById('emp-search-input');
+                filterEmprestimos(c.nome);
+            } else {
+                input = document.getElementById('cli-search-input');
+                filterClientes(c.nome);
+            }
+
+
+            if (input) input.value = c.nome;
+            closeEmpSearchDropdown();
+        }
 
         // ==================== NOVO ====================
         let _novoSelectedClientId = null;
@@ -6998,7 +7512,9 @@
             }).join('');
         }
 
+
         function filterClientes(v) {
+            _cliSearchVal = v;
             const items = document.querySelectorAll('#cli-list .cc');
             items.forEach(el => {
                 const name = el.querySelector('.cc-name').textContent.toLowerCase();
@@ -7020,6 +7536,9 @@
             document.getElementById('cd-tel').textContent = c.tel;
             document.getElementById('cd-email').textContent = c.email || '';
             document.getElementById('cd-desc').textContent = c.desc || '';
+
+            // Anexos do cliente
+            renderClienteAnexos(c);
 
             updatePeriodUI();
             const loans = getClientLoans(cid).filter(loanInPeriod);
@@ -8534,9 +9053,10 @@
 
             let html = '';
             if (!late.length && !warn.length) { html = '<div class="empty"><p>Nenhuma notificação</p></div>'; }
-            late.forEach(l => { const c = getLoanCalc(l); html += loanCardHTML(l, true); });
-            warn.forEach(l => { const c = getLoanCalc(l); html += loanCardHTML(l, true); });
+            html += renderLoanCards(late, true);
+            html += renderLoanCards(warn, true);
             document.getElementById('notif-body').innerHTML = html;
+            syncLoanModeToggles();
             // Clear badge after 600ms — user has seen the notifications
             setTimeout(() => {
                 document.getElementById('notif-fab').className = 'no-notif';
@@ -9242,6 +9762,134 @@
                 }, 5000);
             }
 
+        }
+
+        // ==================== ANEXOS DO CLIENTE (parte visual) ====================
+        // DB.clients[...].anexos = [{ file: "nome_do_anexo", id: "id_no_drive" }, ...]
+        let _clientAttachFile = null;
+
+        // Renderiza a lista de anexos do cliente na tela de detalhe
+        function renderClienteAnexos(client) {
+            const el = document.getElementById('cd-anexos-list');
+            if (!el) return;
+            const anexos = (client && client.anexos) || [];
+
+            if (!anexos.length) {
+                el.innerHTML = '<div class="fs12 tc2" style="text-align:center; padding:8px 0;">Nenhum anexo adicionado</div>';
+                return;
+            }
+
+            el.innerHTML = anexos.map(a => `
+                <div class="attach-item" onclick="visualizarAnexoCliente('${a.id}')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    <div class="attach-item-name">${a.file}</div>
+                    <div class="attach-item-ver">Ver</div>
+                    <div class="attach-item-del" onclick="event.stopPropagation(); removerAnexoCliente('${a.id}')">✕</div>
+                </div>
+            `).join('');
+        }
+
+        // Abre a imagem/PDF do anexo do cliente no visualizador já existente
+        function visualizarAnexoCliente(anexoId) {
+            if (!anexoId) return;
+            const url = "https://lh3.googleusercontent.com/d/" + anexoId;
+            openAttachPreview('image', url);
+        }
+
+        // Abre o sheet de adicionar anexo, já resetado
+        function openClienteAnexoSheet() {
+            _clientAttachFile = null;
+            document.getElementById('client-attach-file-input').value = '';
+            document.getElementById('client-attach-name-input').value = '';
+            document.getElementById('client-attach-preview').innerHTML = '';
+            document.getElementById('client-attach-picker').style.display = '';
+            updateClientAttachSaveState();
+            openSheet('client-attach-sheet');
+        }
+
+        // Preview do arquivo escolhido (apenas visual, ainda não envia para lugar nenhum)
+        function onClientAttachFileSelected(input) {
+            const file = input.files?.[0];
+            if (!file) return;
+
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (file.size > maxSize) {
+                showToast('Arquivo maior que 10MB');
+                input.value = '';
+                return;
+            }
+
+            _clientAttachFile = file;
+            const box = document.getElementById('client-attach-preview');
+            document.getElementById('client-attach-picker').style.display = 'none';
+
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    box.innerHTML = `
+                    <div class="card_comp_pag" style="padding:10px">
+                        <img src="${e.target.result}" style="width:100%; max-height:220px; object-fit:contain; border-radius:8px">
+                        <div style="margin-top:8px; font-size:12px; text-align:center">${file.name}</div>
+                    </div>
+                    <div style="margin-top:8px; font-size:12px; color:var(--danger); cursor:pointer; text-align:center" onclick="removeClienteAttachPreview()">Remover</div>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                box.innerHTML = `
+                <div class="card_comp_pag" style="padding:12px; display:flex; align-items:center; gap:10px">
+                    <div style="font-size:32px">📄</div>
+                    <div>
+                        <div style="font-size:12px; font-weight:600">${file.name}</div>
+                        <div style="font-size:11px; color:var(--txt2)">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                    </div>
+                </div>
+                <div style="margin-top:8px; font-size:12px; color:var(--danger); cursor:pointer; text-align:center" onclick="removeClienteAttachPreview()">Remover</div>
+                `;
+            }
+
+            // Pré-preenche o nome do anexo com o nome do arquivo, se o usuário ainda não tiver digitado nada
+            const nameInput = document.getElementById('client-attach-name-input');
+            if (nameInput && !nameInput.value.trim()) {
+                nameInput.value = file.name.replace(/\.[^/.]+$/, '');
+            }
+
+            updateClientAttachSaveState();
+        }
+
+        // Remove o preview e volta para o botão de seleção
+        function removeClienteAttachPreview() {
+            _clientAttachFile = null;
+            document.getElementById('client-attach-file-input').value = '';
+            document.getElementById('client-attach-preview').innerHTML = '';
+            document.getElementById('client-attach-picker').style.display = '';
+            updateClientAttachSaveState();
+        }
+
+        // Botão de salvar só fica habilitado com arquivo escolhido + nome preenchido
+        function updateClientAttachSaveState() {
+            const nameVal = document.getElementById('client-attach-name-input')?.value.trim();
+            const btn = document.getElementById('client-attach-save-btn');
+            if (btn) btn.disabled = !(_clientAttachFile && nameVal);
+        }
+
+        // TODO: implementar o envio de _clientAttachFile para o Drive/planilha,
+        // salvar { file: nome, id: <id_do_drive> } em DB.clients[...].anexos
+        // e então chamar renderClienteAnexos(getClient(_currentClientId)) + closeSheet(...)
+        function salvarAnexoCliente() {
+            if (!_clientAttachFile || !_currentClientId) return;
+            const nome = document.getElementById('client-attach-name-input').value.trim();
+            showNotif('Função de salvar anexo do cliente ainda não configurada', 'warn');
+        }
+
+        // TODO: implementar a remoção do anexo no Drive/planilha e em DB.clients[...].anexos,
+        // e então chamar renderClienteAnexos(getClient(_currentClientId))
+        function removerAnexoCliente(anexoId) {
+            if (!anexoId || !_currentClientId) return;
+            showNotif('Função de remover anexo do cliente ainda não configurada', 'warn');
         }
 
         // Função para abrir o anexo em tela cheia
