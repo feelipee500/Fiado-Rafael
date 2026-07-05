@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
@@ -774,6 +774,172 @@
 
         .srch::placeholder {
             color: var(--txt2);
+        }
+
+        /* EMPRESTIMOS RESULT DASHBOARD */
+        .erd-hero-compact {
+            padding: 14px 14px 12px !important;
+            margin-bottom: 8px !important;
+        }
+
+        .erd-hero-compact .dash-hero-val {
+            font-size: 26px;
+            margin-bottom: 2px;
+        }
+
+        .erd-hero-compact .dash-hero-sub {
+            margin-bottom: 2px;
+        }
+
+        .erd-hero-compact .dash-hero-row {
+            margin-top: 8px;
+            padding-top: 8px;
+        }
+
+        .erd-hero-compact .dhr-val {
+            font-size: 14px;
+            white-space: normal;
+            line-height: 1.15;
+        }
+
+        .erd-hero-compact .dhr-lbl {
+            font-size: 10px;
+        }
+
+        .erd-compact-card {
+            padding: 12px !important;
+            margin-bottom: 8px;
+        }
+
+        .erd-compact-card:last-child {
+            margin-bottom: 8px;
+        }
+
+        .mb6 {
+            margin-bottom: 6px;
+        }
+
+        .edb-row {
+            margin-bottom: 8px;
+        }
+
+        .edb-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .edb-row-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .edb-row-lbl {
+            color: var(--txt1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .edb-row-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .edb-row-val {
+            font-weight: 700;
+            color: var(--txt0);
+        }
+
+        .edb-bar-track {
+            height: 8px;
+            background: var(--bg2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .edb-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width .3s ease;
+        }
+
+        .emp-dash-statusbar {
+            display: flex;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            background: var(--bg2);
+            margin-bottom: 8px;
+        }
+
+        .emp-dash-statusbar>div {
+            transition: flex-grow .3s ease;
+        }
+
+        .emp-dash-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+        }
+
+        .edl-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--txt1);
+        }
+
+        .edl-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .edl-val {
+            font-weight: 700;
+            color: var(--txt0);
+        }
+
+        /* PERIOD FILTER CHIP */
+        .period-filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+            background: var(--bg2);
+            border: 1px solid var(--brd);
+            border-radius: 20px;
+            padding: 6px 10px 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--txt1);
+            cursor: pointer;
+            margin-bottom: 12px;
+            white-space: nowrap;
+            transition: border-color .15s, color .15s;
+        }
+
+        .period-filter-chip svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        .period-filter-chip .pfc-chev {
+            width: 12px;
+            height: 12px;
+            margin-left: 2px;
+        }
+
+        .period-filter-chip.act {
+            border-color: var(--acc2);
+            color: var(--acc2);
         }
 
         /* TAB BAR */
@@ -2649,6 +2815,21 @@
                     <div class="ptitle">Visão Geral</div>
                     <div class="psub" id="dash-date">—</div>
 
+                    <div class="period-filter-chip" id="dash-period-btn" onclick="openPeriodSheet()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
+                        <span id="dash-period-label">Todo o período</span>
+                        <svg class="pfc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </div>
+
                     <!-- Hero card: total a receber -->
                     <div class="dash-hero">
                         <div class="dash-hero-lbl"> Pendente Em Aberto</div>
@@ -2808,13 +2989,27 @@
                 <div class="pw">
                     <div class="ptitle">Empréstimos</div>
                     <div class="psub" id="emp-subtitle">—</div>
-                    <div class="srch-wrap">
-                        <svg class="srch-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-linecap="round">
-                            <circle cx="11" cy="11" r="8" />
-                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                        </svg>
-                        <input class="srch" placeholder="Buscar cliente ou ID…" oninput="filterEmprestimos(this.value)">
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <div class="srch-wrap" style="flex:1; margin-bottom:12px;">
+                            <svg class="srch-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-linecap="round">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <input class="srch" placeholder="Buscar cliente ou ID…"
+                                oninput="filterEmprestimos(this.value)">
+                        </div>
+                        <div class="period-filter-chip" id="emp-period-btn" onclick="openPeriodSheet()"
+                            style="flex-shrink:0; margin-bottom:12px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg>
+                            <span id="emp-period-label">Período</span>
+                        </div>
                     </div>
                     <div class="tbar">
                         <div class="tbtn act" onclick="setTabEmp(this,'all')">Todos</div>
@@ -2823,6 +3018,55 @@
                         <div class="tbtn" onclick="setTabEmp(this,'late')">Atrasados</div>
                         <div class="tbtn" onclick="setTabEmp(this,'done')">Pagos</div>
                     </div>
+
+                    <!-- DASHBOARD DE RESULTADO (dos empréstimos filtrados) -->
+                    <div id="emp-result-dash" class="mb8">
+                        <div class="dash-hero erd-hero-compact">
+                            <div class="dash-hero-lbl">Resultado do Período</div>
+                            <div class="dash-hero-val" id="erd-lucro-prev">R$ 0</div>
+                            <div class="dash-hero-sub" id="erd-sub">—</div>
+                            <div class="dash-hero-row">
+                                <div class="dhr-item">
+                                    <div class="dhr-val" id="erd-emprestado">R$ 0</div>
+                                    <div class="dhr-lbl">Emprestado</div>
+                                </div>
+                                <div class="dhr-item">
+                                    <div class="dhr-val c-g" id="erd-recebido">R$ 0</div>
+                                    <div class="dhr-lbl">Recebido</div>
+                                </div>
+                                <div class="dhr-item">
+                                    <div class="dhr-val" id="erd-qtd">0</div>
+                                    <div class="dhr-lbl">Qtd.</div>
+                                </div>
+                            </div>
+                            <div class="dash-hero-row">
+                                <div class="dhr-item">
+                                    <div class="dhr-val c-r" id="erd-a-receber">R$ 0</div>
+                                    <div class="dhr-lbl">A Receber</div>
+                                </div>
+                                <div class="dhr-item">
+                                    <div class="dhr-val c-g" id="erd-lucro-relativo">R$ 0</div>
+                                    <div class="dhr-lbl">Lucro Relativo</div>
+                                </div>
+                                <div class="dhr-item">
+                                    <div class="dhr-val" id="erd-lucro-real">R$ 0</div>
+                                    <div class="dhr-lbl">Lucro Real</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-sm erd-compact-card">
+                            <div class="sc-lbl mb6">Emprestado × Recebido × Lucro</div>
+                            <div id="erd-bars"></div>
+                        </div>
+
+                        <div class="card-sm erd-compact-card">
+                            <div class="sc-lbl mb6">Composição por Status</div>
+                            <div class="emp-dash-statusbar" id="erd-statusbar"></div>
+                            <div class="emp-dash-legend" id="erd-legend"></div>
+                        </div>
+                    </div>
+
                     <div id="emp-list"></div>
                 </div>
             </div>
@@ -3006,6 +3250,20 @@
                 <div class="pw">
                     <div class="ptitle">Clientes</div>
                     <div class="psub" id="cli-subtitle">—</div>
+                    <div class="period-filter-chip" id="cli-period-btn" onclick="openPeriodSheet()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
+                        <span id="cli-period-label">Todo o período</span>
+                        <svg class="pfc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </div>
                     <div class="srch-wrap">
                         <svg class="srch-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-linecap="round">
@@ -3158,6 +3416,20 @@
                     <div class="sh">
                         <div class="sh-t">Empréstimos</div>
                         <div class="sh-l" onclick="novoEmprestimoParaCliente()">+ Novo</div>
+                    </div>
+                    <div class="period-filter-chip" id="cd-period-btn" onclick="openPeriodSheet()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
+                        <span id="cd-period-label">Todo o período</span>
+                        <svg class="pfc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
                     </div>
                     <div id="cd-emp-list"></div>
                 </div>
@@ -3604,6 +3876,47 @@
                     </svg></div>
             </div>
             <div class="sh-body" id="remove-sh-body">
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtro por período -->
+    <div class="overlay" id="period-sheet" data-backdrop="period-sheet">
+        <div class="sheet" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title">Filtrar por Período</div>
+                <div class="sh-close" onclick="closeSheet(document.getElementById('period-sheet'))"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></div>
+            </div>
+            <div class="sh-body">
+                <div class="sc-lbl">Período rápido</div>
+                <div class="fs12 tc1 mb12">Filtra os empréstimos pela data de emissão.</div>
+                <div class="tbar" id="period-preset-tabs">
+                    <div class="tbtn" data-mode="all" onclick="selectPeriodPreset('all')">Tudo</div>
+                    <div class="tbtn" data-mode="this-month" onclick="selectPeriodPreset('this-month')">Este Mês
+                    </div>
+                    <div class="tbtn" data-mode="last-month" onclick="selectPeriodPreset('last-month')">Mês Passado
+                    </div>
+                </div>
+                <div class="sc-lbl mt16">Período personalizado</div>
+                <div class="fr">
+                    <div class="fg">
+                        <div class="fl">De</div>
+                        <input class="fi" id="period-start" type="date">
+                    </div>
+                    <div class="fg">
+                        <div class="fl">Até</div>
+                        <input class="fi" id="period-end" type="date">
+                    </div>
+                </div>
+                <div class="confirm-btns mt12">
+                    <button class="cbtn-n" onclick="clearPeriodFilter()">Limpar filtro</button>
+                    <button class="cbtn-y" onclick="applyCustomPeriod()">Aplicar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -4228,6 +4541,121 @@
         let _newLoanData = null;
         let _empFilter = 'all';
 
+        // ==================== FILTRO DE PERÍODO ====================
+        // mode: 'all' | 'this-month' | 'last-month' | 'custom'
+        let _periodFilter = { mode: 'all', start: null, end: null };
+
+        function computePeriodRange(mode) {
+            const today = new Date(TODAY);
+            if (mode === 'this-month') {
+                const start = new Date(today.getFullYear(), today.getMonth(), 1).getTime();
+                const end = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999).getTime();
+                return { start, end };
+            }
+            if (mode === 'last-month') {
+                const start = new Date(today.getFullYear(), today.getMonth() - 1, 1).getTime();
+                const end = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59, 999).getTime();
+                return { start, end };
+            }
+            return { start: null, end: null };
+        }
+
+        function loanInPeriod(loan) {
+            if (_periodFilter.mode === 'all') return true;
+            if (_periodFilter.start == null || _periodFilter.end == null) return true;
+            return loan.emissao >= _periodFilter.start && loan.emissao <= _periodFilter.end;
+        }
+
+        function periodLabelText() {
+            if (_periodFilter.mode === 'all') return 'Todo o período';
+            if (_periodFilter.mode === 'this-month') return 'Este Mês';
+            if (_periodFilter.mode === 'last-month') return 'Mês Passado';
+            if (_periodFilter.mode === 'custom') {
+                return `${fmtDate(_periodFilter.start)} – ${fmtDate(_periodFilter.end)}`;
+            }
+            return 'Período';
+        }
+
+        function updatePeriodUI() {
+            const active = _periodFilter.mode !== 'all';
+            const label = periodLabelText();
+
+            const dashLbl = document.getElementById('dash-period-label');
+            const empLbl = document.getElementById('emp-period-label');
+            const cliLbl = document.getElementById('cli-period-label');
+            const cdLbl = document.getElementById('cd-period-label');
+            if (dashLbl) dashLbl.textContent = label;
+            if (empLbl) empLbl.textContent = label;
+            if (cliLbl) cliLbl.textContent = label;
+            if (cdLbl) cdLbl.textContent = label;
+
+            const dashBtn = document.getElementById('dash-period-btn');
+            const empBtn = document.getElementById('emp-period-btn');
+            const cliBtn = document.getElementById('cli-period-btn');
+            const cdBtn = document.getElementById('cd-period-btn');
+            if (dashBtn) dashBtn.classList.toggle('act', active);
+            if (empBtn) empBtn.classList.toggle('act', active);
+            if (cliBtn) cliBtn.classList.toggle('act', active);
+            if (cdBtn) cdBtn.classList.toggle('act', active);
+
+            document.querySelectorAll('#period-preset-tabs .tbtn').forEach(t => {
+                t.classList.toggle('act', t.dataset.mode === _periodFilter.mode);
+            });
+
+            const startInput = document.getElementById('period-start');
+            const endInput = document.getElementById('period-end');
+            if (_periodFilter.mode === 'custom') {
+                if (startInput) startInput.value = dateStr(_periodFilter.start);
+                if (endInput) endInput.value = dateStr(_periodFilter.end);
+            }
+        }
+
+        function openPeriodSheet() {
+            updatePeriodUI();
+            openSheet('period-sheet');
+        }
+
+        function applyPeriodFilter() {
+            updatePeriodUI();
+            if (_currentScreen === 'dash') renderDash();
+            else if (_currentScreen === 'emprestimos') renderEmprestimos(_empFilter);
+            else if (_currentScreen === 'clientes') renderClientes();
+            else if (_currentScreen === 'cliente-detalhe') openClienteDetalhe(_currentClientId);
+        }
+
+        function selectPeriodPreset(mode) {
+            const range = computePeriodRange(mode);
+            _periodFilter = { mode, start: range.start, end: range.end };
+            document.getElementById('period-start').value = '';
+            document.getElementById('period-end').value = '';
+            applyPeriodFilter();
+            closeSheet(document.getElementById('period-sheet'));
+        }
+
+        function applyCustomPeriod() {
+            const startVal = document.getElementById('period-start').value;
+            const endVal = document.getElementById('period-end').value;
+            if (!startVal || !endVal) {
+                showToast('Selecione as duas datas do período', 'err');
+                return;
+            }
+            let start = parseDate(startVal);
+            let end = parseDate(endVal);
+            end = new Date(end).setHours(23, 59, 59, 999);
+            if (start > end) { const tmp = start; start = end; end = tmp; }
+            _periodFilter = { mode: 'custom', start, end };
+            applyPeriodFilter();
+            closeSheet(document.getElementById('period-sheet'));
+        }
+
+        function clearPeriodFilter() {
+            _periodFilter = { mode: 'all', start: null, end: null };
+            document.getElementById('period-start').value = '';
+            document.getElementById('period-end').value = '';
+            applyPeriodFilter();
+            closeSheet(document.getElementById('period-sheet'));
+        }
+
         // ==================== LOAN CALC ====================
         function getLoanCalc(loan, cancel_pago) {
             const cancel = cancel_pago || false;
@@ -4504,12 +4932,15 @@
         function renderDash() {
             const d = new Date(TODAY).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
             document.getElementById('dash-date').textContent = d.charAt(0).toUpperCase() + d.slice(1);
+            updatePeriodUI();
+
+            const loansPeriodo = DB.loans.filter(loanInPeriod);
 
             let totalRecv = 0, totalEmp = 0, totalpagos = 0, totaldivida = 0, lucrorelativo = 0;
             let cntLate = 0, cntWarn = 0, cntOk = 0, cntDone = 0;
             let valLate = 0, valWarn = 0, valOk = 0;
 
-            DB.loans.forEach(l => {
+            loansPeriodo.forEach(l => {
                 const c = getLoanCalc(l);
                 if (!c.isPago) {
                     totalRecv += c.valorHoje;
@@ -4534,7 +4965,7 @@
                 }
             });
 
-            const total = DB.loans.length;
+            const total = loansPeriodo.length;
 
             // Hero
             document.getElementById('ds-total-recv').textContent = fmtMoney(totalRecv);
@@ -4568,12 +4999,12 @@
             renderDonut(total, cntLate, cntWarn, cntOk, cntDone);
 
             // Lists
-            const lateLoans = DB.loans.filter(l => getLoanCalc(l).status === 'late');
-            const warnLoans = DB.loans.filter(l => getLoanCalc(l).status === 'warn');
-            const okLoans = DB.loans.filter(l => getLoanCalc(l).status === 'ok');
+            const lateLoans = loansPeriodo.filter(l => getLoanCalc(l).status === 'late');
+            const warnLoans = loansPeriodo.filter(l => getLoanCalc(l).status === 'warn');
+            const okLoans = loansPeriodo.filter(l => getLoanCalc(l).status === 'ok');
 
             // Filtra os ultimos dois emprestimos pagos
-            const doneLoans = DB.loans
+            const doneLoans = loansPeriodo
                 .map(l => ({ original: l, calc: getLoanCalc(l) }))
                 .filter(item => item.calc.status === 'done')
                 .sort((a, b) => b.calc.pago - a.calc.pago)
@@ -4735,6 +5166,7 @@
         let _empSearchVal = '';
         function renderEmprestimos(filter) {
             _empFilter = filter || 'all';
+            updatePeriodUI();
             // update tab
             document.querySelectorAll('#scr-emprestimos .tbtn').forEach(t => {
                 const map = {
@@ -4750,7 +5182,7 @@
                     map[t.textContent.trim()] === _empFilter
                 );
             });
-            let loans = [...DB.loans];
+            let loans = DB.loans.filter(loanInPeriod);
             if (_empSearchVal) loans = loans.filter(l => {
                 const c = getClient(l.clientId);
                 return (c && c.nome.toLowerCase().includes(_empSearchVal.toLowerCase())) || l.id.toLowerCase().includes(_empSearchVal.toLowerCase());
@@ -4779,6 +5211,86 @@
             const total = sortedLoansValido.length;
             document.getElementById('emp-subtitle').textContent = `${total} empréstimos · ${sortedLoansValido.length} exibidos`;
             document.getElementById('emp-list').innerHTML = sortedLoansValido.length ? sortedLoansValido.map(l => loanCardHTML(l)).join('') : '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><p>Nenhum empréstimo encontrado</p></div>';
+
+            renderEmpResultDashboard(loans);
+        }
+
+        // Dashboard de resultado financeiro dos empréstimos filtrados (busca + status + período)
+        function renderEmpResultDashboard(loans) {
+            let emprestado = 0, recebido = 0, dividaTotal = 0, lucroContratado = 0, lucroRelativo = 0;
+            let cntLate = 0, cntWarn = 0, cntOk = 0, cntDone = 0;
+
+            loans.forEach(l => {
+                const c = getLoanCalc(l);
+                emprestado += l.valor;
+                recebido += c.totalPago;
+                dividaTotal += c.dividaTotal;
+                lucroContratado += (c.dividaTotal - l.valor);
+                lucroRelativo += c.totalPago >= l.valor ? c.totalPago - l.valor : 0;
+
+                if (c.status === 'late') cntLate++;
+                else if (c.status === 'warn') cntWarn++;
+                else if (c.status === 'ok') cntOk++;
+                else if (c.status === 'done') cntDone++;
+            });
+
+            const qtd = loans.length;
+            const aReceber = Math.max(0, dividaTotal - recebido);
+            const lucroReal = recebido - emprestado; // diferença real entre o que saiu e o que já voltou
+
+            const fmtSigned = v => (v < 0 ? '-' : '') + fmtMoney(Math.abs(v));
+
+            document.getElementById('erd-lucro-prev').textContent = fmtMoney(lucroContratado);
+            document.getElementById('erd-sub').textContent = qtd
+                ? `${qtd} empréstimo${qtd !== 1 ? 's' : ''} · ${periodLabelText()}`
+                : `Nenhum empréstimo neste filtro · ${periodLabelText()}`;
+
+            document.getElementById('erd-emprestado').textContent = fmtMoney(emprestado);
+            document.getElementById('erd-qtd').textContent = qtd;
+            document.getElementById('erd-recebido').textContent = fmtMoney(recebido);
+            document.getElementById('erd-a-receber').textContent = fmtMoney(aReceber);
+
+            document.getElementById('erd-lucro-relativo').textContent = fmtMoney(lucroRelativo);
+
+            const lucroRealEl = document.getElementById('erd-lucro-real');
+            lucroRealEl.textContent = fmtSigned(lucroReal);
+            lucroRealEl.classList.remove('c-g', 'c-r');
+            lucroRealEl.classList.add(lucroReal >= 0 ? 'c-g' : 'c-r');
+
+            // Barras comparativas: Emprestado x Recebido x Lucro Contratado
+            const maxVal = Math.max(emprestado, recebido, lucroContratado, 1);
+            const barRow = (label, value, color) => {
+                const pct = value > 0 ? Math.max(3, Math.round(value / maxVal * 100)) : 0;
+                return `<div class="edb-row">
+                    <div class="edb-row-top">
+                        <span class="edb-row-lbl"><span class="edb-row-dot" style="background:${color}"></span>${label}</span>
+                        <span class="edb-row-val">${fmtMoney(value)}</span>
+                    </div>
+                    <div class="edb-bar-track"><div class="edb-bar-fill" style="width:${pct}%; background:${color}"></div></div>
+                </div>`;
+            };
+            document.getElementById('erd-bars').innerHTML =
+                barRow('Emprestado', emprestado, 'var(--acc2)') +
+                barRow('Recebido', recebido, 'var(--acc)') +
+                barRow('Lucro Previsto', lucroContratado, 'var(--acc3)');
+
+            // Composição por status (barra + legenda)
+            const statusBarEl = document.getElementById('erd-statusbar');
+            const legendEl = document.getElementById('erd-legend');
+            const segs = [
+                { count: cntLate, color: 'var(--danger)', label: 'Atrasados' },
+                { count: cntWarn, color: 'var(--warn)', label: 'Vencendo' },
+                { count: cntOk, color: 'var(--acc2)', label: 'Em Dia' },
+                { count: cntDone, color: 'var(--acc)', label: 'Pagos' },
+            ];
+            statusBarEl.innerHTML = qtd
+                ? segs.filter(s => s.count > 0).map(s => `<div style="flex:${s.count}; background:${s.color}"></div>`).join('')
+                : `<div style="flex:1; background:var(--bg2)"></div>`;
+            legendEl.innerHTML = segs.map(s => `
+                <div class="edl-item">
+                    <span class="edl-dot" style="background:${s.color}"></span>
+                    ${s.label}: <span class="edl-val">${s.count}</span>
+                </div>`).join('');
         }
         function filterEmprestimos(v) { _empSearchVal = v; renderEmprestimos(_empFilter); }
         function setTabEmp(el, filter) { document.querySelectorAll('#scr-emprestimos .tbtn').forEach(t => t.classList.remove('act')); el.classList.add('act'); renderEmprestimos(filter); }
@@ -6188,11 +6700,12 @@
 
         // ==================== CLIENTES ====================
         function renderClientes() {
+            updatePeriodUI();
             const list = document.getElementById('cli-list');
             document.getElementById('cli-subtitle').textContent = `${DB.clients.length} clientes cadastrados`;
             if (!DB.clients.length) { list.innerHTML = '<div class="empty"><p>Nenhum cliente ainda</p></div>'; return; }
             list.innerHTML = DB.clients.map(c => {
-                const loans = getClientLoans(c.id);
+                const loans = getClientLoans(c.id).filter(loanInPeriod);
                 const totalEmp = loans.reduce((s, l) => s + l.valor, 0);
                 const totalPago = loans.reduce((s, l) => s + l.pagamentos.reduce((ss, p) => ss + p.valor, 0), 0);
                 const hasLate = loans.some(l => getLoanCalc(l).status === 'late');
@@ -6253,7 +6766,8 @@
             if (c.desc) { document.getElementById('cd-desc').textContent = c.desc; document.getElementById('cd-desc-wrap').style.display = ''; }
             else document.getElementById('cd-desc-wrap').style.display = 'none';
 
-            const loans = getClientLoans(cid);
+            updatePeriodUI();
+            const loans = getClientLoans(cid).filter(loanInPeriod);
             const hasLate = loans.some(l => getLoanCalc(l).status === 'late');
             const hasWarn = loans.some(l => getLoanCalc(l).status === 'warn');
             const statusC = loans.length == 0 ? 'ok' : hasLate ? 'late' : hasWarn ? 'warn' : loans.some(l => getLoanCalc(l).status === 'ok') ? 'ok' : 'done';
@@ -6345,7 +6859,7 @@
                 </div>
                 <div class="lc-bar"><div class="lc-fill ${calc.status}" style="width:${Math.min(100, Math.round(calc.totalPago / calc.dividaTotal * 100))}%"></div></div>
                 </div>`;
-            }).join('') : '<div class="empty"><p>Nenhum empréstimo ainda</p></div>';
+            }).join('') : `<div class="empty"><p>${_periodFilter.mode !== 'all' ? 'Nenhum empréstimo neste período' : 'Nenhum empréstimo ainda'}</p></div>`;
 
             navTo('cliente-detalhe');
         }
@@ -6675,12 +7189,38 @@
             const anexos_on = anexos ? anexos : false;
 
             const iconSvg = {
-                emissao: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>',
-                pagamento: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>',
-                juros: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
-                vencimento: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
-                hoje: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
-                quitado: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+                emissao: `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <polyline points="19 12 12 19 5 12"/>
+                </svg>`,
+                pagamento: `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>`,
+                juros: `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>`,
+                vencimento: `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>`,
+                hoje: `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>`,
+                quitado: `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>`
             }[e.tipo] || '';
 
             const dateFmt = fmtDate(e.date);
@@ -6726,9 +7266,21 @@
                     const has = pag && pag.anexo_pag[0];
 
                     if (anexos_on) {
-                        return has
-                            ? `<span class="tl-anexo-tag ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Anexo OK</span>`
-                            : `<span class="tl-anexo-tag miss"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Sem anexo</span>`;
+                        return has ? `
+                        <span class="tl-anexo-tag ok">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Anexo OK
+                        </span>
+                        ` : `
+                        <span class="tl-anexo-tag miss">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            Sem anexo
+                        </span>`;
                     } else {
                         return '';
                     }
@@ -6800,14 +7352,15 @@
                 dotClass = 'td-gr'; cardClass = ''; title = e.label; rows = [];
             }
 
-            return `<li class="tl-item${isPag ? ' clickable' : ''}" ${clickAttr}>
+            return `
+            <li class="tl-item${isPag ? ' clickable' : ''}" ${clickAttr}>
                 <div class="tl-dot ${dotClass}" style="margin-top:10px">${iconSvg}</div>
-                <div class="tl-card ${cardClass}">
-                <div class="tl-card-top">
-                    <div class="tl-card-title">${title}</div>
-                    <div class="tl-card-date">${dateLbl}</div>
-                </div>
-                <div class="tl-card-rows">${rows.join('')}</div>
+                    <div class="tl-card ${cardClass}">
+                    <div class="tl-card-top">
+                        <div class="tl-card-title">${title}</div>
+                        <div class="tl-card-date">${dateLbl}</div>
+                    </div>
+                    <div class="tl-card-rows">${rows.join('')}</div>
                 </div>
             </li>`;
         }
@@ -8752,10 +9305,10 @@
 
         // VARIAVEIS GLOBAIS
         // Meu Script
-        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
 
         // Script do Rafael
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbytXLOQJ_dSnl4l0rds_NQZLl3IzWNZBzoXk7mKNGWCWZCmUNBdYW08BVoVWrTZy8_1/exec";
+        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbytXLOQJ_dSnl4l0rds_NQZLl3IzWNZBzoXk7mKNGWCWZCmUNBdYW08BVoVWrTZy8_1/exec";
 
         var DB = {};
 
