@@ -294,7 +294,7 @@
         .psub {
             font-size: 14px;
             color: var(--txt1);
-            margin-bottom: 16px;
+            margin-bottom: 10px;
         }
 
         /* CARDS */
@@ -1905,7 +1905,7 @@
         .cc-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
+            gap: 3px;
         }
 
         .cc-s {
@@ -1919,6 +1919,7 @@
             font-weight: 600;
             font-size: 13px;
             font-family: var(--font-d);
+            white-space: nowrap;
         }
 
         .cc-sl {
@@ -2278,11 +2279,11 @@
 
         /* SECTION LABEL */
         .sc-lbl {
-            font-size: 10px;
-            color: var(--txt2);
+            font-size: 11px;
+            color: var(--txt1);
             text-transform: uppercase;
             letter-spacing: .8px;
-            font-weight: 600;
+            font-weight: 800;
         }
 
         /* AMOUNT HIGHLIGHT */
@@ -2424,12 +2425,13 @@
         }
 
         .dash-hero-lbl {
-            font-size: 11px;
-            color: var(--txt2);
+            font-size: 15px;
+            color: var(--txt1);
             text-transform: uppercase;
-            letter-spacing: .8px;
-            font-weight: 600;
+            letter-spacing: .5px;
+            font-weight: 800;
             margin-bottom: 6px;
+            white-space: nowrap;
         }
 
         .dash-hero-val {
@@ -2442,7 +2444,7 @@
         }
 
         .dash-hero-sub {
-            font-size: 12px;
+            font-size: 14px;
             color: var(--txt1);
         }
 
@@ -2480,8 +2482,8 @@
         }
 
         .dhr-lbl {
-            font-size: 12px;
-            color: var(--txt2);
+            font-size: 14px;
+            color: var(--txt1);
             letter-spacing: .3px;
         }
 
@@ -3341,7 +3343,6 @@
                             <div class="emp-search-dd" id="emp-search-dd"></div>
                         </div>
                     </div>
-                    <div class="psub" id="emp-subtitle">—</div>
 
                     <!-- DASHBOARD DE RESULTADO (dos empréstimos filtrados) -->
                     <div id="emp-result-dash" class="mb8">
@@ -3364,7 +3365,13 @@
                         </div>
 
                         <div class="dash-hero erd-hero-compact">
-                            <div class="dash-hero-lbl">Resultado do Período</div>
+                            <div style="display:flex; align-items:center; justify-content:space-between;">
+                                <div class="dash-hero-lbl">Resultado do Período</div>
+                                <div class="dhr-item">
+                                    <div class="psub" id="emp-total">—</div>
+                                </div>
+                            </div>
+                            
                             <div class="dash-hero-val" id="erd-a-receber">R$ 0</div>
                             <div class="dash-hero-sub" id="erd-sub">—</div>
                             <div class="dash-hero-row">
@@ -4924,7 +4931,17 @@
         }
 
         // Recebe um timestamp e retorna formatada em "dd/mm/yyyy" (pt-BR)
-        function fmtDate(s) { return new Date(s).toLocaleDateString('pt-BR'); }
+        function fmtDate(s) {
+            return new Date(s).toLocaleDateString('pt-BR');
+        }
+
+        // Recebe um timestamp e retorna formatada em "dd/mm" (pt-BR)
+        function fmtDateComp(s) {
+            return new Date(s).toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit'
+            });
+        }
 
         // Recebe um TIMESTAMP inicial e o número de dias a adicionar. Retorna um novo TIMESTAMP.
         function addDays(timestamp, n) {
@@ -5455,9 +5472,10 @@
             });
 
             const total = loansPeriodo.length;
+            const restante = totaldivida - totalpagos;
 
             // Hero
-            document.getElementById('ds-total-recv').textContent = fmtMoney(totalRecv);
+            document.getElementById('ds-total-recv').textContent = fmtMoney(restante);
             document.getElementById('ds-hero-sub').textContent = `${total - cntDone} em aberto · ${cntDone} quitado${cntDone !== 1 ? 's' : ''}`;
 
             document.getElementById('dhr-emprest').textContent = fmtMoney(totalEmp);
@@ -5503,22 +5521,22 @@
             const atenEl = document.getElementById('dash-atencao');
             const atenWrap = document.getElementById('dash-atencao-wrap');
             atenWrap.style.display = lateLoans.length ? '' : 'none';
-            atenEl.innerHTML = renderLoanCards(lateLoans, true);
+            atenEl.innerHTML = renderLoanCards(lateLoans, true, false);
 
             const proxEl = document.getElementById('dash-prox');
             const proxWrap = document.getElementById('dash-prox-wrap');
             proxWrap.style.display = warnLoans.length ? '' : 'none';
-            proxEl.innerHTML = renderLoanCards(warnLoans, true);
+            proxEl.innerHTML = renderLoanCards(warnLoans, true, false);
 
             const okEl = document.getElementById('dash-ok');
             const okWrap = document.getElementById('dash-ok-wrap');
             okWrap.style.display = okLoans.length ? '' : 'none';
-            okEl.innerHTML = renderLoanCards(okLoans, true);
+            okEl.innerHTML = renderLoanCards(okLoans, true, false);
 
             const doneEl = document.getElementById('dash-done');
             const doneWrap = document.getElementById('dash-done-wrap');
             doneWrap.style.display = doneLoans.length ? '' : 'none';
-            doneEl.innerHTML = renderLoanCards(doneLoans, true);
+            doneEl.innerHTML = renderLoanCards(doneLoans, true, false);
             syncLoanModeToggles();
         }
 
@@ -5627,13 +5645,14 @@
         }
 
         // Dispatcher central: gera a lista de cards no modo atualmente selecionado
-        function renderLoanCards(loans, showClient = true) {
+        function renderLoanCards(loans, showClient = true, valoresON = false) {
             if (!loans || !loans.length) return '';
-            return loans.map(l => _loanCardMode === 'mini' ? loanCardMiniHTML(l, showClient) : loanCardHTML(l, showClient)).join('');
+            return loans.map(l => _loanCardMode === 'mini' ? loanCardMiniHTML(l, showClient, valoresON) : loanCardHTML(l, showClient, valoresON)).join('');
         }
 
-        // Versão minimalista do card — menos informações, tamanho reduzido
-        function loanCardMiniHTML(loan, showClient = true) {
+
+        // Versão minimalista — Agora com quebra de linha no nome do cliente
+        function loanCardMiniHTML(loan, showClient, valoresON) {
             const c = getLoanCalc(loan);
             const client = getClient(loan.clientId);
 
@@ -5641,27 +5660,71 @@
 
             const diasAtrasoOrVenc = c.isPago && c.saldoRestante > 0 ? `<span class="c-g">Quitado Man.</span>` :
                 c.isPago && c.saldoRestante <= 0 ? `<span class="c-g">Quitado</span>` :
-                    c.diasAtraso > 0 ? `<span class="c-r">${c.diasAtraso}d atraso</span>` :
+                    c.diasAtraso > 0 ? `<span class="c-r">+${c.diasAtraso}d</span>` :
                         c.diasParaVencer == 0 ? `<span class="c-w">Hoje</span>` :
-                            c.diasParaVencer == 1 ? `<span class="c-w">Amanha</span>` :
+                            c.diasParaVencer == 1 ? `<span class="c-w">Amanhã</span>` :
                                 c.diasParaVencer == 2 ? `<span class="c-w">2 dias</span>` :
-                                    `<span class="c-b">${c.diasParaVencer} dias</span>`;
+                                    `<span class="c-b">Restam ${c.diasParaVencer} dias</span>`;
+
+            const stringPagar = c.isPago && c.saldoRestante > 0 ? 'Ignorado' :
+                c.isPago && c.saldoRestante <= 0 ? 'Lucro' :
+                    'Falta Pagar';
+
+            const valorFaltaPagar = stringPagar === 'Lucro' ?
+                '+' + fmtMoney(c.totalPago - loan.valor) :
+                fmtMoney(Math.max(0, c.dividaTotal - c.totalPago));
+
+            const corFaltaPagar = stringPagar === 'Lucro' ? 'var(--acc)' : 'var(--danger)';
 
             return `
-            <div class="lcm lcm-${c.status}" onclick="closeSheet(document.getElementById('notif-sheet')); openEmpDetalhe('${loan.id}')">
-                ${showClient ? `<div class="av lcm-av ${client.color}">${client.initials}</div>` : ''}
-                <div class="lcm-info">
-                    <div class="lcm-name">${showClient ? client.nome : loan.id}<span class="lcm-val">${fmtMoney(c.valorBase)}</span></div>
-                    <div class="lcm-sub">${loan.id} · ${fmtMoney(Math.max(0, c.dividaTotal - c.totalPago))} restante</div>
+            <div class="lcm lcm-${c.status}" style="display: flex; flex-direction: column;" onclick="closeSheet(document.getElementById('notif-sheet')); openEmpDetalhe('${loan.id}')">
+                ${valoresON ? `
+                <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0; gap: 30px; margin-bottom: -20px">
+                    ${loan.entrada > 0 ? `
+                    <span style="white-space: nowrap; font-weight: 600; font-size: 10px; color: var(--acc)">+${fmtMoney(loan.entrada)}</span>
+                    ` : ``}
+                    ${loan.saida > 0 ? `
+                    <span style="white-space: nowrap; font-weight: 600; font-size: 10px; color: var(--danger)">-${fmtMoney(loan.saida)}</span>
+                    ` : ``}
                 </div>
-                <div class="lcm-right">
-                    <span class="pill pill-xs ${{ late: 'p-late', warn: 'p-warn', ok: 'p-ok', done: 'p-done' }[c.status] || 'p-pend'}">${{ late: 'Atrasado', warn: 'Vence logo', ok: 'Em dia', done: 'Pago' }[c.status] || c.status}</span>
-                    <span class="lcm-days">${diasAtrasoOrVenc}</span>
+                ` : ``}
+                
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; min-height: 48px; gap: 2px;">
+
+                    <div style="display: flex; align-items: center; gap: 1px; width: 100px; flex-shrink: 0; min-width: 100px;">
+                        ${showClient ? `<div class="av ${client.color}" style="flex-shrink: 0;">${client.initials}</div>` : ''}
+                        
+                        <div style="display: flex; flex-direction: column; min-width: 0; flex: 1; justify-content: center;">
+                            <div class="lcm-name" style="font-weight: 600; font-size: 11px; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word;">
+                                ${showClient ? client.nome : 'Cliente'}
+                            </div>
+                            <div class="lc-id" style="font-size: 10px; white-space: nowrap; margin-top: 2px;">
+                                ${loan.id}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 85px; flex-shrink: 0; margin-left: auto;">
+                        <div style="font-weight: 600; font-size: 12px; opacity: 0.9; white-space: nowrap;">${fmtMoney(loan.valor_receber)}</div>
+                        <div style="font-size: 9px; opacity: 0.5; font-weight: 600;">Total</div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 85px; flex-shrink: 0;">
+                        <div style="font-weight: 800; font-size: 13px; color: ${corFaltaPagar}; white-space: nowrap;">${valorFaltaPagar}</div>
+                        <div style="font-size: 9px; opacity: 0.5; font-weight: 600;">${stringPagar}</div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; flex-shrink: 0;">
+                        <div>${statusPill(c.status)}</div>
+                        <div class="lc-mv" style="font-weight: 600; white-space: nowrap; font-size: 10px; margin-top: 2px;">${diasAtrasoOrVenc}</div>
+                    </div>
+                    
                 </div>
             </div>`;
         }
 
-        function loanCardHTML(loan, showClient = true) {
+
+        function loanCardHTML(loan, showClient, valoresON) {
             const c = getLoanCalc(loan);
             const client = getClient(loan.clientId);
 
@@ -5679,11 +5742,15 @@
 
             const diasAtrasoOrVenc = c.isPago && c.saldoRestante > 0 ? `<span class="c-g">Quitado Man.</span>` :
                 c.isPago && c.saldoRestante <= 0 ? `<span class="c-g">Quitado</span>` :
-                    c.diasAtraso > 0 ? `<span class="c-r">${c.diasAtraso} dia${c.diasAtraso != 1 ? 's' : ''}</span>` :
-                        c.diasParaVencer == 0 ? `<span class="c-w">Hoje</span>` :
-                            c.diasParaVencer == 1 ? `<span class="c-w">Amanha</span>` :
-                                c.diasParaVencer == 2 ? `<span class="c-w">2 dias</span>` :
-                                    `<span class="c-b">${c.diasParaVencer} dias</span>`;
+                    c.diasAtraso > 0 ? `<span class="c-r">+${c.diasAtraso} dia${c.diasAtraso != 1 ? 's' : ''}</span>` :
+                        c.diasParaVencer == 0 ? `<span class="c-w">Vence Hoje</span>` :
+                            c.diasParaVencer == 1 ? `<span class="c-w">Vence Amanha</span>` :
+                                c.diasParaVencer == 2 ? `<span class="c-w">Restam 2 dias</span>` :
+                                    `<span class="c-b">Restam ${c.diasParaVencer} dias</span>`;
+
+            const stringPagar = c.isPago && c.saldoRestante > 0 ? 'Divida Ignorada' :
+                c.isPago && c.saldoRestante <= 0 ? 'Lucro' :
+                    'Falta Pagar';
 
             const progressPct = c.totalPago ? Math.max(2, Math.min(100, Math.round((c.totalPago / c.dividaTotal) * 100))) : 0;
 
@@ -5691,43 +5758,83 @@
             const venc = addDays(loan.emissao, prazo);
 
             return `
-            <div class="lc lc-${c.status}" onclick="closeSheet(document.getElementById('notif-sheet')); openEmpDetalhe('${loan.id}')">
-                <div class="lc-top">
-                    <div class="flex-r">${showClient ? `<div class="av ${client.color}">${client.initials}</div>` : ''}<div>
-                        <div class="lc-name">${fmtMoney(c.valorBase)}</div>
-                        <div class="lc-name">${showClient ? client.nome : loan.id}</div>
-                        <div class="lc-id" style="font-weight: 600;">${fmtDate(loan.emissao)}⇨${fmtDate(venc)}</div>
-                        <div class="lc-id" style="font-weight: 600;">${prazo} dias</div>
+            <div class="lc lc-${c.status}" onclick="closeSheet(document.getElementById('notif-sheet')); openEmpDetalhe('${loan.id}')" style="display: flex; flex-direction: column; padding: 10px;">
+                
+                <div class="lc-top" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-bottom: 20px">            
+                    <div style="display: flex; align-items: center; text-align: left;">
+                        ${showClient ? `<div class="av ${client.color}">${client.initials}</div>` : ''}
+                        <div style="display: flex; flex-direction: column; justify-content: center;">
+                            <div class="lc-id" style="font-weight: 600; font-size: 13px; opacity: 0.8; white-space: nowrap;">
+                                ${fmtDateComp(loan.emissao)} ⪼ ${fmtDateComp(venc)} - ${prazo} dias
+                            </div>
+                            <div class="lc-name" style="font-weight: 600;">${showClient ? client.nome : 'Cliente'}</div>
+                        </div>
+                    </div>
+
+                    ${valoresON ? `
+                    <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        ${loan.entrada > 0 ? `<span class="lc-id" style="white-space: nowrap; margin-bottom: 2px; font-weight: 600; font-size: 10px; color: var(--acc)">+${fmtMoney(loan.entrada)}</span>` : ''}
+                        ${loan.saida > 0 ? `<span class="lc-id" style="white-space: nowrap; margin-bottom: 2px; font-weight: 600; font-size: 10px; color: var(--danger)">-${fmtMoney(loan.saida)}</span>` : ''}
+                    </div>
+                    ` : ``}
+
+                    <div style="display: flex; flex-direction: column; align-items: end;">
+                        <div>${statusPill(c.status)}</div>
+                        <div class="lc-mv" style="font-weight: 600; white-space: nowrap; font-size: 10px;">${diasAtrasoOrVenc}</div>
+                        ${c.pago ? `
+                            <div class="lc-id" style="font-weight: 600; font-size: 10px;">${fmtDateComp(c.pago)}✔</div>
+                            ` : ``}
                     </div>
                 </div>
-                <div style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center;">
-                    ${statusPill(c.status)}
-                    <span class="lc-id" style="margin-top: 25px; font-weight: 600; font-size: 13px;">${loan.id}</span>
+
+                <div class="lc-grid" style="display: flex; justify-content: space-between; width: 100%;">
+                    <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: flex-start;">
+                        <div class="lc-ml" style="font-weight: 600; font-size: 10px;">Enviado</div>
+                        <div class="lc-mv" style="font-weight: 600; font-size: 10px;">${fmtMoney(loan.valor)}</div>
+                    </div>
+                    
+                    <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <div class="lc-id" style="font-weight: 600; font-size: 10px;">${loan.id}</div>
+                    </div>
+                    
+                    <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: flex-end;">
+                        ${c.diasAtraso > 0 ? `
+                        <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: flex-end;">
+                            <div class="lc-ml" style="font-weight: 600; white-space: nowrap; font-size: 10px;">Valor +J.</div>
+                            <div class="lc-mv" style="font-weight: 600; white-space: nowrap; color: var(--danger); font-size: 10px;">${fmtMoney(c.dividaTotal)}</div>
+                        </div>
+                        ` : ``}
+                        
+                    </div>
                 </div>
+
+                <div class="lc-grid" style="display: flex; justify-content: space-between; width: 100%; margin-top:-15px">
+                    <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: flex-start;">
+                        <div class="lc-mv" style="font-weight: 800; font-size: 14px;">${fmtMoney(loan.valor_receber)}</div>
+                        <div class="lc-ml" style="font-weight: 600; font-size: 12px;">Valor + Lucro</div>                
+                    </div>
+                                
+                    <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: center;">                
+                        <div class="lc-mv" style="font-weight: 800; font-size: 14px; color: var(--acc)">+${fmtMoney(c.totalPago)}</div>
+                        <div class="lc-ml" style="font-weight: 600; font-size: 12px;">Recebido</div>
+                    </div>
+                    
+                    <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: flex-end;">                
+                        <div class="lc-mv" style="font-weight: 1000; font-size: 14px; color: var(--${stringPagar == 'Lucro' ? 'acc' : 'danger'})">${stringPagar == 'Lucro' ? '+' + fmtMoney(c.totalPago - loan.valor) : fmtMoney(Math.max(0, c.dividaTotal - c.totalPago))}</div>
+                        <div class="lc-ml" style="font-weight: 600; font-size: 12px;">${stringPagar}</div>
+                    </div>
                 </div>
-                <div class="lc-grid">
-                <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
-                    <div class="lc-ml" style="font-weight: 600;">Pago</div>
-                    <div class="lc-mv" style="font-weight: 600;">${fmtMoney(c.totalPago)}</div>
-                </div>
-                <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
-                    <div class="lc-ml" style="font-weight: 600;">Restante</div>
-                    <div class="lc-mv" style="font-weight: 600;">${fmtMoney(Math.max(0, c.dividaTotal - c.totalPago))}</div>
-                </div>
-                <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center;">
-                    <div class="lc-ml" style="font-weight: 600;">${situacao_status}</div>
-                    <div class="lc-mv" style="font-weight: 600; white-space: nowrap;">${diasAtrasoOrVenc}</div>
-                </div>
-                </div>
-                <div class="lc-bar">
-                    <div class="lc-fill ${fillClass}" style="width:${progressPct}%"></div>
+
+                <div class="lc-bar" style="width: 100%;">
+                    <div class="lc-fill done" style="width:${progressPct}%"></div>
                 </div>
             </div>`;
         }
 
         // ==================== EMPRESTIMOS ====================
         let _empSearchVal = '';
-        function renderEmprestimos(filter, render_all = true) {
+        let sortedLoansValido = null;
+        async function renderEmprestimos(filter, render_all = true) {
             _empFilter = filter || 'all';
             updatePeriodUI();
             // update tab
@@ -5754,10 +5861,11 @@
                 loansBase = loansBase.filter(l => getLoanCalc(l).status === _empFilter);
             }
             let loans = loansBase.filter(loanInPeriod);
+            let total_max = loans.length;
 
             // Ordena os emprestimos em ordem de importancia
             const statusPriority = { 'late': 1, 'warn': 2, 'ok': 3, 'done': 4 };
-            const sortedLoansValido = loans
+            sortedLoansValido = loans
                 // Executa o cálculo pesado apenas uma vez por elemento
                 .map(loan => ({
                     original: loan,
@@ -5772,14 +5880,16 @@
                 // Retorna o array contendo apenas a estrutura original do empréstimo
                 .map(item => item.original);
 
+            if (render_all) {
+                await renderEmpResultDashboard(loansBase);
+            }
+
             const total = sortedLoansValido.length;
-            document.getElementById('emp-subtitle').textContent = `${total} empréstimos · ${sortedLoansValido.length} exibidos`;
-            document.getElementById('emp-list').innerHTML = sortedLoansValido.length ? renderLoanCards(sortedLoansValido) : '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><p>Nenhum empréstimo encontrado</p></div>';
+            document.getElementById('emp-total').textContent = `${total} Empréstimos`;
+            document.getElementById('emp-list').innerHTML = sortedLoansValido.length ? renderLoanCards(sortedLoansValido, true, true) : '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><p>Nenhum empréstimo encontrado</p></div>';
             syncLoanModeToggles();
 
-            if (render_all) {
-                renderEmpResultDashboard(loans, loansBase);
-            }
+
 
         }
 
@@ -5890,11 +6000,13 @@
                 </div>`;
         }
 
-        function renderEmpResultDashboard(loans, loansBase) {
+        let loanCount_x = 0, pagCount = 0;
+        function renderEmpResultDashboard(loansBase) {
             let emprestado = 0, recebido = 0, aReceber = 0, lucroContratado = 0;
             let lucroRelativo = 0; lucroRelativo_x = 0; totalPagoAntes_inicial = 0; recebido_x = 0; lin_min = 0;
-            let loanCount = 0, pagCount = 0;
             let cntLate = 0, cntWarn = 0, cntOk = 0, cntDone = 0;
+            loanCount_x = 0, pagCount = 0;
+            
 
             const t0 = todayYM();
             const ref = _periodFilter.mode === 'month' ? { year: _periodFilter.year, month: _periodFilter.month } : t0;
@@ -5911,43 +6023,61 @@
             // Emprestado e A Receber -> empréstimos EMITIDOS naquele mês
             // Recebido -> pagamentos EFETUADOS naquele mês (independente do mês de emissão do empréstimo)
             // Lucro Real -> Recebido - Emprestado
-
+            
             const r = monthRange(months.year, months.month);
             loansBase.forEach(l => {
+                loan_valid = sortedLoansValido.find(p => p.id === l.id);
+
                 if ((l.emissao >= r.start && l.emissao <= r.end) || (months.year == 3000 && months.month == 12)) {
                     const c = getLoanCalc(l);
-                    loanCount++;
+                    loanCount_x++;
                     emprestado += l.valor;
                     aReceber += c.dividaTotal;
                     lucroContratado += (aReceber - emprestado);
+
+                    if (loan_valid) {
+                        loan_valid.saida = l.valor;
+                    }
+
 
                     if (c.status === 'late') cntLate++;
                     else if (c.status === 'warn') cntWarn++;
                     else if (c.status === 'ok') cntOk++;
                     else if (c.status === 'done') cntDone++;
+                } else {
+                    if (loan_valid) {
+                        loan_valid.saida = 0;
+                    }
                 }
+
 
 
                 lin_min = 999999999;
                 recebido_x = 0;
                 lucroRelativo_x = 0;
                 totalPagoAntes_inicial = 0;
+
+                if (loan_valid) {
+                    loan_valid.entrada = 0;
+                }
                 (l.pagamentos || []).forEach(p => {
                     if ((p.data >= r.start && p.data <= r.end) || (months.year == 3000 && months.month == 12)) {
                         pagCount++;
                         recebido += p.valor;
- 
+
                         if (p.lin < lin_min) {
                             lin_min = p.lin;
+                            loan_valid.entrada = p.valor;
 
                             if (p.totalPagoAntes > 0) {
                                 totalPagoAntes_inicial = p.totalPagoAntes;
-                            } 
+                            }
 
                             recebido_x += totalPagoAntes_inicial + p.valor;
                             lucroRelativo_x = totalPagoAntes_inicial >= l.valor ? p.valor : recebido_x > l.valor ? recebido_x - l.valor : 0;
                         } else {
-                           
+                            loan_valid.entrada += p.valor;
+
                             if (totalPagoAntes_inicial >= l.valor) {
                                 lucroRelativo_x += p.valor;
                             } else {
@@ -5962,11 +6092,12 @@
             });
 
             const lucroReal = recebido - emprestado;
+            const restante = aReceber - recebido;
 
             document.getElementById('erd-lucro-prev').textContent = fmtMoney(lucroContratado);
-            document.getElementById('erd-sub').textContent = aReceber > 0 ? 'Restante a Receber' : 'Dividas Quitadas';
+            document.getElementById('erd-sub').textContent = restante > 0 ? 'Restante a Receber' : 'Dividas Quitadas';
 
-            document.getElementById('erd-a-receber').textContent = fmtMoney(aReceber);
+            document.getElementById('erd-a-receber').textContent = fmtMoney(restante);
 
             document.getElementById('erd-emprestado').textContent = fmtMoney(emprestado);
             document.getElementById('erd-recebido').textContent = fmtMoney(recebido);
@@ -6015,7 +6146,7 @@
                 { count: cntLate, color: 'var(--danger)', label: 'Atrasados' },
                 { count: cntDone, color: 'var(--acc)', label: 'Pagos' },
             ];
-            statusBarEl.innerHTML = loanCount
+            statusBarEl.innerHTML = loanCount_x
                 ? segs.filter(s => s.count > 0).map(s => `<div style="flex:${s.count}; background:${s.color}"></div>`).join('')
                 : `<div style="flex:1; background:var(--bg2)"></div>`;
             legendEl.innerHTML = segs.map(s => `
@@ -6024,8 +6155,16 @@
                     ${s.label}: <span class="edl-val">${s.count}</span>
                 </div>`).join('');
         }
-        function filterEmprestimos(v) { _empSearchVal = v; renderEmprestimos(_empFilter); }
-        function setTabEmp(el, filter) { document.querySelectorAll('#scr-emprestimos .tbtn').forEach(t => t.classList.remove('act')); el.classList.add('act'); renderEmprestimos(filter, false); }
+
+        function filterEmprestimos(v) {
+            _empSearchVal = v;
+            renderEmprestimos(_empFilter);
+        }
+
+        function setTabEmp(el, filter) {
+            document.querySelectorAll('#scr-emprestimos .tbtn').forEach(t => t.classList.remove('act'));
+            el.classList.add('act'); renderEmprestimos(filter, false);
+        }
 
         // ==================== BUSCA: DROPDOWN DE CLIENTES ====================
         let _cliSearchVal;
@@ -7523,14 +7662,25 @@
             if (!DB.clients.length) { list.innerHTML = '<div class="empty"><p>Nenhum cliente ainda</p></div>'; return; }
             list.innerHTML = DB.clients.map(c => {
                 const loans = getClientLoans(c.id).filter(loanInPeriod);
+                console.log(loans);
                 const totalEmp = loans.reduce((s, l) => s + l.valor, 0);
                 const totalPago = loans.reduce((s, l) => s + l.pagamentos.reduce((ss, p) => ss + p.valor, 0), 0);
+                const dividaTotal = loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0);
+                const restante = Math.max(0, dividaTotal - totalPago);
+
+                const LucroRelativo = loans.reduce((accLucro, l) => {
+                    const pagoNoEmprestimo = l.pagamentos.reduce((ss, p) => ss + p.valor, 0);
+                    // Só há lucro real se o que foi pago for maior do que o valor enviado
+                    const lucroNesteEmprestimo = Math.max(0, pagoNoEmprestimo - l.valor);
+                    return accLucro + lucroNesteEmprestimo;
+                }, 0);
+
                 const hasLate = loans.some(l => getLoanCalc(l).status === 'late');
                 const hasWarn = loans.some(l => getLoanCalc(l).status === 'warn');
                 const statusC = loans.length == 0 ? 'ok' : hasLate ? 'late' : hasWarn ? 'warn' : loans.some(l => getLoanCalc(l).status === 'ok') ? 'ok' : 'done';
                 const open = loans.filter(l => !getLoanCalc(l).isPago).length;
 
-                const progressPct = totalPago == 0 ? 0 : Math.min(100, totalPago / Math.max(0, loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0)) * 100);
+                const progressPct = totalPago == 0 ? 0 : Math.min(100, totalPago / Math.max(5, loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0)) * 100);
 
                 return `<div class="cc" onclick="openClienteDetalhe('${c.id}')">
                     <div class="cc-top">
@@ -7543,15 +7693,26 @@
                     ${statusPill(statusC)}
                     </div>
                     <div class="cc-stats">
-                    <div class="cc-s"><div class="cc-sv">${fmtMoney(totalEmp)}</div><div class="cc-sl">Emprestado</div></div>
-                    <div class="cc-s"><div class="cc-sv c-g">${fmtMoney(totalPago)}</div><div class="cc-sl">Pago</div></div>
-                    <div class="cc-s"><div class="cc-sv c-r">${fmtMoney(Math.max(0, loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0)))}</div><div class="cc-sl">A receber</div></div>
+                        <div class="cc-s">
+                            <div class="cc-sl" style="font-size: 10px">Enviado</div>
+                            <div class="cc-sv" style="font-size: 10px">${fmtMoney(totalEmp)}</div>
+                            <div class="cc-sv" style="font-size: 16px; font-weight:800;">${fmtMoney(Math.max(0, loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0)))}</div>
+                            <div class="cc-sl">A Receber</div>
+                        </div>
+                        <div class="cc-s">
+                            <div class="cc-sl" style="font-size: 10px">Lucro</div>
+                            <div class="cc-sv c-g" style="font-size: 10px">+${fmtMoney(LucroRelativo)}</div>
+                            <div class="cc-sv c-g" style="font-size: 16px; font-weight:800;">${fmtMoney(totalPago)}</div>
+                            <div class="cc-sl">Pago</div>
+                        </div>
+                        <div class="cc-s" style="display: flex; flex-direction: column; justify-content: center;">
+                            <div class="cc-sl" style="margin-top: 4px;">Saldo</div>
+                            <div class="cc-sv c-r" style="font-size: 18px; font-weight:800; line-height: 1.2;">${fmtMoney(restante)}</div>
+                            <div class="cc-sl" style="margin-top: 4px;">Restante</div>
+                        </div>
                     </div>
                     <div class="cc-bar">
-                    <div
-                        class="lc-fill done"
-                        style="width:${progressPct}%"
-                    ></div>
+                        <div class="lc-fill done" style="width:${progressPct}%"></div>
                     </div>
                 </div>`;
             }).join('');
@@ -7620,7 +7781,7 @@
             const sitBox = document.getElementById('cd-sit-box');
             sitBox.className = 'prev-box mb12 ' + (statusC === 'late' ? 'err-bdr' : statusC === 'warn' ? 'warn-bdr' : statusC === 'done' ? 'done-bdr' : 'ok-bdr');
             document.getElementById('cd-valor-hoje').textContent = statusC === 'done' ? '✓ Quitado' : fmtMoney(falta);
-            document.getElementById('cd-valor-hoje').className = 'amt-big ' + (statusC === 'done' ? 'c-g' : statusC === 'late' ? 'c-r' : statusC === 'warn' ? 'c-w' : 'c-b');
+            document.getElementById('cd-valor-hoje').className = 'amt-big ' + (statusC === 'done' ? 'c-g' : 'c-r');
 
             if (statusC === 'done' && restante > 0) {
                 document.getElementById('cd-valor-hoje-title').style.display = 'none';
@@ -7656,34 +7817,21 @@
                 // Retorna o array contendo apenas a estrutura original do empréstimo
                 .map(item => item.original);
 
-            document.getElementById('cd-emp-list').innerHTML = sortedLoansValido.length ? sortedLoansValido.map(l => {
-                const calc = getLoanCalc(l);
-                const venc = addDays(l.emissao, l.prazo);
-                const jVal = l.juros_tipo === 'fixo' ? fmtMoney(l.juros_val) + '/dia' : `${l.juros_val}%/dia`;
-                return `<div class="lc lc-${calc.status}" onclick="openEmpDetalhe('${l.id}')">
-                <div class="lc-top">
-                    <div><div class="lc-name">${fmtMoney(calc.valorBase)}</div><div class="lc-id">${fmtDate(l.emissao)} ⇨ ${fmtDate(venc)}</div><div class="lc-id">${l.prazo} dias</div></div>
-                    <div><div class="lc-id">${l.id}</div></div>
-                    ${statusPill(calc.status)}
-                </div>
-                <div class="lc-grid">
-                    <div class="lc-mi"><div class="lc-ml">Emprestado</div><div class="lc-mv">${fmtMoney(l.valor)}</div></div>
-                    <div class="lc-mi"><div class="lc-ml">Lucro Previsto</div><div class="lc-mv c-g">${fmtMoney(calc.dividaTotal - l.valor)}</div></div>
-                    <div class="lc-mi"><div class="lc-ml">Juros/dia</div><div class="lc-mv c-r">${fmtMoney(calc.jurosDia)} ${calc.status == "late" ? "(+" + calc.diasAtraso + "d)" : ""}</div><div class="lc-mv c-r">${calc.status == "late" ? fmtMoney(calc.totalJuros) + " ↩" : ""}</div></div>
-                </div>
-                <div class="lc-grid" style="margin-bottom:8px">
-                    <div class="lc-mi"><div class="lc-ml">Pago</div><div class="lc-mv c-g">${fmtMoney(calc.totalPago)}</div></div>
-                    <div class="lc-mi"><div class="lc-ml">Restante</div><div class="lc-mv c-r">${fmtMoney(Math.max(0, calc.valorHoje))}</div></div>
-                    <div class="lc-mi"><div class="lc-ml">Divida Total</div><div class="lc-mv c-r">${fmtMoney(calc.dividaTotal)}</div></div>
-                </div>
-                <div class="lc-bar"><div class="lc-fill ${calc.status}" style="width:${Math.min(100, Math.round(calc.totalPago / calc.dividaTotal * 100))}%"></div></div>
-                </div>`;
-            }).join('') : `<div class="empty"><p>${_periodFilter.mode !== 'all' ? 'Nenhum empréstimo neste período' : 'Nenhum empréstimo ainda'}</p></div>`;
+            document.getElementById('cd-emp-list').innerHTML = sortedLoansValido.length ? renderLoanCards(sortedLoansValido, true, false) :
+                `<div class="empty"><p>${_periodFilter.mode !== 'all' ? 'Nenhum empréstimo neste período' :
+                    'Nenhum empréstimo ainda'}</p></div>`;
 
             navTo('cliente-detalhe');
         }
-        function backFromClienteDetalhe() { navTo(_prevScreen === 'clientes' ? 'clientes' : 'clientes'); }
-        function novoEmprestimoParaCliente() { _newLoanClientId = _currentClientId; navTo('novo'); }
+
+        function backFromClienteDetalhe() {
+            navTo(_prevScreen === 'clientes' ? 'clientes' : 'clientes');
+        }
+
+        function novoEmprestimoParaCliente() {
+            _newLoanClientId = _currentClientId;
+            navTo('novo');
+        }
 
         // ==================== EMP DETALHE ====================
         function openEmpDetalhe(lid) {
@@ -9098,8 +9246,8 @@
 
             let html = '';
             if (!late.length && !warn.length) { html = '<div class="empty"><p>Nenhuma notificação</p></div>'; }
-            html += renderLoanCards(late, true);
-            html += renderLoanCards(warn, true);
+            html += renderLoanCards(late, true, false);
+            html += renderLoanCards(warn, true, false);
             document.getElementById('notif-body').innerHTML = html;
             syncLoanModeToggles();
             // Clear badge after 600ms — user has seen the notifications
