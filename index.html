@@ -3551,12 +3551,22 @@
                                     placeholder="Ex: 15" style="display:none; width: 100%; text-align: center; "
                                     oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview(); ">
                             </div>
+                            <div class="fg" style="flex:1; ">
+                                <div class="fl" style="text-align: center; ">Parcelas *</div>
+                                <input class="fi" id="ne-parcelas" type="text" inputmode="numeric" min="1"
+                                    value="1" placeholder="Ex: 1" style="width: 100%; text-align: center; "
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,'');" onchange="if(this.value==='' || parseInt(this.value)<1) this.value='1'; updateNovoPreview(); ">
+                            </div>
                         </div>
                         <div id="custom-prazo-wrap" style="display:none" class="fg mt8">
                             <div class="fl" style="text-align:center">Prazo em dias *</div>
                             <input class="fi" id="ne-prazo-custom" type="text" inputmode="numeric" min="1"
                                 placeholder="Ex: 10" style="width: 100%; text-align: center"
                                 oninput="this.value=this.value.replace(/[^0-9\s]/g, ''); updateNovoPreview()">
+                        </div>
+                        <div id="novo-parcelas-info" style="display:none" class="fg mt8">
+                            <div class="fl" style="text-align:center">Divisão das parcelas</div>
+                            <div id="novo-parcelas-info-txt" class="fs11 tc2" style="text-align:center"></div>
                         </div>
                         <div class="fg mt8">
                             <div class="fl" style="text-align: center; ">Juros por dia de atraso *</div>
@@ -4722,7 +4732,7 @@
                         </div>
                     </div>
 
-                    <div class="fr" style="margin-top:8px; ">
+                    <div class="fr" style="margin-top:8px; display: flex; gap: 12px; ">
                         <div class="fg" style="flex:1; ">
                             <div class="fl">Data de emissão *</div>
                             <input class="fi" id="ee-data-edit" type="date" onchange="updateNovoPreview_edit()">
@@ -4734,6 +4744,13 @@
                                 placeholder="Ex: 15"
                                 oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit(); ">
                         </div>
+
+                        <div class="fg" style="flex:1; ">
+                            <div class="fl">Parcelas *</div>
+                            <input class="fi" id="ee-parcelas-edit" type="text" inputmode="numeric" min="1"
+                                value="1" placeholder="Ex: 1"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'');" onchange="if(this.value==='' || parseInt(this.value)<1) this.value='1'; updateNovoPreview_edit(); ">
+                        </div>
                     </div>
 
                     <div id="custom-prazo-wrap-edit" style="display:none; " class="fg mt8">
@@ -4741,6 +4758,11 @@
                         <input class="fi" id="ee-prazo-custom-edit" type="text" inputmode="numeric" min="1"
                             placeholder="Ex: 10"
                             oninput="this.value=this.value.replace(/[^0-9\s]/g, ''); updateNovoPreview_edit()">
+                    </div>
+
+                    <div id="ee-parcelas-info" style="display:none" class="fg mt8">
+                        <div class="fl">Divisão das parcelas</div>
+                        <div id="ee-parcelas-info-txt" class="fs11 tc2"></div>
                     </div>
 
                     <div class="fg mt8">
@@ -4954,6 +4976,19 @@
         function diffDays(a, b) {
             // Como 'a' e 'b' já são números (milissegundos), a conta fica direta e muito mais rápida
             return Math.trunc((b - a) / (1000 * 60 * 60 * 24));
+        }
+
+        // Recebe emissão, prazo (em dias) e quantidade de parcelas.
+        // Retorna um array com {numero, dias, data} para cada parcela, dividindo o prazo em partes iguais.
+        // Ex: prazo=31, parcelas=2 -> parcela 1 vence aos 15 dias (metade), parcela 2 (final) vence aos 31 dias.
+        function getParcelaDates(emissao, prazo, parcelas) {
+            const n = Math.max(1, parseInt(parcelas) || 1);
+            const out = [];
+            for (let i = 1; i <= n; i++) {
+                const dias = Math.round(prazo * i / n);
+                out.push({ numero: i, dias, data: addDays(emissao, dias) });
+            }
+            return out;
         }
 
         // Recebe um valor numerico e transforma em reais monetário (R$ X.XXX,XX)
@@ -5319,26 +5354,55 @@
             }
 
 
-            // Vencimento marker — inserted at vencimento date
+            // Parcela / Vencimento markers — inserted at each parcela checkpoint, ending with the final vencimento
             {
-                // Calc pago até o vencimento
-                const pagsAteVenc = sortedPags.filter(p => p.data <= vencimento + (23 * 60 * 60 * 1000));
-                const totalPagoAteVenc = pagsAteVenc.reduce((s, p) => s + p.valor, 0);
-                // saldo na data de vencimento (before any juros — juros start the day AFTER)
-                const saldoNoVenc = Math.max(0, c.valorBase - totalPagoAteVenc);
-                const quitouAntesVenc = totalPagoAteVenc >= c.valorBase;
-                const algumPagAteVenc = pagsAteVenc.length > 0;
+                const numParcelas = Math.max(1, parseInt(loan.parcelas) || 1);
+                const checkpoints = getParcelaDates(emissao, loan.prazo, numParcelas);
+                const valorParcela = c.valorBase / numParcelas;
 
-                events.push({
-                    date: vencimento + (23 * 60 * 60 * 1000), tipo: 'vencimento',
-                    label: 'Vencimento',
-                    quitouAntes: quitouAntesVenc,
-                    algumPag: algumPagAteVenc,
-                    totalPagoAteVenc,
-                    saldoNoVenc,
-                    saldoAntes: saldoNoVenc, saldoDepois: saldoNoVenc,
-                    valor: saldoNoVenc,
-                    color: quitouAntesVenc ? 'td-g' : 'td-a'
+                checkpoints.forEach(ck => {
+                    const isFinal = ck.numero === numParcelas;
+                    const dataCk = ck.data + (23 * 60 * 60 * 1000);
+                    // Pagamentos considerados até esta data (usados tanto para a parcela quanto para o vencimento final)
+                    const pagsAteData = sortedPags.filter(p => p.data <= dataCk);
+                    const totalPagoAteData = pagsAteData.reduce((s, p) => s + p.valor, 0);
+                    const esperadoAcumulado = valorParcela * ck.numero;
+                    const algumPagAteData = pagsAteData.length > 0;
+
+                    if (isFinal) {
+                        // Mantém a semântica original do evento de vencimento (baseado na dívida total)
+                        const saldoNoVenc = Math.max(0, c.valorBase - totalPagoAteData);
+                        const quitouAntesVenc = totalPagoAteData >= c.valorBase;
+                        events.push({
+                            date: dataCk, tipo: 'vencimento',
+                            numero: ck.numero, totalParcelas: numParcelas,
+                            label: 'Vencimento',
+                            quitouAntes: quitouAntesVenc,
+                            algumPag: algumPagAteData,
+                            totalPagoAteVenc: totalPagoAteData,
+                            saldoNoVenc,
+                            saldoAntes: saldoNoVenc, saldoDepois: saldoNoVenc,
+                            valor: saldoNoVenc,
+                            color: quitouAntesVenc ? 'td-g' : 'td-a'
+                        });
+                    } else {
+                        // Checkpoint de parcela intermediária — compara o pago até aqui com o esperado até aqui
+                        const saldoParcela = Math.max(0, esperadoAcumulado - totalPagoAteData);
+                        const quitouParcela = totalPagoAteData >= esperadoAcumulado;
+                        events.push({
+                            date: dataCk, tipo: 'parcela',
+                            numero: ck.numero, totalParcelas: numParcelas,
+                            label: `${ck.numero}° parcela`,
+                            quitouAntes: quitouParcela,
+                            algumPag: algumPagAteData,
+                            totalPagoAteVenc: totalPagoAteData,
+                            esperadoAcumulado, valorParcela,
+                            saldoNoVenc: saldoParcela,
+                            saldoAntes: saldoParcela, saldoDepois: saldoParcela,
+                            valor: saldoParcela,
+                            color: quitouParcela ? 'td-g' : 'td-a'
+                        });
+                    }
                 });
             }
 
@@ -5372,7 +5436,7 @@
 
 
             // Sort chronologically; within same day: juros → pagamento → quitado → hoje
-            const typeOrder = { emissao: 0, juros: 1, pagamento: 2, vencimento: 3, quitado: 4, hoje: 5 };
+            const typeOrder = { emissao: 0, juros: 1, pagamento: 2, parcela: 3, vencimento: 3, quitado: 4, hoje: 5 };
             events.sort((a, b) => a.date - b.date || (typeOrder[a.tipo] || 0) - (typeOrder[b.tipo] || 0));
 
             // Verificar se é preview de historico de pagamento no dia atual
@@ -5660,7 +5724,7 @@
 
             const diasAtrasoOrVenc = c.isPago && c.saldoRestante > 0 ? `<span class="c-g">Quitado Man.</span>` :
                 c.isPago && c.saldoRestante <= 0 ? `<span class="c-g">Quitado</span>` :
-                    c.diasAtraso > 0 ? `<span class="c-r">+${c.diasAtraso}d</span>` :
+                    c.diasAtraso > 0 ? `<span class="c-r">+${c.diasAtraso} dia${c.diasAtraso != 1 ? 's' : ''}</span>` :
                         c.diasParaVencer == 0 ? `<span class="c-w">Hoje</span>` :
                             c.diasParaVencer == 1 ? `<span class="c-w">Amanhã</span>` :
                                 c.diasParaVencer == 2 ? `<span class="c-w">2 dias</span>` :
@@ -5675,6 +5739,8 @@
                 fmtMoney(Math.max(0, c.dividaTotal - c.totalPago));
 
             const corFaltaPagar = stringPagar === 'Lucro' ? 'var(--acc)' : 'var(--danger)';
+
+            const progressPct = c.totalPago ? Math.max(2, Math.min(100, Math.round((c.totalPago / c.dividaTotal) * 100))) : 0;
 
             return `
             <div class="lcm lcm-${c.status}" style="display: flex; flex-direction: column;" onclick="closeSheet(document.getElementById('notif-sheet')); openEmpDetalhe('${loan.id}')">
@@ -5718,7 +5784,9 @@
                         <div>${statusPill(c.status)}</div>
                         <div class="lc-mv" style="font-weight: 600; white-space: nowrap; font-size: 10px; margin-top: 2px;">${diasAtrasoOrVenc}</div>
                     </div>
-                    
+                </div>
+                <div class="lc-bar" style="width: 100%;">
+                    <div class="lc-fill done" style="width:${progressPct}%"></div>
                 </div>
             </div>`;
         }
@@ -5765,7 +5833,7 @@
                         ${showClient ? `<div class="av ${client.color}">${client.initials}</div>` : ''}
                         <div style="display: flex; flex-direction: column; justify-content: center;">
                             <div class="lc-id" style="font-weight: 600; font-size: 13px; opacity: 0.8; white-space: nowrap;">
-                                ${fmtDateComp(loan.emissao)} ⪼ ${fmtDateComp(venc)} - ${prazo} dias
+                                ${fmtDateComp(loan.emissao)} ⪼ ${fmtDateComp(venc)} - ${prazo} dias${(loan.parcelas || 1) > 1 ? ` (${loan.parcelas}x)` : ''}
                             </div>
                             <div class="lc-name" style="font-weight: 600;">${showClient ? client.nome : 'Cliente'}</div>
                         </div>
@@ -6602,6 +6670,8 @@
             if (!restoreData) {
                 document.getElementById('ne-valor').value = '';
                 document.getElementById('ne-prazo').value = '';
+                document.getElementById('ne-parcelas').value = '1';
+                document.getElementById('novo-parcelas-info').style.display = 'none';
                 const dataEl = document.getElementById('ne-data');
                 dataEl.value = dateStr(TODAY);
                 dataEl.max = dateStr(TODAY);
@@ -6625,6 +6695,7 @@
                     dataEl.max = dateStr(TODAY);
                     document.getElementById('ne-juros-tipo').value = _newLoanData.juros_tipo || 'fixo';
                     document.getElementById('ne-juros-val').value = _newLoanData.juros_val || '';
+                    document.getElementById('ne-parcelas').value = _newLoanData.parcelas || 1;
                     _updateJurosSuffix();
                     const prazoEl = document.getElementById('ne-prazo');
                     const prazoOptions = [...prazoEl.options].map(o => o.value);
@@ -6727,7 +6798,7 @@
         function updateNovoPreview() {
             const inputValor = document.getElementById('ne-valor');
             const inputReceber = document.getElementById('ne-receber-manual');
-            const inputPrazo = document.getElementById('ne-prazo');
+            let inputPrazo = document.getElementById('ne-prazo');
             const inputData = document.getElementById('ne-data');
             const inputJurosVal = document.getElementById('ne-juros-val');
 
@@ -6742,7 +6813,8 @@
                 prazoRaw = inputPrazo.value === 'custom' ? parseInt(document.getElementById('ne-prazo-custom').value) || 0 : parseInt(inputPrazo.value) || 0;
             } else {
                 customWrap.style.display = 'none';
-                prazoRaw = parseInt(document.getElementById('ne-prazo-manual').value) || 0;
+                inputPrazo = document.getElementById('ne-prazo-manual');
+                prazoRaw = parseInt(inputPrazo.value) || 0;
             }
 
             const valor = parseFloat(inputValor.value);
@@ -6767,6 +6839,17 @@
 
             const emissao = dataEmissao;
             const venc = addDays(emissao, prazoRaw);
+
+            const parcelasRaw = Math.max(1, parseInt(document.getElementById('ne-parcelas').value) || 1);
+            const parcelasInfoWrap = document.getElementById('novo-parcelas-info');
+            const parcelasInfoTxt = document.getElementById('novo-parcelas-info-txt');
+            if (parcelasRaw > 1) {
+                const cks = getParcelaDates(emissao, prazoRaw, parcelasRaw);
+                parcelasInfoTxt.textContent = cks.map(c => `${c.numero}ª: ${fmtDate(c.data)} (${c.dias}d)`).join('  ·  ');
+                parcelasInfoWrap.style.display = '';
+            } else {
+                parcelasInfoWrap.style.display = 'none';
+            }
 
             let pr = 0;
             let valorBase = 0;
@@ -6814,7 +6897,7 @@
             const modo = document.getElementById('ne-modo-calculo')?.value || 'padrao';
             const inputValor = document.getElementById('ne-valor');
             const inputReceber = document.getElementById('ne-receber-manual');
-            const inputPrazo = document.getElementById('ne-prazo');
+            let inputPrazo = document.getElementById('ne-prazo');
             const inputData = document.getElementById('ne-data');
             const inputJurosVal = document.getElementById('ne-juros-val');
             const valor = parseFloat(inputValor.value) || 0;
@@ -6829,13 +6912,14 @@
             if (modo === 'padrao') {
                 prazoRaw = inputPrazo.value === 'custom' ? parseInt(document.getElementById('ne-prazo-custom').value) || 0 : parseInt(inputPrazo.value) || 0;
             } else {
-                prazoRaw = parseInt(document.getElementById('ne-prazo-manual').value) || 0;
+                inputPrazo = document.getElementById('ne-prazo-manual');
+                prazoRaw = parseInt(inputPrazo.value) || 0;
 
                 // Validação extra e impeditiva para o valor a receber no modo manual
                 const valorReceber = parseFloat(inputReceber.value) || 0;
                 if (!valorReceber || valorReceber < valor) {
                     inputReceber.style.borderColor = "var(--err, #ff4d4d)";
-                    showToast('O valor a receber precisa ser igual ou maior que o valor emprestado', 'err');
+                    showToast('O valor a receber não esta válido', 'err');
                     return;
                 } else {
                     inputReceber.style.borderColor = "";
@@ -6864,6 +6948,12 @@
             const valor_receber = modo === 'manual' ? parseFloat(document.getElementById('ne-receber-manual').value) : valor * (1 + pr);
             const c = getClient(_novoSelectedClientId);
 
+            const parcelas = Math.max(1, parseInt(document.getElementById('ne-parcelas').value) || 1);
+            if (parcelas > prazoRaw) {
+                showToast('O número de parcelas não pode ser maior que o prazo em dias', 'err');
+                return;
+            }
+
             // Injetamos a propriedade 'modo_calculo' e o 'valor_receber' para persistir os estados se o usuário voltar a tela
             _newLoanData = {
                 clientId: c.id,
@@ -6871,6 +6961,7 @@
                 qtd_emps: c.qtd_emps,
                 valor,
                 prazo: prazoRaw,
+                parcelas,
                 emissao: dataEmissao,
                 juros_tipo: jurosTipo,
                 juros_val: jurosVal,
@@ -6909,6 +7000,7 @@
                 document.getElementById('ne-data').value = dateStr(_newLoanData.emissao) || dateStr(TODAY);
                 document.getElementById('ne-juros-tipo').value = _newLoanData.juros_tipo || 'fixo';
                 document.getElementById('ne-juros-val').value = _newLoanData.juros_val || '';
+                document.getElementById('ne-parcelas').value = _newLoanData.parcelas || 1;
 
                 // Restaura o modo de cálculo correto ao voltar da simulação
                 const modoSalvo = _newLoanData.modo_calculo || 'padrao';
@@ -6961,6 +7053,20 @@
             const totalJuros = diasAtraso * jurosDia;
             const valorHoje = valorBase + totalJuros;
 
+            const parcelas = Math.max(1, parseInt(d.parcelas) || 1);
+            let parcelasHTML = '';
+            if (parcelas > 1) {
+                const cks = getParcelaDates(emissao, d.prazo, parcelas);
+                const valorParcela = valorBase / parcelas;
+                let parcRows = cks.map(ck => `
+                    <div class="dr"><div class="dk">${ck.numero}° parcela${ck.numero === parcelas ? ' (final)' : ''}</div><div class="dv2">${fmtDate(ck.data)} — ${fmtMoney(valorParcela)}</div></div>
+                `).join('');
+                parcelasHTML = `<div class="card mb12">
+                    <div class="sc-lbl">Parcelas (${parcelas}x de ${fmtMoney(valorParcela)})</div>
+                    ${parcRows}
+                </div>`;
+            }
+
             let tblRows = '';
             tblRows += `<tr class="venc"><td>${fmtDate(venc)}</td><td>Vencimento</td><td>R$0,00</td><td>${fmtMoney(valorBase)}</td></tr>`;
             let acJ = 0;
@@ -7004,6 +7110,7 @@
                 <div class="dr"><div class="dk">Prazo de pagamento</div><div class="dv2">${d.prazo} dias</div></div>
                 <div class="dr" style="border:none"><div class="dk">Data de vencimento</div><div class="dv2 fw6">${fmtDate(venc)}</div></div>
                 </div>
+                ${parcelasHTML}
                 ${situacaoRetroHTML}
                 <div class="card mb12">
                 <div class="sc-lbl">Previsão de juros por atraso — ${d.juros_tipo === 'fixo' ? fmtMoney(d.juros_val) + '/dia' : `${d.juros_val}%/dia`}</div>
@@ -7050,7 +7157,7 @@
                 <div class="card-sm mb12">
                 <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${c.nome}</div></div>
                 <div class="dr"><div class="dk">Data de emissão</div><div class="dv2">${fmtDate(d.emissao)}</div></div>
-                <div class="dr"><div class="dk">Prazo</div><div class="dv2">${d.prazo} dias</div></div>
+                <div class="dr"><div class="dk">Prazo</div><div class="dv2">${d.prazo} dias${(d.parcelas || 1) > 1 ? ` (${d.parcelas}x)` : ''}</div></div>
                 <div class="dr"><div class="dk">Vencimento</div><div class="dv2 fw6">${fmtDate(venc)}</div></div>
                 <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(d.valor)}</div></div>
                 <div class="dr"><div class="dk">Valor a receber (+${Math.round(pr)}%)</div><div class="dv2 c-g fw6" style="font-size:16px">${fmtMoney(valorBase)}</div></div>
@@ -7074,6 +7181,7 @@
             const clientId = d.clientId;
             const valor = d.valor;
             const prazo = d.prazo;
+            const parcelas = Math.max(1, parseInt(d.parcelas) || 1);
             const juros_tipo = d.juros_tipo;
             const juros_val = d.juros_val;
             const emissao = d.emissao;
@@ -7095,7 +7203,7 @@
 
             const qtd_emps = d.qtd_emps + 1;
 
-            const loan = { id, clientId, valor, valor_receber, prazo, juros_tipo, juros_val, emissao, pago, qtd_pags, lin_cliente, novo_qtd_emps, time: DB.time };
+            const loan = { id, clientId, valor, valor_receber, prazo, parcelas, juros_tipo, juros_val, emissao, pago, qtd_pags, lin_cliente, novo_qtd_emps, time: DB.time };
 
             try {
                 console.log("Adicionando empréstimo na planilha...");
@@ -7156,7 +7264,7 @@
                 <div class="dr"><div class="dk">Cliente</div><div class="dv2">${c.nome}</div></div>
                 <div class="dr"><div class="dk">Telefone</div><div class="dv2">${c.tel}</div></div>
                 <div class="dr"><div class="dk">Emissão</div><div class="dv2">${fmtDate(loan.emissao)}</div></div>
-                <div class="dr"><div class="dk">Prazo</div><div class="dv2">${loan.prazo} dias</div></div>
+                <div class="dr"><div class="dk">Prazo</div><div class="dv2">${loan.prazo} dias${(loan.parcelas || 1) > 1 ? ` (${loan.parcelas}x)` : ''}</div></div>
                 <div class="dr"><div class="dk">Vencimento</div><div class="dv2 fw6">${fmtDate(venc)}</div></div>
                 <div class="dr"><div class="dk">Valor emprestado</div><div class="dv2">${fmtMoney(loan.valor)}</div></div>
                 <div class="dr"><div class="dk">Lucro (${Math.round(pr)}%)</div><div class="dv2 c-g">+ ${fmtMoney(calc.valorBase - loan.valor)}</div></div>
@@ -7197,6 +7305,10 @@
             customWrap.style.display = 'none';
             novoPrazo = parseInt(document.getElementById('ee-prazo-manual-edit').value) || 0;
 
+            const novoParcelas = Math.max(1, parseInt(document.getElementById('ee-parcelas-edit').value) || 1);
+            const parcelasInfoWrap = document.getElementById('ee-parcelas-info');
+            const parcelasInfoTxt = document.getElementById('ee-parcelas-info-txt');
+
 
             if (novoValor < 0) {
                 inputValor.style.borderColor = "var(--err, #ff4d4d)";
@@ -7215,11 +7327,24 @@
                 impactEl.innerHTML = '<div class="fs12 tc2">Preencha todos os campos para ver o impacto</div>';
                 statusBox.style.display = 'none';
                 tlWrap.innerHTML = '<div class="fs12 tc2">Preencha os campos para ver o histórico</div>';
+                parcelasInfoWrap.style.display = 'none';
                 return;
+            }
+
+            if (novoParcelas > novoPrazo) {
+                showToast('O número de parcelas não pode ser maior que o prazo em dias', 'err');
             }
 
             const emissao = novaData;
             const novaVenc = addDays(emissao, novoPrazo);
+
+            if (novoParcelas > 1) {
+                const cks = getParcelaDates(emissao, novoPrazo, novoParcelas);
+                parcelasInfoTxt.textContent = cks.map(ck => `${ck.numero}ª: ${fmtDate(ck.data)} (${ck.dias}d)`).join('  ·  ');
+                parcelasInfoWrap.style.display = '';
+            } else {
+                parcelasInfoWrap.style.display = 'none';
+            }
 
             let pr = 0;
             let valorBase = 0;
@@ -7255,6 +7380,7 @@
             loanSim.valor = novoValor;
             loanSim.valor_receber = valorBase;
             loanSim.prazo = novoPrazo;
+            loanSim.parcelas = novoParcelas;
             loanSim.emissao = novaData;
             loanSim.juros_tipo = novoTipo;
             loanSim.juros_val = novoJuros;
@@ -7277,6 +7403,7 @@
                 row('A receber (prazo)', fmtMoney(c.valorBase), fmtMoney(novoBase), 'var(--acc2)') +
                 row('Data de emissão', fmtDate(loan.emissao), fmtDate(novaData), '') +
                 row('Prazo', loan.prazo + 'd', novoPrazo + 'd', '') +
+                row('Parcelas', (Math.max(1, parseInt(loan.parcelas) || 1)) + 'x', novoParcelas + 'x', '') +
                 row('Vencimento', fmtDate(addDays(loan.emissao, loan.prazo)), fmtDate(novaVenc), '') +
                 row('Juros/dia', jAntTxt, jTxt, 'var(--danger)');
 
@@ -7351,6 +7478,7 @@
             document.getElementById('ee-data-edit').value = dateStr(loan.emissao);
             document.getElementById('ee-data-edit').max = dateStr(TODAY);
             document.getElementById('ee-prazo-manual-edit').value = loan.prazo;
+            document.getElementById('ee-parcelas-edit').value = Math.max(1, parseInt(loan.parcelas) || 1);
             document.getElementById('ee-juros-tipo-edit').value = loan.juros_tipo;
             document.getElementById('ee-juros-val-edit').value = loan.juros_val;
             updateNovoPreview_edit();
@@ -7364,12 +7492,14 @@
             const novoValorReceber = parseFloat(document.getElementById('ee-receber-manual-edit').value) || 0;
             const novaData = parseDate(document.getElementById('ee-data-edit').value);
             const novoPrazo = parseInt(document.getElementById('ee-prazo-manual-edit').value) || 0;
+            const novoParcelas = Math.max(1, parseInt(document.getElementById('ee-parcelas-edit').value) || 1);
             const novoTipo = document.getElementById('ee-juros-tipo-edit').value;
             const novoJuros = parseFloat(document.getElementById('ee-juros-val-edit').value) || 0;
             if (!novoValor || !novoValorReceber || !novaData || !novoPrazo || !novoJuros) { showToast('Preencha todos os campos', 'err'); return; }
             if (novaData > TODAY) { showToast('Data não pode ser no futuro', 'err'); return; }
+            if (novoParcelas > novoPrazo) { showToast('O número de parcelas não pode ser maior que o prazo em dias', 'err'); return; }
 
-            _pendingEditEmp = { valor: novoValor, valor_receber: novoValorReceber, emissao: novaData, prazo: novoPrazo, juros_tipo: novoTipo, juros_val: novoJuros, pago: _pendingEditEmp_pago };
+            _pendingEditEmp = { valor: novoValor, valor_receber: novoValorReceber, emissao: novaData, prazo: novoPrazo, parcelas: novoParcelas, juros_tipo: novoTipo, juros_val: novoJuros, pago: _pendingEditEmp_pago };
 
             document.getElementById('edit-emp-confirm-body').innerHTML = `
                 <div class="warn-box" style="background:#f5a62312; border-color:#f5a62340; margin-bottom:12px">
@@ -7406,6 +7536,7 @@
             const valor = _pendingEditEmp.valor;
             const valor_receber = _pendingEditEmp.valor_receber;
             const prazo = _pendingEditEmp.prazo;
+            const parcelas = Math.max(1, parseInt(_pendingEditEmp.parcelas) || 1);
             const juros_val = _pendingEditEmp.juros_val;
             const juros_tipo = _pendingEditEmp.juros_tipo;
             const emissao = _pendingEditEmp.emissao;
@@ -7418,7 +7549,7 @@
             const lin = loan.lin;
             const lins_pags = loan.lins_pags;
 
-            const new_loan = { id, clientId, valor, valor_receber, prazo, juros_tipo, juros_val, emissao, pago, qtd_pags, lin, time: DB.time };
+            const new_loan = { id, clientId, valor, valor_receber, prazo, parcelas, juros_tipo, juros_val, emissao, pago, qtd_pags, lin, time: DB.time };
 
             if (lins_pags.length > 0) {
                 new_loan.lins_pags = lins_pags;
@@ -7852,7 +7983,7 @@
 
             // Dados iniciais
             document.getElementById('ed-data-emissao').textContent = fmtDate(l.emissao);
-            document.getElementById('ed-prazo').textContent = `${l.prazo} dias`;
+            document.getElementById('ed-prazo').textContent = `${l.prazo} dias${(l.parcelas || 1) > 1 ? ` (${l.parcelas}x)` : ''}`;
             document.getElementById('ed-data-venc').textContent = fmtDate(venc);
             document.getElementById('ed-valor-emp').textContent = fmtMoney(l.valor);
             document.getElementById('ed-valor-receber').textContent = fmtMoney(calc.valorBase);
@@ -8187,6 +8318,13 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                     <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>`,
+                parcela: `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
                 </svg>`
             }[e.tipo] || '';
 
@@ -8270,7 +8408,9 @@
             } else if (e.tipo === 'vencimento') {
                 dotClass = e.quitouAntes ? 'td-g' : 'td-a';
                 cardClass = e.quitouAntes ? 'tl-card-done' : 'tl-card-venc';
-                title = 'Vencimento do prazo';
+                title = (e.totalParcelas && e.totalParcelas > 1)
+                    ? `Vencimento final - ${e.numero}° parcela`
+                    : 'Vencimento do prazo';
                 if (e.quitouAntes) {
                     rows = [
                         row('Situação', '✓ Quitado antes do vencimento', true, 'var(--acc)'),
@@ -8286,6 +8426,29 @@
                         row('Pago até o vencimento', fmtMoney(e.totalPagoAteVenc), false, 'var(--acc)'),
                         row('Saldo restante', fmtMoney(e.saldoNoVenc), true, 'var(--txt0)'),
                         row('⚠ Juros de atraso', 'a partir deste dia', false, 'var(--warn)'),
+                    ];
+                }
+
+            } else if (e.tipo === 'parcela') {
+                dotClass = e.quitouAntes ? 'td-g' : 'td-a';
+                cardClass = e.quitouAntes ? 'tl-card-done' : 'tl-card-venc';
+                title = `${e.numero}° parcela`;
+                if (e.quitouAntes) {
+                    rows = [
+                        row('Pagamento esperado', fmtMoney(e.esperadoAcumulado), false, 'var(--txt1)'),
+                        row('Situação', '✓ Pagamentos no prazo', true, 'var(--acc)'),
+                    ];
+                } else if (!e.algumPag) {
+                    rows = [
+                        row('Pagamento esperado', fmtMoney(e.esperadoAcumulado), false, 'var(--txt1)'),
+                        row('Pagamentos no prazo', 'Nenhum', false, 'var(--danger)'),
+                        row('Valor em aberto desta parcela', fmtMoney(e.saldoNoVenc), true, 'var(--txt0)'),
+                    ];
+                } else {
+                    rows = [
+                        row('Pagamento esperado', fmtMoney(e.esperadoAcumulado), false, 'var(--txt1)'),
+                        row('Pago até aqui', fmtMoney(e.totalPagoAteVenc), false, 'var(--acc)'),
+                        row('Valor em aberto desta parcela', fmtMoney(e.saldoNoVenc), true, 'var(--txt0)'),
                     ];
                 }
 
@@ -9125,7 +9288,7 @@
                 </div>
 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:50px; max-width:250px; min-width:50px; margin:0 auto">
-                    <div style="text-align:center; font-size:10px; color:var(--txt2)">PRAZO (${loan.prazo} dias)</div>
+                    <div style="text-align:center; font-size:10px; color:var(--txt2)">PRAZO (${loan.prazo} dias${(loan.parcelas || 1) > 1 ? `, ${loan.parcelas}x` : ''})</div>
                     <div style="text-align:center; font-size:10px"><span style="color:${diasAtrasoPag > 0 ? 'var(--danger)' : 'var(--acc)'}; font-weight:700; background:${diasAtrasoPag > 0 ? 'rgba(255,70,70,.12)' : 'rgba(0,255,140,.10)'}; padding:2px 6px; border-radius:999px; white-space:nowrap">${diasAtrasoPag > 0 && !retro ? 'STATUS ATRASADO' :
                     diasAtrasoPag > 0 && retro ? 'PAGOU ATRASADO*' :
                         diasAtrasoPag <= 0 && !retro ? 'STATUS EM DIA' :
