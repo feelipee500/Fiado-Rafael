@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
- 
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -4020,7 +4020,8 @@
 
                         <!-- Display do valor restante -->
                         <div id="ed-sit-box"
-                            style="position:relative; display: flex; flex-direction: column; align-items: center; margin-top:5px">
+                            style="position:relative; display: flex; flex-direction: column; align-items: center; margin-top:5px"
+                            onclick="pagarTudo()">
                             <div class="fs11 tc2" style="margin-bottom:2px;" id="ed-valor-hoje-title">Valor a pagar hoje
                             </div>
                             <div style="font-size: 13px; font-weight: 1000; color: var(--acc3);"
@@ -5602,7 +5603,7 @@
                 .sort(sortByPago)
                 .slice(0, 2) // Pega apenas os 2 primeiros elementos do array ordenado
                 .map(item => item.original);
-            
+
 
             const atenEl = document.getElementById('dash-atencao');
             const atenWrap = document.getElementById('dash-atencao-wrap');
@@ -8024,6 +8025,7 @@
         }
 
         // ==================== EMP DETALHE ====================
+        _saldoRestante = 0;
         function openEmpDetalhe(lid) {
             pushHistory('emp-detalhe', lid);
             _currentLoanId = lid;
@@ -8119,6 +8121,7 @@
             sitBox.className = 'prev-box mb12 ' + (calc.status === 'late' ? 'err-bdr' : calc.status === 'warn' ? 'warn-bdr' : calc.status === 'done' ? 'done-bdr' : 'ok-bdr');
             document.getElementById('ed-valor-hoje').textContent = calc.isPago ? '✓ Quitado' : fmtMoney(calc.valorHoje);
             document.getElementById('ed-valor-hoje').className = 'amt-big ' + (calc.isPago ? 'c-g' : calc.status === 'late' ? 'c-r' : calc.status === 'warn' ? 'c-w' : 'c-b');
+            _saldoRestante = calc.valorHoje;
 
             if (calc.isPago && calc.saldoRestante > 0) {
                 document.getElementById('ed-valor-hoje-title').style.display = 'none';
@@ -8154,6 +8157,18 @@
             // Timeline
             renderTimeline(l);
             navTo('emp-detalhe');
+        }
+
+        function pagarTudo() {
+            if (document.getElementById('ed-valor-hoje-ignorado').style.display == '' || !_saldoRestante) return;
+
+            const inputPag = document.getElementById('ed-pag-valor');
+            inputPag.value = _saldoRestante;
+
+            const boxPag = document.getElementById('ed-pag-form-wrap');
+            boxPag.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            boxPag.focus({ preventScroll: true });
+
         }
 
         function renderAttachList(file) {
