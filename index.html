@@ -3371,7 +3371,7 @@
                                     <div class="psub" id="emp-total">—</div>
                                 </div>
                             </div>
-                            
+
                             <div class="dash-hero-val" id="erd-a-receber">R$ 0</div>
                             <div class="dash-hero-sub" id="erd-sub">—</div>
                             <div class="dash-hero-row">
@@ -3553,9 +3553,10 @@
                             </div>
                             <div class="fg" style="flex:1; ">
                                 <div class="fl" style="text-align: center; ">Parcelas *</div>
-                                <input class="fi" id="ne-parcelas" type="text" inputmode="numeric" min="1"
-                                    value="1" placeholder="Ex: 1" style="width: 100%; text-align: center; "
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,'');" onchange="if(this.value==='' || parseInt(this.value)<1) this.value='1'; updateNovoPreview(); ">
+                                <input class="fi" id="ne-parcelas" type="text" inputmode="numeric" min="1" value="1"
+                                    placeholder="Ex: 1" style="width: 100%; text-align: center; "
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                                    onchange="if(this.value==='' || parseInt(this.value)<1) this.value='1'; updateNovoPreview(); ">
                             </div>
                         </div>
                         <div id="custom-prazo-wrap" style="display:none" class="fg mt8">
@@ -4747,9 +4748,9 @@
 
                         <div class="fg" style="flex:1; ">
                             <div class="fl">Parcelas *</div>
-                            <input class="fi" id="ee-parcelas-edit" type="text" inputmode="numeric" min="1"
-                                value="1" placeholder="Ex: 1"
-                                oninput="this.value=this.value.replace(/[^0-9]/g,'');" onchange="if(this.value==='' || parseInt(this.value)<1) this.value='1'; updateNovoPreview_edit(); ">
+                            <input class="fi" id="ee-parcelas-edit" type="text" inputmode="numeric" min="1" value="1"
+                                placeholder="Ex: 1" oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                                onchange="if(this.value==='' || parseInt(this.value)<1) this.value='1'; updateNovoPreview_edit(); ">
                         </div>
                     </div>
 
@@ -5569,18 +5570,39 @@
             // Donut chart
             renderDonut(total, cntLate, cntWarn, cntOk, cntDone);
 
-            // Lists
-            const lateLoans = loansPeriodo.filter(l => getLoanCalc(l).status === 'late');
-            const warnLoans = loansPeriodo.filter(l => getLoanCalc(l).status === 'warn');
-            const okLoans = loansPeriodo.filter(l => getLoanCalc(l).status === 'ok');
+            // 1. Mapeia os empréstimos calculando os dados uma única vez
+            const computedLoans = loansPeriodo.map(loan => ({
+                original: loan,
+                calc: getLoanCalc(loan)
+            }));
 
-            // Filtra os ultimos dois emprestimos pagos
-            const doneLoans = loansPeriodo
-                .map(l => ({ original: l, calc: getLoanCalc(l) }))
-                .filter(item => item.calc.status === 'done')
-                .sort((a, b) => b.calc.pago - a.calc.pago)
-                .slice(0, 2)
+            // Helper para ordenar por 'diasParaVencer' de forma crescente (menor para o maior)
+            const sortByDiasParaVencer = (a, b) => a.calc.diasParaVencer - b.calc.diasParaVencer;
+            const sortByPago = (a, b) => b.calc.pago - a.calc.pago; // Decrescente (maior primeiro)
+
+            // 2. Filtra, ordena e extrai o objeto original para cada categoria
+            const lateLoans = computedLoans
+                .filter(item => item.calc.status === 'late')
+                .sort(sortByDiasParaVencer)
                 .map(item => item.original);
+
+            const warnLoans = computedLoans
+                .filter(item => item.calc.status === 'warn')
+                .sort(sortByDiasParaVencer)
+                .map(item => item.original);
+
+            const okLoans = computedLoans
+                .filter(item => item.calc.status === 'ok')
+                .sort(sortByDiasParaVencer)
+                .map(item => item.original);
+
+            // Filtra os 'done', ordena pelo maior 'pago' e limita aos 2 primeiros
+            const doneLoans = computedLoans
+                .filter(item => item.calc.status === 'done')
+                .sort(sortByPago)
+                .slice(0, 2) // Pega apenas os 2 primeiros elementos do array ordenado
+                .map(item => item.original);
+            
 
             const atenEl = document.getElementById('dash-atencao');
             const atenWrap = document.getElementById('dash-atencao-wrap');
@@ -5934,18 +5956,36 @@
             // Ordena os emprestimos em ordem de importancia
             const statusPriority = { 'late': 1, 'warn': 2, 'ok': 3, 'done': 4 };
             sortedLoansValido = loans
-                // Executa o cálculo pesado apenas uma vez por elemento
-                .map(loan => ({
-                    original: loan,
-                    status: getLoanCalc(loan).status
-                }))
-                // Ordena baseado no status pré-calculado
-                .sort((a, b) => {
-                    const weightA = statusPriority[a.status] || 99;
-                    const weightB = statusPriority[b.status] || 99;
-                    return weightA - weightB;
+                // 1. Executa o cálculo pesado apenas uma vez por elemento e guarda os dados necessários
+                .map(loan => {
+                    const calc = getLoanCalc(loan);
+                    return {
+                        original: loan,
+                        status: calc.status,
+                        diasParaVencer: calc.diasParaVencer ?? 0,
+                        pago: calc.pago ?? 0
+                    };
                 })
-                // Retorna o array contendo apenas a estrutura original do empréstimo
+                // 2. Ordena baseado na nova lógica combinada
+                .sort((a, b) => {
+                    const aIsDone = a.status === 'done';
+                    const bIsDone = b.status === 'done';
+
+                    // REGRA 1: Se um é 'done' e o outro não, o que NÃO é 'done' vem primeiro
+                    if (aIsDone !== bIsDone) {
+                        return aIsDone ? 1 : -1;
+                        // Se 'a' for done, ele vai para o fim (retorna 1). Se 'b' for done, 'a' vem para a frente (retorna -1).
+                    }
+
+                    // REGRA 2: Se AMBOS NÃO forem 'done', ordena por diasParaVencer (Crescente: menor primeiro)
+                    if (!aIsDone) {
+                        return a.diasParaVencer - b.diasParaVencer;
+                    }
+
+                    // REGRA 3: Se AMBOS FOREM 'done', ordena por pago (Decrescente: maior primeiro)
+                    return b.pago - a.pago;
+                })
+                // 3. Retorna o array contendo apenas a estrutura original do empréstimo
                 .map(item => item.original);
 
             if (render_all) {
@@ -6074,7 +6114,7 @@
             let lucroRelativo = 0; lucroRelativo_x = 0; totalPagoAntes_inicial = 0; recebido_x = 0; lin_min = 0;
             let cntLate = 0, cntWarn = 0, cntOk = 0, cntDone = 0;
             loanCount_x = 0, pagCount = 0;
-            
+
 
             const t0 = todayYM();
             const ref = _periodFilter.mode === 'month' ? { year: _periodFilter.year, month: _periodFilter.month } : t0;
@@ -6091,7 +6131,7 @@
             // Emprestado e A Receber -> empréstimos EMITIDOS naquele mês
             // Recebido -> pagamentos EFETUADOS naquele mês (independente do mês de emissão do empréstimo)
             // Lucro Real -> Recebido - Emprestado
-            
+
             const r = monthRange(months.year, months.month);
             loansBase.forEach(l => {
                 loan_valid = sortedLoansValido.find(p => p.id === l.id);
@@ -7793,7 +7833,6 @@
             if (!DB.clients.length) { list.innerHTML = '<div class="empty"><p>Nenhum cliente ainda</p></div>'; return; }
             list.innerHTML = DB.clients.map(c => {
                 const loans = getClientLoans(c.id).filter(loanInPeriod);
-                console.log(loans);
                 const totalEmp = loans.reduce((s, l) => s + l.valor, 0);
                 const totalPago = loans.reduce((s, l) => s + l.pagamentos.reduce((ss, p) => ss + p.valor, 0), 0);
                 const dividaTotal = loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0);
@@ -7892,6 +7931,8 @@
                 restante += Math.max(0, calc.saldoRestante);
                 lucro += calc.dividaTotal - l.valor;
                 jurosacm += calc.acumJuros;
+
+                console.log(calc)
             });
 
             // Definir valores do status geral
@@ -7934,18 +7975,36 @@
             // Ordena os emprestimos em ordem de importancia
             const statusPriority = { 'late': 1, 'warn': 2, 'ok': 3, 'done': 4 };
             const sortedLoansValido = loans
-                // Executa o cálculo pesado apenas uma vez por elemento
-                .map(loan => ({
-                    original: loan,
-                    status: getLoanCalc(loan).status
-                }))
-                // Ordena baseado no status pré-calculado
-                .sort((a, b) => {
-                    const weightA = statusPriority[a.status] || 99;
-                    const weightB = statusPriority[b.status] || 99;
-                    return weightA - weightB;
+                // 1. Executa o cálculo pesado apenas uma vez por elemento e guarda os dados necessários
+                .map(loan => {
+                    const calc = getLoanCalc(loan);
+                    return {
+                        original: loan,
+                        status: calc.status,
+                        diasParaVencer: calc.diasParaVencer ?? 0,
+                        pago: calc.pago ?? 0
+                    };
                 })
-                // Retorna o array contendo apenas a estrutura original do empréstimo
+                // 2. Ordena baseado na nova lógica combinada
+                .sort((a, b) => {
+                    const aIsDone = a.status === 'done';
+                    const bIsDone = b.status === 'done';
+
+                    // REGRA 1: Se um é 'done' e o outro não, o que NÃO é 'done' vem primeiro
+                    if (aIsDone !== bIsDone) {
+                        return aIsDone ? 1 : -1;
+                        // Se 'a' for done, ele vai para o fim (retorna 1). Se 'b' for done, 'a' vem para a frente (retorna -1).
+                    }
+
+                    // REGRA 2: Se AMBOS NÃO forem 'done', ordena por diasParaVencer (Crescente: menor primeiro)
+                    if (!aIsDone) {
+                        return a.diasParaVencer - b.diasParaVencer;
+                    }
+
+                    // REGRA 3: Se AMBOS FOREM 'done', ordena por pago (Decrescente: maior primeiro)
+                    return b.pago - a.pago;
+                })
+                // 3. Retorna o array contendo apenas a estrutura original do empréstimo
                 .map(item => item.original);
 
             document.getElementById('cd-emp-list').innerHTML = sortedLoansValido.length ? renderLoanCards(sortedLoansValido, true, false) :
@@ -9404,13 +9463,24 @@
         // ==================== NOTIF ====================
         let notif_view = false;
         function buildNotif() {
-            const late = DB.loans.filter(l => getLoanCalc(l).status === 'late');
-            const warn = DB.loans.filter(l => getLoanCalc(l).status === 'warn');
+            // 1. Mapeia os empréstimos calculando os dados uma única vez
+            const computedLoans = DB.loans.map(loan => ({
+                original: loan,
+                calc: getLoanCalc(loan)
+            }));
+
+            // Helper para ordenar por 'diasParaVencer' de forma crescente (menor para o maior)
+            const sortByDiasParaVencer = (a, b) => a.calc.diasParaVencer - b.calc.diasParaVencer;
+
+            // 2. Filtra, ordena e extrai o objeto original para cada categoria
+            const LoansAlert = computedLoans
+                .filter(item => item.calc.status === 'late' || item.calc.status === 'warn')
+                .sort(sortByDiasParaVencer)
+                .map(item => item.original);
 
             let html = '';
-            if (!late.length && !warn.length) { html = '<div class="empty"><p>Nenhuma notificação</p></div>'; }
-            html += renderLoanCards(late, true, false);
-            html += renderLoanCards(warn, true, false);
+            if (!LoansAlert.length) { html = '<div class="empty"><p>Nenhuma notificação</p></div>'; }
+            html += renderLoanCards(LoansAlert, true, false);
             document.getElementById('notif-body').innerHTML = html;
             syncLoanModeToggles();
             // Clear badge after 600ms — user has seen the notifications
