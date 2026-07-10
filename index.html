@@ -3589,10 +3589,11 @@
                                 oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview();"
                                 onchange="if(this.value==='' || parseInt(this.value)<1) this.value='1';">
                         </div>
-                        <div id="novo-parcelas-info" style="display:none" class="fg mt8">
-                            <div class="fl" style="text-align:center; font-size: 14px;">Divisão das parcelas</div>
-                            <div id="novo-parcelas-info-txt" class="fs11 tc2"
-                                style="text-align:center; font-size: 14px;"></div>
+                        <div id="novo-parcelas-info" style="margin-top: 12px; display: none;">
+                            <div style="text-align: center; font-size: 13px; color: #8892b0; margin-bottom: 8px;">
+                                Divisão das parcelas</div>
+                            <div id="novo-parcelas-info-txt"
+                                style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;"></div>
                         </div>
                         <div class="fg mt8">
                             <div class="fl" style="text-align: center; ">Juros por dia de atraso *</div>
@@ -7031,9 +7032,41 @@
             const parcelasRaw = Math.max(1, parseInt(document.getElementById('ne-parcelas').value) || 1);
             const parcelasInfoWrap = document.getElementById('novo-parcelas-info');
             const parcelasInfoTxt = document.getElementById('novo-parcelas-info-txt');
+
             if (parcelasRaw > 1) {
                 const cks = getParcelaDates(emissao, prazoRaw, parcelasRaw);
-                parcelasInfoTxt.textContent = cks.map(c => `${c.numero}ª: ${fmtDate(c.data)} (${c.dias}d)`).join('  ·  ');
+
+                // Limpa o conteúdo anterior
+                parcelasInfoTxt.innerHTML = '';
+
+                // Cria um bloco visual para cada parcela
+                cks.forEach(c => {
+                    const badge = document.createElement('div');
+                    badge.style.cssText = `
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 6px;
+                    padding: 4px 8px;
+                    font-size: 11px;
+                    color: #ccd6f6;
+                    display: inline-flex;
+                    gap: 4px;
+                    align-items: center;
+                    justify-content: center;
+                    min-width: calc(50% - 6px); /* Garante que caibam exatamente 2 por linha em telas bem pequenas */
+                    box-sizing: border-box;
+                `;
+
+                    // Estrutura interna do badge para destacar o número da parcela e os dias restantes
+                    badge.innerHTML = `
+                    <span style="font-weight: bold; color: #64ffda;">${c.numero}ª</span>
+                    <span>${fmtDate(c.data)}</span>
+                    <span style="color: #8892b0; font-size: 10px;">(${c.dias}d)</span>
+                `;
+
+                    parcelasInfoTxt.appendChild(badge);
+                });
+
                 parcelasInfoWrap.style.display = '';
             } else {
                 parcelasInfoWrap.style.display = 'none';
@@ -8656,7 +8689,7 @@
                 dotClass = 'td-a';
                 cardClass = 'tl-card-venc';
                 title = (e.totalParcelas && e.totalParcelas > 1)
-                    ? `Vencimento final - ${e.numero}° parcela`
+                    ? `${e.numero}° parcela - Vencimento final`
                     : 'Vencimento do prazo';
                 const prazoTxt = e.diasAte == 0 ? 'Hoje' : e.diasAte == 1 ? 'Amanhã' : `em ${e.diasAte} dias`;
                 if (e.quitouAntes) {
