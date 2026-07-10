@@ -1073,7 +1073,7 @@
         }
 
         .erd-hero-compact .dhr-lbl {
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .erd-compact-card {
@@ -1119,7 +1119,7 @@
         }
 
         .erd-month-lbl {
-            font-size: 11px;
+            font-size: 14px;
             color: var(--txt2);
             font-weight: 500;
             text-align: center;
@@ -1151,7 +1151,7 @@
         }
 
         .erd-mm-val {
-            font-size: 9.5px;
+            font-size: 12px;
             color: var(--txt1);
             font-weight: 700;
             white-space: nowrap;
@@ -3230,7 +3230,7 @@
                                     <div class="ds-lbl">
                                         <div class="ds-lbl-dot" style="background:var(--warn)">
                                         </div>
-                                        Vencendo
+                                        Em Alerta
                                     </div>
                                     <div class="ds-num c-w" id="ds-cnt-warn">
                                         0
@@ -3364,12 +3364,15 @@
                             <div id="erd-bars"></div>
                         </div>
 
-                        <div class="dash-hero erd-hero-compact">
-                            <div style="display:flex; align-items:center; justify-content:space-between;">
-                                <div class="dash-hero-lbl">Resultado do Período</div>
-                                <div class="dhr-item">
-                                    <div class="psub" id="emp-total">—</div>
-                                </div>
+                        <div class="dash-hero erd-hero-compact" style="position: relative;">
+
+                            <div class="dash-hero-lbl">Resultado do Período</div>
+
+                            <div style="position: absolute; top: 17px; right: 16px; text-align: right;">
+                                <div class="psub" id="emp-total"
+                                    style="display: block; font-size: 13px; line-height: 1.2;">- Empréstimos</div>
+                                <div class="psub" id="emp-total-exibido"
+                                    style="display: block; font-size: 13px; margin-top: 2px;">- Exibidos</div>
                             </div>
 
                             <div class="dash-hero-val" id="erd-a-receber">R$ 0</div>
@@ -3414,7 +3417,7 @@
                     <div class="tbar">
                         <div class="tbtn act" onclick="setTabEmp(this,'all')">Todos</div>
                         <div class="tbtn" onclick="setTabEmp(this,'ok')">Em Dia</div>
-                        <div class="tbtn" onclick="setTabEmp(this,'warn')">Vencendo</div>
+                        <div class="tbtn" onclick="setTabEmp(this,'warn')">Alerta</div>
                         <div class="tbtn" onclick="setTabEmp(this,'late')">Atrasados</div>
                         <div class="tbtn" onclick="setTabEmp(this,'done')">Pagos</div>
                         <div class="lc-mode-toggle" onclick="toggleLoanCardMode()" id="emp-btn-card"></div>
@@ -3533,41 +3536,55 @@
                                     oninput="this.value=this.value.replace(/[^0-9]/g,''); validarECalcularManual(); ">
                             </div>
                         </div>
-                        <div class="fr" style="margin-top:8px; display: flex; gap: 12px; ">
-                            <div class="fg" style="flex:1; ">
-                                <div class="fl" style="text-align: center; ">Data de emissão *</div>
-                                <input class="fi" id="ne-data" type="date" style="width: 100%; text-align: center; "
-                                    onchange="updateNovoPreview()">
+                        <div class="fr"
+                            style="margin-top:8px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 100%; box-sizing: border-box;">
+
+                            <div class="fg" style="min-width: 130px; max-width: 130px; width: 100%;">
+                                <div class="fl" style="text-align: center;">Data de Emissão *</div>
+                                <input class="fi" id="ne-data" type="date"
+                                    style="width: 100%; text-align: center; box-sizing: border-box;"
+                                    oninput="updateNovoPreview('prazo')">
                             </div>
-                            <div class="fg" style="flex:1; ">
-                                <div class="fl" style="text-align: center; ">Prazo (dias) *</div>
+
+                            <div class="fg" style="max-width: 70px; width: 100%;">
+                                <div class="fl" style="text-align: center; white-space: nowrap;">Prazo (dias) *</div>
                                 <select class="fi fs" id="ne-prazo"
-                                    style="width: 100%; text-align: center; text-align-last: center; "
-                                    onchange="updateNovoPreview()">
+                                    style="width: 100%; text-align: center; text-align-last: center; box-sizing: border-box;"
+                                    oninput="updateNovoPreview('prazo')">
                                     <option value="">Escolher…</option>
                                     <option value="custom">Personalizado</option>
                                 </select>
                                 <input class="fi" id="ne-prazo-manual" type="text" inputmode="numeric"
-                                    placeholder="Ex: 15" style="display:none; width: 100%; text-align: center; "
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview(); ">
+                                    placeholder="Ex: 15"
+                                    style="display:none; width: 100%; text-align: center; white-space: nowrap; box-sizing: border-box;"
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview('prazo'); ">
                             </div>
-                            <div class="fg" style="flex:1; ">
-                                <div class="fl" style="text-align: center; ">Parcelas *</div>
-                                <input class="fi" id="ne-parcelas" type="text" inputmode="numeric" min="1" value="1"
-                                    placeholder="Ex: 1" style="width: 100%; text-align: center; "
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,'');"
-                                    onchange="if(this.value==='' || parseInt(this.value)<1) this.value='1'; updateNovoPreview(); ">
+
+                            <div class="fg" style="min-width: 130px; max-width: 130px; width: 100%;">
+                                <div class="fl" style="text-align: center;">Vencimento *</div>
+                                <input class="fi" id="ne-data-venc" type="date"
+                                    style="width: 100%; text-align: center; box-sizing: border-box;"
+                                    oninput="updateNovoPreview('data')">
                             </div>
+
                         </div>
                         <div id="custom-prazo-wrap" style="display:none" class="fg mt8">
                             <div class="fl" style="text-align:center">Prazo em dias *</div>
                             <input class="fi" id="ne-prazo-custom" type="text" inputmode="numeric" min="1"
                                 placeholder="Ex: 10" style="width: 100%; text-align: center"
-                                oninput="this.value=this.value.replace(/[^0-9\s]/g, ''); updateNovoPreview()">
+                                oninput="this.value=this.value.replace(/[^0-9\s]/g, ''); updateNovoPreview('prazo')">
+                        </div>
+                        <div class="fg" style="flex:1; ">
+                            <div class="fl" style="text-align: center; ">Parcelas *</div>
+                            <input class="fi" id="ne-parcelas" type="text" inputmode="numeric" min="1" value="1"
+                                placeholder="Ex: 1" style="width: 100%; text-align: center; "
+                                oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview();"
+                                onchange="if(this.value==='' || parseInt(this.value)<1) this.value='1';">
                         </div>
                         <div id="novo-parcelas-info" style="display:none" class="fg mt8">
-                            <div class="fl" style="text-align:center">Divisão das parcelas</div>
-                            <div id="novo-parcelas-info-txt" class="fs11 tc2" style="text-align:center"></div>
+                            <div class="fl" style="text-align:center; font-size: 14px;">Divisão das parcelas</div>
+                            <div id="novo-parcelas-info-txt" class="fs11 tc2"
+                                style="text-align:center; font-size: 14px;"></div>
                         </div>
                         <div class="fg mt8">
                             <div class="fl" style="text-align: center; ">Juros por dia de atraso *</div>
@@ -3894,6 +3911,13 @@
                 </div>
 
                 <div class="pw" style="padding-top:10px">
+                    <!-- ALERTA DE PARCELA ATRASADA -->
+                    <div id="ed-parcela-alert" class="warn-box" style="display:none">
+                        <div class="wb-t">⚠ Parcela atrasada</div>
+                        <div class="wb-d">Não paga integralmente até o prazo: <span id="ed-parcela-alert-list"
+                                style="font-weight:800; color:var(--warn)"></span></div>
+                    </div>
+
                     <!-- DADOS INICIAIS -->
                     <div class="card-sm" style="padding: 3px; display: flex; flex-direction: column; gap: 10px;">
                         <div
@@ -3965,18 +3989,24 @@
                         </div>
 
                         <div
-                            style="display: flex; justify-content: center; align-items: center; gap: 60px; width: 100%; margin-bottom: 10px; margin-top: 10px;">
+                            style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; margin-bottom: 10px; margin-top: 10px;">
                             <div
-                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
                                 <span class="fs10 tc2" id="ed-tempo-total-aberto-title">Em Aberto</span>
                                 <span style="font-size: 13px; font-weight: 800;" id="ed-tempo-total-aberto">--
                                     dias</span>
                             </div>
                             <div
-                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
                                 <span class="fs10 tc2" id="ed-juros-dias-atraso-title">De Atraso</span>
                                 <span style="font-size: 13px; font-weight: 800; color: var(--danger);"
                                     id="ed-juros-dias-atraso">-- dias</span>
+                            </div>
+                            <div id="ed-prox-parcela-box"
+                                style="flex: 1; display: none; flex-direction: column; align-items: center; text-align: center;">
+                                <span class="fs10 tc2" id="ed-prox-parcela-title">1° Parcela</span>
+                                <span style="font-size: 13px; font-weight: 800; color: var(--acc2);"
+                                    id="ed-prox-parcela">-- dias</span>
                             </div>
                         </div>
 
@@ -4750,8 +4780,9 @@
                         <div class="fg" style="flex:1; ">
                             <div class="fl">Parcelas *</div>
                             <input class="fi" id="ee-parcelas-edit" type="text" inputmode="numeric" min="1" value="1"
-                                placeholder="Ex: 1" oninput="this.value=this.value.replace(/[^0-9]/g,'');"
-                                onchange="if(this.value==='' || parseInt(this.value)<1) this.value='1'; updateNovoPreview_edit(); ">
+                                placeholder="Ex: 1"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit();"
+                                onchange="if(this.value==='' || parseInt(this.value)<1) this.value='1';">
                         </div>
                     </div>
 
@@ -5256,14 +5287,49 @@
             const jurosDia = TODAY > vencimento && !isPago ? jdv : 0;
             const totalJuros = acumJuros;
 
+            // Para emprestimos com parcelas, o "warn" (Em Alerta) passa a considerar o prazo
+            // até a PRÓXIMA PARCELA FUTURA EM ABERTO (em vez da data de vencimento final),
+            // pulando parcelas futuras já quitadas por adiantamento, e também verifica se
+            // alguma parcela já vencida ficou com pagamento incompleto até seu prazo.
+            const numParcelas = Math.max(1, parseInt(loan.parcelas) || 1);
+            const checkpoints = getParcelaDates(emissao, loan.prazo, numParcelas);
+            const valorParcela = valorBase / numParcelas;
+
+            // Próxima parcela futura em aberto: primeiro checkpoint cujo prazo ainda não
+            // passou E cujo valor acumulado esperado ainda não foi coberto pelo total pago
+            // até agora — se a parcela mais próxima já estiver quitada (adiantada), pula
+            // para a parcela futura seguinte que ainda está em aberto.
+            let proximaParcela = checkpoints.find(ck => (ck.data + (23 * 60 * 60 * 1000)) >= TODAY && totalPago < (valorParcela * ck.numero));
+            if (!proximaParcela) {
+                const futuros = checkpoints.filter(ck => (ck.data + (23 * 60 * 60 * 1000)) >= TODAY);
+                proximaParcela = futuros.length ? futuros[futuros.length - 1] : checkpoints[checkpoints.length - 1];
+            }
+            const diasParaProximaParcela = diffDays(TODAY - (12 * 60 * 60 * 1000), proximaParcela.data);
+            const numeroProximaParcela = proximaParcela.numero;
+            const ultimaParcela = proximaParcela.numero >= numParcelas;
+
+            // Verifica quais parcelas já vencidas (data já passada) ficaram com pagamento
+            // incompleto até o seu prazo — independe de já ter sido "alcançada" ou não hoje.
+            let parcelasAtrasadasNumeros = [];
+            for (const ck of checkpoints) {
+                const dataCk = ck.data + (23 * 60 * 60 * 1000);
+                if (dataCk >= TODAY) break;
+                const totalPagoAteData = sortedPags.filter(p => p.data <= dataCk).reduce((s, p) => s + p.valor, 0);
+                const esperadoAcumulado = valorParcela * ck.numero;
+                if (totalPagoAteData < esperadoAcumulado) {
+                    parcelasAtrasadasNumeros.push(ck.numero);
+                }
+            }
+            const parcelaAnteriorAtrasada = parcelasAtrasadasNumeros.length > 0;
+
             let status = 'ok';
             if (isPago) status = 'done';
             else if (TODAY - (12 * 60 * 60 * 1000) > vencimento) status = 'late';
-            else if (diasParaVencer <= 2) status = 'warn';
+            else if (parcelaAnteriorAtrasada || diasParaProximaParcela <= 2) status = 'warn';
 
             let pago = loan.pago != 0 ? loan.pago : saldoCorrente <= 0 ? max_data + 1 : 0;
 
-            const calc = { emissao, vencimento, valorBase, profitRate, totalPago, saldoRestante, diasAtraso, isPago, jurosDia, totalJuros, valorHoje, diasParaVencer, status, dividaTotal, pago, acumJuros, totalPago_antes, valor_anterior };
+            const calc = { emissao, vencimento, valorBase, profitRate, totalPago, saldoRestante, diasAtraso, isPago, jurosDia, totalJuros, valorHoje, diasParaVencer, diasParaProximaParcela, numeroProximaParcela, ultimaParcela, parcelaAnteriorAtrasada, parcelasAtrasadasNumeros, numParcelas, status, dividaTotal, pago, acumJuros, totalPago_antes, valor_anterior };
 
             return calc;
         }
@@ -5370,6 +5436,8 @@
                     const totalPagoAteData = pagsAteData.reduce((s, p) => s + p.valor, 0);
                     const esperadoAcumulado = valorParcela * ck.numero;
                     const algumPagAteData = pagsAteData.length > 0;
+                    const vencido = dataCk < TODAY;
+                    const diasAte = diffDays(TODAY - (12 * 60 * 60 * 1000), ck.data);
 
                     if (isFinal) {
                         // Mantém a semântica original do evento de vencimento (baseado na dívida total)
@@ -5383,6 +5451,7 @@
                             algumPag: algumPagAteData,
                             totalPagoAteVenc: totalPagoAteData,
                             saldoNoVenc,
+                            vencido, diasAte,
                             saldoAntes: saldoNoVenc, saldoDepois: saldoNoVenc,
                             valor: saldoNoVenc,
                             color: quitouAntesVenc ? 'td-g' : 'td-a'
@@ -5400,6 +5469,7 @@
                             totalPagoAteVenc: totalPagoAteData,
                             esperadoAcumulado, valorParcela,
                             saldoNoVenc: saldoParcela,
+                            vencido, diasAte,
                             saldoAntes: saldoParcela, saldoDepois: saldoParcela,
                             valor: saldoParcela,
                             color: quitouParcela ? 'td-g' : 'td-a'
@@ -5459,7 +5529,7 @@
         // ==================== STATUS LABELS ====================
         function statusPill(s) {
             const map = { ok: 'p-ok', late: 'p-late', warn: 'p-warn', done: 'p-done', pend: 'p-pend' };
-            const lbl = { ok: 'Em dia', late: 'Atrasado', warn: 'Vence logo', done: 'Pago', pend: 'Pendente' };
+            const lbl = { ok: 'Em dia', late: 'Atrasado', warn: 'Alerta', done: 'Pago', pend: 'Pendente' };
             return `<span class="pill ${map[s] || 'p-pend'}">${lbl[s] || s}</span>`;
         }
 
@@ -5633,7 +5703,7 @@
             const cx = 55, cy = 55, r = 38, stroke = 20;
             const segments = [
                 { count: late, color: '#ff4d6d', label: 'Em Atraso', filter: 'late' },
-                { count: warn, color: '#ffb547', label: 'Vence logo', filter: 'warn' },
+                { count: warn, color: '#ffb547', label: 'Em Alerta', filter: 'warn' },
                 { count: ok, color: '#3d7fff', label: 'Em Dia', filter: 'ok' },
                 { count: done, color: '#00e8a2', label: 'Pago', filter: 'done' },
             ];
@@ -5751,7 +5821,14 @@
                         c.diasParaVencer == 0 ? `<span class="c-w">Hoje</span>` :
                             c.diasParaVencer == 1 ? `<span class="c-w">Amanhã</span>` :
                                 c.diasParaVencer == 2 ? `<span class="c-w">2 dias</span>` :
-                                    `<span class="c-b">Restam ${c.diasParaVencer} dias</span>`;
+                                    `<span class="${c.status === 'warn' ? 'c-w' : 'c-b'}">Restam ${c.diasParaVencer} dias</span>`;
+
+            const parcelaLine = (!c.isPago && c.diasAtraso <= 0 && !c.ultimaParcela) ? (
+                c.diasParaProximaParcela == 0 ? `<span class="c-w">${c.numeroProximaParcela}P Hoje</span>` :
+                    c.diasParaProximaParcela == 1 ? `<span class="c-w">${c.numeroProximaParcela}P Amanhã</span>` :
+                        c.diasParaProximaParcela == 2 ? `<span class="c-w">${c.numeroProximaParcela}P Em 2 dias</span>` :
+                            `<span class="${c.status === 'warn' ? 'c-w' : 'c-b'}">${c.numeroProximaParcela}P Em ${c.diasParaProximaParcela} dias</span>`
+            ) : '';
 
             const stringPagar = c.isPago && c.saldoRestante > 0 ? 'Ignorado' :
                 c.isPago && c.saldoRestante <= 0 ? 'Lucro' :
@@ -5767,7 +5844,7 @@
 
             return `
             <div class="lcm lcm-${c.status}" style="display: flex; flex-direction: column;" onclick="closeSheet(document.getElementById('notif-sheet')); openEmpDetalhe('${loan.id}')">
-                ${valoresON ? `
+                ${valoresON || (c.status === 'warn' && c.parcelaAnteriorAtrasada) ? `
                 <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0; gap: 30px; margin-bottom: -20px">
                     ${loan.entrada > 0 ? `
                     <span style="white-space: nowrap; font-weight: 600; font-size: 10px; color: var(--acc)">+${fmtMoney(loan.entrada)}</span>
@@ -5775,6 +5852,11 @@
                     ${loan.saida > 0 ? `
                     <span style="white-space: nowrap; font-weight: 600; font-size: 10px; color: var(--danger)">-${fmtMoney(loan.saida)}</span>
                     ` : ``}
+                    ${c.status === 'warn' && c.parcelaAnteriorAtrasada ? `
+                    <div style="font-size: 10px; align-items: right; font-weight: 700; color: var(--warn); white-space: nowrap">
+                        ⚠ Parcela atrasada
+                    </div>
+                    ` : ''}
                 </div>
                 ` : ``}
                 
@@ -5806,6 +5888,7 @@
                     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; flex-shrink: 0;">
                         <div>${statusPill(c.status)}</div>
                         <div class="lc-mv" style="font-weight: 600; white-space: nowrap; font-size: 10px; margin-top: 2px;">${diasAtrasoOrVenc}</div>
+                        ${parcelaLine ? `<div class="lc-mv" style="font-weight: 600; white-space: nowrap; font-size: 9px; margin-top: 1px; opacity: 0.85;">${parcelaLine}</div>` : ''}
                     </div>
                 </div>
                 <div class="lc-bar" style="width: 100%;">
@@ -5828,8 +5911,7 @@
 
             const situacao_status = c.isPago ? 'Situação' :
                 c.diasAtraso > 0 ? 'Atraso' :
-                    c.diasParaVencer == 0 || c.diasParaVencer == 1 ? 'Vence' :
-                        'Vence Em';
+                    c.diasParaVencer == 0 || c.diasParaVencer == 1 ? 'Vence' : 'Vence Em';
 
             const diasAtrasoOrVenc = c.isPago && c.saldoRestante > 0 ? `<span class="c-g">Quitado Man.</span>` :
                 c.isPago && c.saldoRestante <= 0 ? `<span class="c-g">Quitado</span>` :
@@ -5837,7 +5919,14 @@
                         c.diasParaVencer == 0 ? `<span class="c-w">Vence Hoje</span>` :
                             c.diasParaVencer == 1 ? `<span class="c-w">Vence Amanha</span>` :
                                 c.diasParaVencer == 2 ? `<span class="c-w">Restam 2 dias</span>` :
-                                    `<span class="c-b">Restam ${c.diasParaVencer} dias</span>`;
+                                    `<span class="${c.status === 'warn' ? 'c-w' : 'c-b'}">Restam ${c.diasParaVencer} dias</span>`;
+
+            const parcelaLine = (!c.isPago && c.diasAtraso <= 0 && !c.ultimaParcela) ? (
+                c.diasParaProximaParcela == 0 ? `<span class="c-w">${c.numeroProximaParcela}P Hoje</span>` :
+                    c.diasParaProximaParcela == 1 ? `<span class="c-w">${c.numeroProximaParcela}P Amanha</span>` :
+                        c.diasParaProximaParcela == 2 ? `<span class="c-w">${c.numeroProximaParcela}P Em 2 dias</span>` :
+                            `<span class="${c.status === 'warn' ? 'c-w' : 'c-b'}">${c.numeroProximaParcela}P Em ${c.diasParaProximaParcela} dias</span>`
+            ) : '';
 
             const stringPagar = c.isPago && c.saldoRestante > 0 ? 'Divida Ignorada' :
                 c.isPago && c.saldoRestante <= 0 ? 'Lucro' :
@@ -5871,10 +5960,14 @@
 
                     <div style="display: flex; flex-direction: column; align-items: end;">
                         <div>${statusPill(c.status)}</div>
+                        ${c.status === 'warn' && c.parcelaAnteriorAtrasada ? `
+                            <div style="font-weight: 700; white-space: nowrap; font-size: 10px; color: var(--warn); margin-top: 2px;">⚠ Parcela atrasada</div>
+                            ` : ``}
                         <div class="lc-mv" style="font-weight: 600; white-space: nowrap; font-size: 10px;">${diasAtrasoOrVenc}</div>
                         ${c.pago ? `
                             <div class="lc-id" style="font-weight: 600; font-size: 10px;">${fmtDateComp(c.pago)}✔</div>
                             ` : ``}
+                        ${parcelaLine ? `<div class="lc-mv" style="font-weight: 600; white-space: nowrap; font-size: 10px; margin-top: 2px; opacity: 0.85;">${parcelaLine}</div>` : ``}
                     </div>
                 </div>
 
@@ -5925,6 +6018,7 @@
         // ==================== EMPRESTIMOS ====================
         let _empSearchVal = '';
         let sortedLoansValido = null;
+        let loans_total = 0;
         async function renderEmprestimos(filter, render_all = true) {
             _empFilter = filter || 'all';
             updatePeriodUI();
@@ -5933,7 +6027,7 @@
                 const map = {
                     'Todos': 'all',
                     'Em Dia': 'ok',
-                    'Vencendo': 'warn',
+                    'Em Alerta': 'warn',
                     'Atrasados': 'late',
                     'Pagos': 'done'
                 };
@@ -5989,17 +6083,17 @@
                 // 3. Retorna o array contendo apenas a estrutura original do empréstimo
                 .map(item => item.original);
 
+
             if (render_all) {
+                loans_total = loans.length;
                 await renderEmpResultDashboard(loansBase);
             }
 
             const total = sortedLoansValido.length;
-            document.getElementById('emp-total').textContent = `${total} Empréstimos`;
+            document.getElementById('emp-total').textContent = `${loans_total} Empréstimo${loans_total == 1 ? '' : 's'}`;
+            document.getElementById('emp-total-exibido').textContent = `${total} Exibido${total == 1 ? '' : 's'}`;
             document.getElementById('emp-list').innerHTML = sortedLoansValido.length ? renderLoanCards(sortedLoansValido, true, true) : '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><p>Nenhum empréstimo encontrado</p></div>';
             syncLoanModeToggles();
-
-
-
         }
 
         // Dashboard de resultado financeiro dos empréstimos filtrados (busca + status + período)
@@ -6142,7 +6236,7 @@
                     loanCount_x++;
                     emprestado += l.valor;
                     aReceber += c.dividaTotal;
-                    lucroContratado += (aReceber - emprestado);
+                    lucroContratado += (c.dividaTotal - l.valor);
 
                     if (loan_valid) {
                         loan_valid.saida = l.valor;
@@ -6251,7 +6345,7 @@
             const legendEl = document.getElementById('erd-legend');
             const segs = [
                 { count: cntOk, color: 'var(--acc2)', label: 'Em Dia' },
-                { count: cntWarn, color: 'var(--warn)', label: 'Vencendo' },
+                { count: cntWarn, color: 'var(--warn)', label: 'Em Alerta' },
                 { count: cntLate, color: 'var(--danger)', label: 'Atrasados' },
                 { count: cntDone, color: 'var(--acc)', label: 'Pagos' },
             ];
@@ -6714,8 +6808,10 @@
                 document.getElementById('ne-parcelas').value = '1';
                 document.getElementById('novo-parcelas-info').style.display = 'none';
                 const dataEl = document.getElementById('ne-data');
-                dataEl.value = dateStr(TODAY);
+                const dataElVenc = document.getElementById('ne-data-venc');
                 dataEl.max = dateStr(TODAY);
+                dataEl.value = dateStr(TODAY);
+                dataElVenc.min = dateStr(addDays(TODAY, 1));
                 // Pre-fill juros from defaults
                 const defTipo = DB.defaults.juros_tipo || 'fixo';
                 document.getElementById('ne-juros-tipo').value = defTipo;
@@ -6732,8 +6828,11 @@
                 if (_newLoanData) {
                     document.getElementById('ne-valor').value = _newLoanData.valor || '';
                     const dataEl = document.getElementById('ne-data');
+                    const dataElVenc = document.getElementById('ne-data-venc');
                     dataEl.value = dateStr(_newLoanData.emissao) || dateStr(TODAY);
                     dataEl.max = dateStr(TODAY);
+                    dataElVenc.min = dateStr(addDays(TODAY, 1));
+
                     document.getElementById('ne-juros-tipo').value = _newLoanData.juros_tipo || 'fixo';
                     document.getElementById('ne-juros-val').value = _newLoanData.juros_val || '';
                     document.getElementById('ne-parcelas').value = _newLoanData.parcelas || 1;
@@ -6746,6 +6845,11 @@
                     } else {
                         prazoEl.value = 'custom';
                         document.getElementById('ne-prazo-custom').value = _newLoanData.prazo;
+                        document.getElementById('custom-prazo-wrap').style.display = '';
+                    }
+                    if (_newLoanData.prazo_custom) {
+                        prazoEl.value = 'custom';
+                        document.getElementById('ne-prazo-custom').value = _newLoanData.prazo_custom;
                         document.getElementById('custom-prazo-wrap').style.display = '';
                     }
                     updateNovoPreview();
@@ -6835,13 +6939,17 @@
             updateNovoPreview();
         }
 
+
         // Atualização da sua função updateNovoPreview
-        function updateNovoPreview() {
+        function updateNovoPreview(tipo) {
             const inputValor = document.getElementById('ne-valor');
             const inputReceber = document.getElementById('ne-receber-manual');
             let inputPrazo = document.getElementById('ne-prazo');
             const inputData = document.getElementById('ne-data');
+            const inputDataVenc = document.getElementById('ne-data-venc');
             const inputJurosVal = document.getElementById('ne-juros-val');
+
+            const dataEmissao = parseDate(inputData.value);
 
             const modo = document.getElementById('ne-modo-calculo')?.value || 'padrao';
             const customWrap = document.getElementById('custom-prazo-wrap');
@@ -6858,6 +6966,40 @@
                 prazoRaw = parseInt(inputPrazo.value) || 0;
             }
 
+            const emissao = dataEmissao;
+            const venc = addDays(emissao, prazoRaw);
+
+            if (tipo == 'prazo') {
+                inputDataVenc.min = dateStr(addDays(dataEmissao, 1));
+
+                if (prazoRaw > 0) {
+                    inputDataVenc.value = dateStr(venc);
+                } else {
+                    inputDataVenc.value = '';
+                }
+
+            } else if (tipo == 'data') {
+                const venc_time = parseDate(inputDataVenc.value);
+                if (modo != 'padrao') {
+                    if (venc_time && venc_time != '') {
+                        const venc_prazo = diffDays(dataEmissao, venc_time);
+                        inputPrazo.value = venc_prazo;
+                    } else {
+                        inputPrazo.value = '';
+                    }
+                } else {
+                    inputPrazo.value = 'custom';
+                    customWrap.style.display = '';
+
+                    if (venc_time && venc_time != '') {
+                        const venc_prazo = diffDays(dataEmissao, venc_time);
+                        document.getElementById('ne-prazo-custom').value = venc_prazo;
+                    } else {
+                        document.getElementById('ne-prazo-custom').value = '';
+                    }
+                }
+            }
+
             const valor = parseFloat(inputValor.value);
             if (valor < 0) {
                 inputValor.style.borderColor = "var(--err, #ff4d4d)";
@@ -6868,9 +7010,8 @@
                 inputValor.style.borderColor = "";
             }
 
-            const dataEmissao = parseDate(inputData.value);
-
-            !prazoRaw ? inputPrazo.style.borderColor = "" : inputPrazo.style.borderColor = "";
+            inputPrazo.style.borderColor = "";
+            inputDataVenc.style.borderColor = "";
             !dataEmissao ? inputData.style.borderColor = "var(--err, #ff4d4d)" : inputData.style.borderColor = "";
 
             if (!valor || !prazoRaw || !dataEmissao) {
@@ -6878,8 +7019,6 @@
                 return;
             }
 
-            const emissao = dataEmissao;
-            const venc = addDays(emissao, prazoRaw);
 
             const parcelasRaw = Math.max(1, parseInt(document.getElementById('ne-parcelas').value) || 1);
             const parcelasInfoWrap = document.getElementById('novo-parcelas-info');
@@ -6940,6 +7079,7 @@
             const inputReceber = document.getElementById('ne-receber-manual');
             let inputPrazo = document.getElementById('ne-prazo');
             const inputData = document.getElementById('ne-data');
+            const inputDataVenc = document.getElementById('ne-data-venc');
             const inputJurosVal = document.getElementById('ne-juros-val');
             const valor = parseFloat(inputValor.value) || 0;
             const dataEmissao = parseDate(inputData.value);
@@ -6950,8 +7090,10 @@
 
 
             let prazoRaw = 0;
+            let prazo_custom = 0;
             if (modo === 'padrao') {
                 prazoRaw = inputPrazo.value === 'custom' ? parseInt(document.getElementById('ne-prazo-custom').value) || 0 : parseInt(inputPrazo.value) || 0;
+                prazo_custom = parseInt(document.getElementById('ne-prazo-custom').value);
             } else {
                 inputPrazo = document.getElementById('ne-prazo-manual');
                 prazoRaw = parseInt(inputPrazo.value) || 0;
@@ -6970,6 +7112,7 @@
             if (!valor || !prazoRaw || !dataEmissao || !jurosVal) {
                 !valor ? inputValor.style.borderColor = "var(--err, #ff4d4d)" : inputValor.style.borderColor = "";
                 !prazoRaw ? inputPrazo.style.borderColor = "var(--err, #ff4d4d)" : inputPrazo.style.borderColor = "";
+                inputDataVenc.value == '' ? inputDataVenc.style.borderColor = "var(--err, #ff4d4d)" : inputDataVenc.style.borderColor = "";
                 !dataEmissao ? inputData.style.borderColor = "var(--err, #ff4d4d)" : inputData.style.borderColor = "";
                 !jurosVal ? inputJurosVal.style.borderColor = "var(--err, #ff4d4d)" : inputJurosVal.style.borderColor = "";
 
@@ -7007,7 +7150,8 @@
                 juros_tipo: jurosTipo,
                 juros_val: jurosVal,
                 modo_calculo: modo,
-                valor_receber
+                valor_receber,
+                prazo_custom,
             };
 
             renderPreview();
@@ -8041,6 +8185,7 @@
             document.getElementById('ed-desc').textContent = c.desc;
             document.getElementById('ed-client-name').textContent = c.nome;
             document.getElementById('ed-status-pill').innerHTML = statusPill(calc.status);
+            document.getElementById('ed-parcela-alert').style.display = (calc.status === 'warn' && calc.parcelaAnteriorAtrasada) ? '' : 'none';
 
             // Dados iniciais
             document.getElementById('ed-data-emissao').textContent = fmtDate(l.emissao);
@@ -8096,6 +8241,26 @@
                 document.getElementById('ed-juros-dias-atraso').style.color =
                     calc.diasAtraso > 0 ? `var(--danger)` :
                         `var(--acc2)`;
+            }
+
+            // Próxima Parcela em aberto (apenas se houver parcelas futuras além da última)
+            if (!calc.isPago && calc.diasAtraso <= 0 && !calc.ultimaParcela) {
+                document.getElementById('ed-prox-parcela-box').style.display = 'flex';
+                document.getElementById('ed-prox-parcela-title').textContent = `${calc.numeroProximaParcela}° Parcela`;
+                document.getElementById('ed-prox-parcela').textContent =
+                    calc.diasParaProximaParcela == 0 ? 'Hoje' :
+                        calc.diasParaProximaParcela == 1 ? 'Amanha' :
+                            `em ${calc.diasParaProximaParcela} dia${calc.diasParaProximaParcela !== 1 ? 's' : ''}`;
+                document.getElementById('ed-prox-parcela').style.color =
+                    calc.diasParaProximaParcela <= 2 ? 'var(--warn)' : 'var(--acc2)';
+            } else {
+                document.getElementById('ed-prox-parcela-box').style.display = 'none';
+            }
+
+            // Lista das parcelas atrasadas, exibida em destaque no alerta
+            if (calc.parcelasAtrasadasNumeros && calc.parcelasAtrasadasNumeros.length) {
+                document.getElementById('ed-parcela-alert-list').textContent =
+                    calc.parcelasAtrasadasNumeros.map(n => `${n}ª`).join(', ');
             }
 
             // Definir Valores Atuais
@@ -8480,14 +8645,25 @@
                 if (anexoBadge) rows.push(`<div style="margin-top:-10px; display:flex; align-items:center; justify-content: center;">${anexoBadge}</div>`);
 
             } else if (e.tipo === 'vencimento') {
-                dotClass = e.quitouAntes ? 'td-g' : 'td-a';
-                cardClass = e.quitouAntes ? 'tl-card-done' : 'tl-card-venc';
+                dotClass = 'td-a';
+                cardClass = 'tl-card-venc';
                 title = (e.totalParcelas && e.totalParcelas > 1)
                     ? `Vencimento final - ${e.numero}° parcela`
                     : 'Vencimento do prazo';
+                const prazoTxt = e.diasAte == 0 ? 'Hoje' : e.diasAte == 1 ? 'Amanhã' : `em ${e.diasAte} dias`;
                 if (e.quitouAntes) {
                     rows = [
                         row('Situação', '✓ Quitado antes do vencimento', true, 'var(--acc)'),
+                    ];
+                } else if (!e.vencido) {
+                    // Vencimento ainda não chegou
+                    rows = e.algumPag ? [
+                        row('Valor esperado', fmtMoney(e.saldoNoVenc + e.totalPagoAteVenc), false, 'var(--txt1)'),
+                        row('Pago até aqui', fmtMoney(e.totalPagoAteVenc), false, 'var(--acc)'),
+                        row('Prazo', prazoTxt, true, 'var(--acc2)'),
+                    ] : [
+                        row('Valor esperado', fmtMoney(e.saldoNoVenc), false, 'var(--txt1)'),
+                        row('Prazo', prazoTxt, true, 'var(--acc2)'),
                     ];
                 } else if (!e.algumPag) {
                     rows = [
@@ -8504,13 +8680,24 @@
                 }
 
             } else if (e.tipo === 'parcela') {
-                dotClass = e.quitouAntes ? 'td-g' : 'td-a';
-                cardClass = e.quitouAntes ? 'tl-card-done' : 'tl-card-venc';
+                dotClass = 'td-a';
+                cardClass = 'tl-card-venc';
                 title = `${e.numero}° parcela`;
+                const prazoTxtP = e.diasAte == 0 ? 'Hoje' : e.diasAte == 1 ? 'Amanhã' : `em ${e.diasAte} dias`;
                 if (e.quitouAntes) {
                     rows = [
                         row('Pagamento esperado', fmtMoney(e.esperadoAcumulado), false, 'var(--txt1)'),
                         row('Situação', '✓ Pagamentos no prazo', true, 'var(--acc)'),
+                    ];
+                } else if (!e.vencido) {
+                    // Prazo desta parcela ainda não chegou
+                    rows = e.algumPag ? [
+                        row('Pagamento esperado', fmtMoney(e.esperadoAcumulado), false, 'var(--txt1)'),
+                        row('Pago até aqui', fmtMoney(e.totalPagoAteVenc), false, 'var(--acc)'),
+                        row('Prazo', prazoTxtP, true, 'var(--acc2)'),
+                    ] : [
+                        row('Pagamento esperado', fmtMoney(e.esperadoAcumulado), false, 'var(--txt1)'),
+                        row('Prazo', prazoTxtP, true, 'var(--acc2)'),
                     ];
                 } else if (!e.algumPag) {
                     rows = [
@@ -8623,7 +8810,7 @@
             let id_x = pid.split('_');
             id_x = id_x[1] + '_' + id_x[2];
 
-            const statusLabels = { late: 'Em atraso', warn: 'Vence logo', ok: 'Em dia', done: 'Quitado' };
+            const statusLabels = { late: 'Em atraso', warn: 'Em Alerta', ok: 'Em dia', done: 'Quitado' };
             const statusColors = { late: 'var(--danger)', warn: 'var(--warn)', ok: 'var(--acc2)', done: 'var(--acc)' };
 
             document.getElementById('delete-pag-confirm-body').innerHTML = `
