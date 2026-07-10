@@ -3536,18 +3536,22 @@
                                     oninput="this.value=this.value.replace(/[^0-9]/g,''); validarECalcularManual(); ">
                             </div>
                         </div>
-                        <div class="fr"
-                            style="margin-top:8px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 100%; box-sizing: border-box;">
 
-                            <div class="fg" style="min-width: 130px; max-width: 130px; width: 100%;">
-                                <div class="fl" style="text-align: center;">Data de Emissão *</div>
+
+                        <div class="fr"
+                            style="margin-top:8px; display: grid; grid-template-columns: minmax(0, 1fr) 63px minmax(0, 1fr); gap: 8px; width: 100%; box-sizing: border-box;">
+
+                            <div class="fg" style="width: 100%; min-width: 0;">
+                                <div class="fl"
+                                    style="text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    Data de Emissão *</div>
                                 <input class="fi" id="ne-data" type="date"
-                                    style="width: 100%; text-align: center; box-sizing: border-box;"
+                                    style="width: 100%; text-align: center; box-sizing: border-box; min-width: 0;"
                                     oninput="updateNovoPreview('prazo')">
                             </div>
 
-                            <div class="fg" style="max-width: 70px; width: 100%;">
-                                <div class="fl" style="text-align: center; white-space: nowrap;">Prazo (dias) *</div>
+                            <div class="fg" style="width: 100%; min-width: 0;">
+                                <div class="fl" style="text-align: center; white-space: nowrap;">Prazo *</div>
                                 <select class="fi fs" id="ne-prazo"
                                     style="width: 100%; text-align: center; text-align-last: center; box-sizing: border-box;"
                                     oninput="updateNovoPreview('prazo')">
@@ -3560,14 +3564,18 @@
                                     oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview('prazo'); ">
                             </div>
 
-                            <div class="fg" style="min-width: 130px; max-width: 130px; width: 100%;">
-                                <div class="fl" style="text-align: center;">Vencimento *</div>
+                            <div class="fg" style="width: 100%; min-width: 0;">
+                                <div class="fl"
+                                    style="text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    Vencimento *</div>
                                 <input class="fi" id="ne-data-venc" type="date"
-                                    style="width: 100%; text-align: center; box-sizing: border-box;"
+                                    style="width: 100%; text-align: center; box-sizing: border-box; min-width: 0;"
                                     oninput="updateNovoPreview('data')">
                             </div>
 
                         </div>
+
+
                         <div id="custom-prazo-wrap" style="display:none" class="fg mt8">
                             <div class="fl" style="text-align:center">Prazo em dias *</div>
                             <input class="fi" id="ne-prazo-custom" type="text" inputmode="numeric" min="1"
