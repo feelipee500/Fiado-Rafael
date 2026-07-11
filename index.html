@@ -6468,7 +6468,7 @@
             // já aparecem na lista acima ao clicar/selecionar o mês (o período muda e a lista atualiza).
             const barH = (value, isAll) => {
                 const ref = isAll ? globalMax_all : globalMax;
-                return value > 0 ? Math.max(4, Math.round(Math.abs(value) / ref * 100)) : 0;
+                return Math.max(20, Math.round(Math.abs(value) / ref * 100));
             };
 
             const colsHTML = monthData.map(d => {
@@ -6481,7 +6481,8 @@
                 const tip = `Emprestado ${fmtMoney(d.emprestado)} · Recebido ${fmtMoney(d.recebido)} · `
                     + `A Receber ${fmtMoney(d.aReceber)} · Lucro ${fmtSigned(d.lucroReal)}`;
 
-                return `<div class="erd-chart-col ${d.isRef ? 'act' : ''}" onclick="selectChartMonth(${d.year},${d.month})" title="${tip}">
+                return `
+                <div class="erd-chart-col ${d.isRef ? 'act' : ''}" onclick="selectChartMonth(${d.year},${d.month})" title="${tip}">
                     <div class="erd-chart-bars">
                         <div class="erd-chart-bar" style="height:${barH(d.emprestado, all_card)}%; background:var(--acc2)"></div>
                         <div class="erd-chart-bar" style="height:${barH(d.aReceber, all_card)}%; background:var(--danger)"></div>
