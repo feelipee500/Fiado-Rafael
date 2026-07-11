@@ -5293,7 +5293,7 @@
 
         function applyPeriodFilter() {
             updatePeriodUI();
-            if (_currentScreen === 'emprestimos') renderEmprestimos(_empFilter);
+            if (_currentScreen === 'emprestimos') renderEmprestimos();
             else if (_currentScreen === 'clientes') renderClientes();
             else if (_currentScreen === 'cliente-detalhe') openClienteDetalhe(_currentClientId);
         }
