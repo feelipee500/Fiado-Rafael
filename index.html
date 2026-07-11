@@ -3313,7 +3313,7 @@
                             <!-- DASH STRIP AQUI -->
                             <div class="dash-strip">
                                 <div class="ds-item ds-late" style="font-weight: 800;" id="card-late"
-                                    onclick="navTo('emprestimos','late')">
+                                    onclick="navTo('emprestimos','all'); renderEmprestimos('late', false)">
                                     <div class="ds-lbl">
                                         <div class="ds-lbl-dot" style="background:var(--danger);">
                                         </div>
@@ -3328,7 +3328,7 @@
                                 </div>
                                 <!-- warn -->
                                 <div class="ds-item ds-warn" style="font-weight: 800;" id="card-warn"
-                                    onclick="navTo('emprestimos','warn')">
+                                    onclick="navTo('emprestimos','all'); renderEmprestimos('warn', false)">
                                     <div class="ds-lbl">
                                         <div class="ds-lbl-dot" style="background:var(--warn)">
                                         </div>
@@ -3343,7 +3343,7 @@
                                 </div>
                                 <!-- ok -->
                                 <div class="ds-item ds-ok" style="font-weight: 800;" id="card-ok"
-                                    onclick="navTo('emprestimos','ok')">
+                                    onclick="navTo('emprestimos','all'); renderEmprestimos('ok', false)">
                                     <div class="ds-lbl">
                                         <div class="ds-lbl-dot" style="background:var(--acc2)">
                                         </div>
@@ -3358,7 +3358,7 @@
                                 </div>
                                 <!-- done -->
                                 <div class="ds-item ds-done" style="font-weight: 800;" id="card-done"
-                                    onclick="navTo('emprestimos','done')">
+                                    onclick="navTo('emprestimos','all'); renderEmprestimos('done', false)">
                                     <div class="ds-lbl">
                                         <div class="ds-lbl-dot" style="background:var(--acc)">
                                         </div>
@@ -3384,7 +3384,7 @@
                     <div id="dash-atencao-wrap">
                         <div class="sh">
                             <div class="sh-t">Precisa de Atenção</div>
-                            <div class="sh-l" onclick="navTo('emprestimos','late')">Ver todos</div>
+                            <div class="sh-l" onclick="navTo('emprestimos','all'); renderEmprestimos('late', false)">Ver todos</div>
                         </div>
                         <div id="dash-atencao"></div>
                     </div>
@@ -3392,8 +3392,8 @@
                     <!-- Próximos vencimentos -->
                     <div id="dash-prox-wrap" class="mt8">
                         <div class="sh">
-                            <div class="sh-t">Vencem em Breve</div>
-                            <div class="sh-l" onclick="navTo('emprestimos','warn')">Ver todos</div>
+                            <div class="sh-t">Em Alerta</div>
+                            <div class="sh-l" onclick="navTo('emprestimos','all'); renderEmprestimos('warn', false)">Ver todos</div>
                         </div>
                         <div id="dash-prox"></div>
                     </div>
@@ -3402,7 +3402,7 @@
                     <div id="dash-ok-wrap" class="mt8">
                         <div class="sh">
                             <div class="sh-t">Em Dia</div>
-                            <div class="sh-l" onclick="navTo('emprestimos','ok')">Ver todos</div>
+                            <div class="sh-l" onclick="navTo('emprestimos','all'); renderEmprestimos('ok', false)">Ver todos</div>
                         </div>
                         <div id="dash-ok"></div>
                     </div>
@@ -3411,7 +3411,7 @@
                     <div id="dash-done-wrap" class="mt8">
                         <div class="sh">
                             <div class="sh-t">Pagos</div>
-                            <div class="sh-l" onclick="navTo('emprestimos','done')">Ver todos</div>
+                            <div class="sh-l" onclick="navTo('emprestimos','all'); renderEmprestimos('done', false)">Ver todos</div>
                         </div>
                         <div id="dash-done"></div>
                     </div>
@@ -5915,7 +5915,7 @@
                         svgHTML += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
                             stroke="${seg.color}" stroke-width="${stroke}"
                             style="cursor:pointer; transition:opacity .15s"
-                            onclick="navTo('emprestimos','${seg.filter}')"
+                            onclick="navTo('emprestimos','all'); renderEmprestimos('${seg.filter}', false)"
                             onmouseenter="this.style.opacity='.65'" onmouseleave="this.style.opacity='1'"
                         />`;
                         startDeg = endDeg;
@@ -5930,7 +5930,7 @@
                         svgHTML += `<path d="${d}" fill="none"
                             stroke="${seg.color}" stroke-width="${stroke}" stroke-linecap="butt"
                             style="cursor:pointer; transition:opacity .15s"
-                            onclick="navTo('emprestimos','${seg.filter}')"
+                            onclick="navTo('emprestimos','all'); renderEmprestimos('${seg.filter}', false)"
                             onmouseenter="this.style.opacity='.65'" onmouseleave="this.style.opacity='1'"
                         />`;
                     }
@@ -6206,7 +6206,7 @@
                 const map = {
                     'Todos': 'all',
                     'Em Dia': 'ok',
-                    'Em Alerta': 'warn',
+                    'Alerta': 'warn',
                     'Atrasados': 'late',
                     'Pagos': 'done'
                 };
@@ -6545,7 +6545,8 @@
 
         function setTabEmp(el, filter) {
             document.querySelectorAll('#scr-emprestimos .tbtn').forEach(t => t.classList.remove('act'));
-            el.classList.add('act'); renderEmprestimos(filter, false);
+            el.classList.add('act');
+            renderEmprestimos(filter, false);
         }
 
         // ==================== BUSCA: DROPDOWN DE CLIENTES ====================
