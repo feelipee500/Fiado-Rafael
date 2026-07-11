@@ -28,7 +28,7 @@
             --warn: #ffb547;
             --txt0: #eef0f8;
             --txt1: #9198b5;
-            --txt2: #555d7a;
+            --txt2: #9198b5;
             --txt3: #2e3550;
             --brd: #ffffff0c;
             --brd2: #ffffff16;
@@ -1824,6 +1824,60 @@
             opacity: .75;
         }
 
+        /* PREVISÃO DE JUROS FUTUROS — bloco apagado/menor ao final do histórico,
+           indicando uma projeção que ainda não é real. */
+        .tl-dot-forecast {
+            margin-top: 10px;
+            width: 22px;
+            height: 22px;
+            opacity: .5;
+        }
+
+        .tl-dot-forecast svg {
+            width: 11px;
+            height: 11px;
+        }
+
+        .tl-card.tl-card-forecast {
+            opacity: .55;
+            border-left: 2px dashed var(--txt2);
+            box-shadow: none;
+        }
+
+        .tl-forecast-title {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--txt0);
+        }
+
+        .tl-forecast-date {
+            font-size: 10px;
+            color: var(--txt0);
+        }
+
+        .tl-forecast-lbl {
+            font-size: 10px;
+            color: var(--txt0);
+        }
+
+        .tl-forecast-val {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--txt0);
+        }
+
+        .tl-forecast-chevron {
+            color: var(--txt0);
+        }
+
+        .tl-forecast-group .tl-juros-items {
+            padding-left: 36px;
+        }
+
+        .tl-forecast-item .tl-card {
+            padding: 8px 10px;
+        }
+
         /* PREVIEW TABLE */
         .ptbl {
             width: 100%;
@@ -2062,21 +2116,62 @@
             font-size: 13px;
         }
 
-        .attach-btn svg {
-            width: 20px;
-            height: 10px;
-        }
-
         .attach-item {
             display: flex;
             align-items: center;
             gap: 10px;
             background: var(--bg2);
-            border: 1px solid var(--brd);
+            border: 1px solid var(--brd2);
             border-radius: var(--rad8);
-            padding: 10px 12px;
+            padding: 10px 7px;
             margin-top: 6px;
             cursor: pointer;
+            min-width: 65px;
+        }
+
+        #cd-anexos-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            overflow: hidden;
+            transition: max-height .2s ease;
+        }
+
+        .cd-anexos-toggle {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--acc);
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        #cd-anexos-list .attach-item {
+            flex: 0 0 auto;
+            width: auto;
+            margin-top: 0;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #cd-anexos-list .attach-item-name {
+            flex: none;
+            white-space: nowrap;
+        }
+
+        .attach-item-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .attach-item-actions-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
         }
 
         .attach-item svg {
@@ -2090,6 +2185,7 @@
             font-size: 12px;
             color: var(--txt1);
             cursor: pointer;
+            font-weight: 800;
         }
 
         .attach-item-ver {
@@ -2380,12 +2476,18 @@
             font-size: 11px;
         }
 
+        .fs10 {
+            font-size: 12px;
+            font-weight: 800;
+        }
+
         .tc2 {
-            color: var(--txt2);
+            color: var(--txt1);
         }
 
         .tc1 {
             color: var(--txt1);
+            font-weight: 800;
         }
 
         .text-center {
@@ -3623,6 +3725,10 @@
                                 <div class="dk">Data de vencimento</div>
                                 <div class="dv2" id="nv-venc">—</div>
                             </div>
+                            <div class="dr" id="nv-parcela-valor-row" style="display:none; ">
+                                <div class="dk">Valor de cada parcela</div>
+                                <div class="dv2" id="nv-parcela-valor">—</div>
+                            </div>
                             <div class="dr" style="border:none; ">
                                 <div class="dk">Lucro esperado</div>
                                 <div class="dv2 c-g" id="nv-lucro">—</div>
@@ -3754,6 +3860,8 @@
 
                         <!-- ANEXOS -->
                         <div id="cd-anexos-list"></div>
+                        <div id="cd-anexos-toggle-btn" class="cd-anexos-toggle" style="display:none"
+                            onclick="toggleClienteAnexosExpand()">Mostrar Tudo</div>
                     </div>
 
 
@@ -3763,7 +3871,7 @@
                         <div
                             style="display: flex; flex-direction: column; align-items: center; gap: 6px; border-bottom: 1px solid var(--brd); padding-bottom: 4px; margin-top: 1px;">
                             <span class="fs11 tc2"
-                                style="text-transform: uppercase; letter-spacing: .5px; font-weight: 800;">STATUS
+                                style="text-transform: uppercase; font-size: 14px; font-weight: 800; color: var(--txt1); white-space:nowrap;">STATUS
                                 GERAL</span>
                         </div>
 
@@ -3772,7 +3880,8 @@
                             style="display: flex; justify-content: center; align-items: center; gap: 40px; width: 100%; margin-bottom: 20px;">
                             <div
                                 style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <span class="fs10 tc2">Lucro<br>Previsto</span>
+                                <span class="fs10 tc2"
+                                    style="color: var(--txt1); font-weight: 800;">Lucro<br>Previsto</span>
                                 <span style="font-size: 13px; font-weight: 800; color: var(--acc); white-space:nowrap;"
                                     id="cd-lucro-prev">R$ 0.000,00</span>
                             </div>
@@ -3791,23 +3900,25 @@
                             </div>
                         </div>
 
+
                         <div style="display: flex; align-items: center; margin-bottom: 0px; width: 100%;">
                             <div
                                 style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
                                 <span class="fs10 tc2">Total Pago</span>
-                                <span style="font-size: 15px; font-weight: 1000; color: var(--acc);"
+                                <span style="font-size: 15px; font-weight: 1000; color: var(--acc); white-space:nowrap;"
                                     id="cd-total-pago">R$ -.---,--</span>
                             </div>
                             <div
                                 style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <span class="fs10 tc2" style="font-size: 12px;">Qtd.</span>
-                                <span style="font-size: 12px; font-weight: 800; color: var(--txt1); white-space:nowrap;"
-                                    id="cd-qtd-emp">0</span>
+                                <span class="fs10 tc2" style="font-size: 12px;">Lucro Relativo</span>
+                                <span style="font-size: 12px; font-weight: 800; color: var(--acc); white-space:nowrap;"
+                                    id="cd-lucro-rel">+R$ -.---,--</span>
                             </div>
                             <div
                                 style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center;">
                                 <span class="fs10 tc2">Dívida Total</span>
-                                <span style="font-size: 15px; font-weight: 1000; color: var(--danger);"
+                                <span
+                                    style="font-size: 15px; font-weight: 1000; color: var(--danger); white-space:nowrap;"
                                     id="cd-total-divida">R$ -.---,--</span>
                             </div>
                         </div>
@@ -3838,6 +3949,10 @@
                                 id="cd-valor-hoje-ignorado">Divida Ignorada - R$ --.---,--</div>
                             <div style="font-family:var(--font-d); font-size:34px; font-weight:900; letter-spacing:-1.5px; line-height:1"
                                 id="cd-valor-hoje">R$ 0</div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                            <span style="font-size: 12px; font-weight: 800; color: var(--txt1); white-space:nowrap;"
+                                id="cd-qtd-emp">---</span>
                         </div>
                     </div>
 
@@ -4060,7 +4175,7 @@
                         <!-- Display do valor restante -->
                         <div id="ed-sit-box"
                             style="position:relative; display: flex; flex-direction: column; align-items: center; margin-top:5px"
-                            onclick="pagarTudo()">
+                            onclick="pagarTudo(); onPagValorChange()">
                             <div class="fs11 tc2" style="margin-bottom:2px;" id="ed-valor-hoje-title">Valor a pagar hoje
                             </div>
                             <div style="font-size: 13px; font-weight: 1000; color: var(--acc3);"
@@ -4342,11 +4457,13 @@
 
                 <div class="fg mt12">
                     <div class="fl">Nome do Anexo</div>
-                    <input class="fi" id="client-attach-name-input" type="text"
-                        placeholder="Ex: RG, Comprovante de Residência…" oninput="updateClientAttachSaveState()">
+                    <select class="fi fs" id="client-attach-name-select" onchange="onClientAttachNameSelectChange()">
+                    </select>
+                    <input class="fi mt8" id="client-attach-name-input" type="text" style="display:none"
+                        placeholder="Digite o nome do anexo" oninput="updateClientAttachSaveState()">
                 </div>
 
-                <button class="btn-p mt12" id="client-attach-save-btn" disabled onclick="salvarAnexoCliente()">Salvar
+                <button class="btn-p mt12" id="client-attach-save-btn" disabled onclick="add_anexo_cliente()">Salvar
                     Anexo</button>
             </div>
         </div>
@@ -5503,6 +5620,39 @@
                 });
             }
 
+            // Previsão de Juros Futuros — bloco apagado ao final do histórico, com a
+            // estimativa dos próximos 10 dias de juros caso o empréstimo continue em
+            // aberto. Os dias projetados começam a partir do último evento do
+            // histórico (pode ser o vencimento final, a última parcela, ou o dia atual —
+            // o que for mais recente), e mostra os valores em qualquer empréstimo não
+            // quitado (status 'ok', 'warn' ou 'late'), não somente quando já atrasado.
+            if (!c.isPago) {
+                const forecastDays = 10;
+                const lastEventDate = events.length ? Math.max(...events.map(e => e.date)) : TODAY;
+                let saldoForecast = saldoCorrente;
+                const forecastSubEvents = [];
+                for (let i = 1; i <= forecastDays; i++) {
+                    const dia = addDays(lastEventDate, i);
+                    const saldoAntes = saldoForecast;
+                    const jurosDoDia = jdv;
+                    saldoForecast += jurosDoDia;
+                    forecastSubEvents.push({
+                        date: dia, tipo: 'juros-forecast-dia',
+                        label: `Previsão dia ${i}`,
+                        valor: jurosDoDia,
+                        saldoAntes, saldoDepois: saldoForecast,
+                        color: 'td-gr'
+                    });
+                }
+                events.push({
+                    date: addDays(lastEventDate, forecastDays), tipo: 'juros-forecast',
+                    label: 'Previsão de Juros Futuros',
+                    subEvents: forecastSubEvents,
+                    saldoAntes: saldoCorrente, saldoDepois: saldoForecast,
+                    color: 'td-gr'
+                });
+            }
+
             // Quitação marker
             if (c.isPago) {
                 const lastPag = sortedPags.length > 0 ? sortedPags[sortedPags.length - 1] : null;
@@ -5516,9 +5666,15 @@
             }
 
 
-            // Sort chronologically; within same day: juros → pagamento → quitado → hoje
+            // Sort chronologically; within same day: juros → pagamento → quitado → hoje.
+            // A previsão de juros futuros sempre fica por último, mesmo quando há
+            // parcelas com vencimento final além dos 10 dias projetados.
             const typeOrder = { emissao: 0, juros: 1, pagamento: 2, parcela: 3, vencimento: 3, quitado: 4, hoje: 5 };
-            events.sort((a, b) => a.date - b.date || (typeOrder[a.tipo] || 0) - (typeOrder[b.tipo] || 0));
+            events.sort((a, b) => {
+                if (a.tipo === 'juros-forecast') return 1;
+                if (b.tipo === 'juros-forecast') return -1;
+                return a.date - b.date || (typeOrder[a.tipo] || 0) - (typeOrder[b.tipo] || 0);
+            });
 
             // Verificar se é preview de historico de pagamento no dia atual
             if (!retro) {
@@ -5567,17 +5723,31 @@
             document.getElementById(id).classList.add('act');
             if (bniMap[scr]) document.getElementById(bniMap[scr])?.classList.add('act');
             document.getElementById('screens').scrollTop = 0;
+
+            if (_currentScreen != scr &&
+                !(_currentScreen == 'clientes' && scr == 'cliente-detalhe') &&
+                !(_currentScreen == 'cliente-detalhe' && scr == 'clientes') &&
+                !(_currentScreen == 'cliente-detalhe' && scr == 'emp-detalhe') &&
+                !(_currentScreen == 'emp-detalhe' && scr == 'cliente-detalhe') &&
+                !(_currentScreen == 'emp-detalhe' && scr == 'emprestimos') &&
+                !(_currentScreen == 'emprestimos' && scr == 'emp-detalhe')) {
+                _periodFilter = { mode: 'all', year: null, month: null, start: null, end: null };
+            } 
             _prevScreen = _currentScreen;
             _currentScreen = scr;
 
+
             showLoadingFor(300);
-            if (scr === 'dash') { renderDash(); updateNotifBadge(); }
-            else if (scr === 'emprestimos') {
-                _periodFilter = { mode: 'all', year: null, month: null, start: null, end: null };
+            if (scr === 'dash') {
+                renderDash();
+                updateNotifBadge();
+            } else if (scr === 'emprestimos') {
                 renderEmprestimos(param || _empFilter);
+            } else if (scr === 'clientes') {
+                renderClientes();
+            } else if (scr === 'novo') {
+                renderNovo();
             }
-            else if (scr === 'clientes') renderClientes();
-            else if (scr === 'novo') { renderNovo(); }
         }
 
         // ==================== DASH ====================
@@ -5829,7 +5999,7 @@
                     c.diasAtraso > 0 ? `<span class="c-r">+${c.diasAtraso} dia${c.diasAtraso != 1 ? 's' : ''}</span>` :
                         c.diasParaVencer == 0 ? `<span class="c-w">Hoje</span>` :
                             c.diasParaVencer == 1 ? `<span class="c-w">Amanhã</span>` :
-                                c.diasParaVencer == 2 ? `<span class="c-w">2 dias</span>` :
+                                c.diasParaVencer == 2 ? `<span class="c-w">Restam 2 dias</span>` :
                                     `<span class="${c.status === 'warn' ? 'c-w' : 'c-b'}">Restam ${c.diasParaVencer} dias</span>`;
 
             const parcelaLine = (!c.isPago && c.diasAtraso <= 0 && !c.ultimaParcela) ? (
@@ -7108,6 +7278,15 @@
             document.getElementById('nv-receber').textContent = fmtMoney(valorBase);
             document.getElementById('nv-venc').textContent = fmtDate(venc);
 
+            // Exibe o valor de cada parcela na prévia rápida, quando houver mais de uma
+            const nvParcelaRow = document.getElementById('nv-parcela-valor-row');
+            if (parcelasRaw > 1) {
+                document.getElementById('nv-parcela-valor').textContent = `${parcelasRaw}x de ${fmtMoney(valorBase / parcelasRaw)}`;
+                nvParcelaRow.style.display = '';
+            } else {
+                nvParcelaRow.style.display = 'none';
+            }
+
             // Mantém a exibição padrão de porcentagem arredondada usando a taxa dinâmica calculada
             document.getElementById('nv-lucro').textContent = fmtMoney(valorBase - valor) + ` (+${Math.round(pr)}%)`;
             document.getElementById('novo-preview-mini').style.display = '';
@@ -7293,15 +7472,11 @@
                 </div>`;
             }
 
-            let tblRows = '';
-            tblRows += `<tr class="venc"><td>${fmtDate(venc)}</td><td>Vencimento</td><td>R$0,00</td><td>${fmtMoney(valorBase)}</td></tr>`;
-            let acJ = 0;
-            for (let dd = 1; dd <= 10; dd++) {
-                const dia = addDays(venc, dd);
-                acJ += jurosDia;
-                const isT = dateStr(dia) === dateStr(TODAY);
-                tblRows += `<tr class="${isT ? 'today' : ''}"><td>${fmtDate(dia)}</td><td>+${dd}d</td><td>${fmtMoney(jurosDia)}</td><td>${fmtMoney(valorBase + acJ)}</td></tr>`;
-            }
+            // Simula um empréstimo (sem pagamentos) com os dados informados para gerar
+            // a mesma visualização de histórico usada em todo o resto do site.
+            const loanSim = { ...d, pagamentos: [], pago: 0 };
+            const historicoEvents = buildTimeline(loanSim, false);
+            const historicoHTML = renderTimelineHTML(historicoEvents, null, false);
 
             let situacaoRetroHTML = '';
             if (isRetro) {
@@ -7338,12 +7513,10 @@
                 </div>
                 ${parcelasHTML}
                 ${situacaoRetroHTML}
-                <div class="card mb12">
-                <div class="sc-lbl">Previsão de juros por atraso — ${d.juros_tipo === 'fixo' ? fmtMoney(d.juros_val) + '/dia' : `${d.juros_val}%/dia`}</div>
-                <div style="overflow-x:auto">
-                    <table class="ptbl"><thead><tr><th>Data</th><th>Dia</th><th>Juros</th><th>Total</th></tr></thead><tbody>${tblRows}</tbody></table>
+                <div class="sh">
+                    <div class="sh-t">Histórico</div>
                 </div>
-                </div>
+                <ul class="tl" style="padding-left:0">${historicoHTML}</ul>
             `;
         }
 
@@ -7364,7 +7537,9 @@
             updateNovoPreview();
         }
 
-        function irParaEmprestimoAposCriar() { openEmpDetalhe(_currentLoanId); }
+        function irParaEmprestimoAposCriar() {
+            openEmpDetalhe(_currentLoanId);
+        }
 
         function confirmarEmprestimo() {
             const d = _newLoanData;
@@ -8107,7 +8282,7 @@
             const hasLate = loans.some(l => getLoanCalc(l).status === 'late');
             const hasWarn = loans.some(l => getLoanCalc(l).status === 'warn');
             const statusC = loans.length == 0 ? 'ok' : hasLate ? 'late' : hasWarn ? 'warn' : loans.some(l => getLoanCalc(l).status === 'ok') ? 'ok' : 'done';
-            let totalEmp = 0, totalPago = 0, dividaTotal = 0, falta = 0, lucro = 0, progressPct = 0, jurosacm = 0, restante = 0;
+            let totalEmp = 0, totalPago = 0, dividaTotal = 0, falta = 0, lucro = 0, progressPct = 0, jurosacm = 0, restante = 0, lucroRelativo = 0, emAberto = 0;
             loans.forEach(l => {
                 const calc = getLoanCalc(l);
                 totalEmp += l.valor;
@@ -8117,8 +8292,8 @@
                 restante += Math.max(0, calc.saldoRestante);
                 lucro += calc.dividaTotal - l.valor;
                 jurosacm += calc.acumJuros;
-
-                console.log(calc)
+                lucroRelativo += calc.totalPago > l.valor ? calc.totalPago - l.valor : 0;
+                emAberto += calc.status != 'done' ? 1 : 0;
             });
 
             // Definir valores do status geral
@@ -8126,8 +8301,9 @@
             document.getElementById('cd-total-emp').textContent = fmtMoney(totalEmp);
             document.getElementById('cd-juros-acm').textContent = fmtMoney(jurosacm);
             document.getElementById('cd-total-pago').textContent = fmtMoney(totalPago);
+            document.getElementById('cd-lucro-rel').textContent = '+' + fmtMoney(lucroRelativo);
             document.getElementById('cd-total-divida').textContent = fmtMoney(dividaTotal);
-            document.getElementById('cd-qtd-emp').textContent = loans.length;
+            document.getElementById('cd-qtd-emp').textContent = loans.length + ' EMPRÉSTIMO' + (loans.length == 1 ? '' : 'S') + ' - ' + emAberto + ' EM ABERTO';
 
             // Definir valores da barra de progresso de pagamento
             const percent_pago = totalPago > 0 ? Math.max(1, Math.round(totalPago / dividaTotal * 100)) : 0;
@@ -8439,9 +8615,7 @@
 
                 if (mode == 'loan' && _currentLoanId) {
                     box_add.innerHTML = `
-                    <p class="fs12 tc1 mb12">Selecione uma imagem ou PDF. Somente 1 arquivo.</p>
-                    <div class="attach-btn" id="btn-add-anexo"
-                        onclick="document.getElementById('attach-file-input').click()">
+                    <div id="btn-add-anexo" class="file-picker-btn" onclick="document.getElementById('attach-file-input').click()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                             <polyline points="17 8 12 3 7 8" />
@@ -8453,9 +8627,7 @@
                     `;
                 } else if (mode == 'pag' && pag.id) {
                     box_add.innerHTML = `
-                    <p class="fs12 tc1 mb12">Selecione uma imagem ou PDF. Somente 1 arquivo.</p>
-                    <div class="attach-btn" id="btn-add-anexo"
-                        onclick="document.getElementById('attach-file-input').click()">
+                    <div id="btn-add-anexo" class="file-picker-btn" onclick="document.getElementById('attach-file-input').click()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                             <polyline points="17 8 12 3 7 8" />
@@ -8471,14 +8643,14 @@
             openSheet('attach-sheet', animate);
         }
 
-        function openRemoveAttach(anexo_id, linha, pid, mode) {
+        function openRemoveAttach(anexo_id, linha, pid, mode, file_name) {
 
             const box_remove = document.getElementById('remove-sh-body');
             if (!anexo_id || !linha) {
                 return showToast('Erro ao remover anexo!');
             } else {
                 box_remove.innerHTML = `
-                    <div class="sh-body">Tem certeza que deseja remover o anexo '${mode == 'loan' ? _currentLoanId : pid}'?</div>
+                    <div class="sh-body">Tem certeza que deseja remover o anexo '${mode == 'loan' ? _currentLoanId : mode == 'pag' ? pid : mode == 'cliente' ? file_name : ''}'?</div>
                     <div class="confirm-btns mt12">
                         <button class="cbtn-n"
                             onclick="closeSheet(document.getElementById('remove-attach'))">Cancelar</button>
@@ -8558,6 +8730,73 @@
                 <ul class="tl" style="padding:4px 0 0">${itemsHTML}</ul>
                 </div>
             </div>`;
+        }
+
+        // Bloco apagado de "Previsão de Juros Futuros" — mostrado ao final do histórico
+        // quando o empréstimo está em aberto. Ao clicar, expande os dias individuais
+        // da projeção, com cores mais apagadas para indicar que ainda não são reais.
+        function _jurosForecastGroupHTML(forecastEvent, groupId) {
+            const subEvents = forecastEvent.subEvents;
+            const n = subEvents.length;
+            const totalJuros = subEvents.reduce((s, e) => s + e.valor, 0);
+            const firstDate = fmtDate(subEvents[0].date);
+            const lastDate = fmtDate(subEvents[n - 1].date);
+
+            const itemsId = groupId + '-items';
+            const chevId = groupId + '-chev';
+            const itemsHTML = subEvents.map(e => _jurosForecastDayHTML(e)).join('');
+
+            const iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+            const chevSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>';
+
+            return `<div class="tl-juros-group tl-forecast-group">
+                <li class="tl-item" style="cursor:pointer" onclick="(function(){
+                var el=document.getElementById('${itemsId}');
+                var ch=document.getElementById('${chevId}');
+                var open=el.classList.toggle('open');
+                ch.classList.toggle('open',open);
+                })()">
+                <div class="tl-dot td-gr tl-dot-forecast">${iconSvg}</div>
+                <div class="tl-card tl-card-forecast">
+                    <div class="tl-card-top">
+                    <div class="tl-card-title tl-forecast-title">Previsão de Juros Futuros</div>
+                    <div style="display:flex; align-items:center; gap:6px">
+                        <div class="tl-card-date tl-forecast-date">${firstDate} – ${lastDate}</div>
+                        <div class="tl-juros-chevron tl-forecast-chevron" id="${chevId}">${chevSvg}</div>
+                    </div>
+                    </div>
+                    <div class="tl-card-rows">
+                    <div class="tl-card-row">
+                        <span class="tl-row-lbl tl-forecast-lbl">Juros por dia</span>
+                        <span class="tl-row-val tl-forecast-val">+ ${fmtMoney(subEvents[0].valor)} / Dia</span>
+                    </div>
+                    </div>
+                </div>
+                </li>
+                <div class="tl-juros-items" id="${itemsId}">
+                <ul class="tl" style="padding:4px 0 0">${itemsHTML}</ul>
+                </div>
+            </div>`;
+        }
+
+        function _jurosForecastDayHTML(e) {
+            const iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+            return `
+            <li class="tl-item tl-forecast-item">
+                <div class="tl-dot td-gr tl-dot-forecast">${iconSvg}</div>
+                <div class="tl-card tl-card-forecast">
+                    <div class="tl-card-top">
+                        <div class="tl-card-title tl-forecast-title">${fmtDate(e.date)}</div>
+                        <div class="tl-card-date tl-forecast-date">${e.valor > 0 ? '+ ' + fmtMoney(e.valor) : '—'}</div>
+                    </div>
+                    <div class="tl-card-rows">
+                        <div class="tl-card-row">
+                            <span class="tl-row-lbl tl-forecast-lbl">Dívida projetada</span>
+                            <span class="tl-row-val tl-forecast-val">${fmtMoney(e.saldoDepois)}</span>
+                        </div>
+                    </div>
+                </div>
+            </li>`;
         }
 
         function tlEventHTML(e, loanId, anexos) {
@@ -9023,6 +9262,8 @@
                     const run = [];
                     while (i < events.length && events[i].tipo === 'juros') run.push(events[i++]);
                     chunks.push({ tipo: 'juros-group', events: run });
+                } else if (events[i].tipo === 'juros-forecast') {
+                    chunks.push({ tipo: 'juros-forecast-group', event: events[i++] });
                 } else {
                     chunks.push({ tipo: 'single', event: events[i++] });
                 }
@@ -9031,6 +9272,8 @@
             for (const chunk of chunks) {
                 if (chunk.tipo === 'juros-group') {
                     html += _jurosGroupHTML(chunk.events, `jg-${loanId || 'p'}-${grpIdx++}-${Date.now()}`);
+                } else if (chunk.tipo === 'juros-forecast-group') {
+                    html += _jurosForecastGroupHTML(chunk.event, `jgf-${loanId || 'p'}-${grpIdx++}-${Date.now()}`);
                 } else {
                     html += tlEventHTML(chunk.event, loanId, anexos);
                 }
@@ -10178,6 +10421,7 @@
         }
 
         window.addEventListener('popstate', (e) => {
+
             // 1. Sheet open — close it first
             if (document.querySelector('.overlay.open')) {
                 document.querySelector('.overlay.open').classList.remove('open');
@@ -10406,13 +10650,17 @@
                     renderAttachList(loan_anexo);
 
                     openAttachSheet('loan', _currentLoanId, false);
-                } else {
+                } else if (mode == 'pag') {
                     renderTimeline(loan);
 
                     if (pid) {
                         openTlEvent(loan.id, pid, false);
                         openAttachSheet('pag', pid, false);
                     }
+                } else if (mode == 'cliente') {
+                    closeSheet(document.getElementById('remove-attach'));
+                    const c = getClient(_currentClientId);
+                    renderClienteAnexos(c);
                 }
 
                 hideLoading();
@@ -10436,29 +10684,101 @@
         // ==================== ANEXOS DO CLIENTE (parte visual) ====================
         // DB.clients[...].anexos = [{ file: "nome_do_anexo", id: "id_no_drive" }, ...]
         let _clientAttachFile = null;
+        let _clienteAnexosExpanded = false;
+
+        // Lista de nomes pré-definidos para os anexos do cliente
+        const CLIENT_ATTACH_PREDEFINED_NAMES = [
+            'RG',
+            'CNH',
+            'CPF',
+            'Comp. de Residência',
+            'Comp. de Vínculo',
+            'Foto do Cliente'
+        ];
 
         // Renderiza a lista de anexos do cliente na tela de detalhe
         function renderClienteAnexos(client) {
             const el = document.getElementById('cd-anexos-list');
+            const toggleBtn = document.getElementById('cd-anexos-toggle-btn');
             if (!el) return;
             const anexos = (client && client.anexos) || [];
 
+            // Sempre renderiza recolhido por padrão
+            _clienteAnexosExpanded = false;
+
             if (!anexos.length) {
                 el.innerHTML = '<div class="fs12 tc2" style="text-align:center; padding:8px 0;">Nenhum anexo adicionado</div>';
+                el.style.maxHeight = '';
+                if (toggleBtn) toggleBtn.style.display = 'none';
                 return;
             }
 
             el.innerHTML = anexos.map(a => `
-                <div class="attach-item" onclick="visualizarAnexoCliente('${a.id}')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                    </svg>
-                    <div class="attach-item-name">${a.file}</div>
-                    <div class="attach-item-ver">Ver</div>
-                    <div class="attach-item-del" onclick="event.stopPropagation(); removerAnexoCliente('${a.id}')">✕</div>
+                <div class="attach-item" onclick="visualizarAnexoCliente('${a.anexo_id}')">
+                    <div class="attach-item-title-row">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                        </svg>
+                        <div class="attach-item-name">${a.file}</div>
+                    </div>
+                    <div class="attach-item-actions-row">
+                        <div class="attach-item-ver">Ver</div>
+                        <div class="attach-item-del" onclick="event.stopPropagation(); openRemoveAttach('${a.anexo_id}', ${a.lin}, '', 'cliente', '${a.file}')">✕</div>
+                    </div>
                 </div>
             `).join('');
+
+            updateClienteAnexosCollapse();
+        }
+
+        // Ajusta a altura visível de #cd-anexos-list conforme o estado recolhido/expandido
+        // e mostra/oculta o botão "Mostrar Tudo" / "Recolher" quando há mais de uma linha de anexos
+        function updateClienteAnexosCollapse() {
+            // Adiado com rAF: no momento da chamada a tela do cliente pode ainda não estar
+            // visível (ex: chamada antes do navTo trocar a tela), o que faria offsetTop/offsetHeight
+            // retornarem 0 para todos os itens. Esperar dois frames garante que a troca de tela
+            // (adição da classe "act") já foi aplicada e o layout já foi calculado.
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    const el = document.getElementById('cd-anexos-list');
+                    const btn = document.getElementById('cd-anexos-toggle-btn');
+                    if (!el || !btn) return;
+
+                    const items = Array.from(el.children).filter(c => c.classList.contains('attach-item'));
+                    if (!items.length) {
+                        el.style.maxHeight = '';
+                        btn.style.display = 'none';
+                        return;
+                    }
+
+                    const firstTop = items[0].offsetTop;
+                    const hasMultipleRows = items.some(it => it.offsetTop > firstTop + 5);
+
+                    if (!hasMultipleRows) {
+                        el.style.maxHeight = '';
+                        btn.style.display = 'none';
+                        return;
+                    }
+
+                    btn.style.display = '';
+
+                    if (_clienteAnexosExpanded) {
+                        el.style.maxHeight = el.scrollHeight + 'px';
+                        btn.textContent = 'Recolher';
+                    } else {
+                        const rowHeight = Math.max(...items.filter(it => it.offsetTop === firstTop).map(it => it.offsetHeight)) + 1;
+                        el.style.maxHeight = rowHeight + 'px';
+                        btn.textContent = 'Mostrar Tudo';
+                    }
+                });
+            });
+        }
+
+        // Alterna entre recolhido (só a primeira linha) e expandido (todos os anexos)
+        function toggleClienteAnexosExpand() {
+            _clienteAnexosExpanded = !_clienteAnexosExpanded;
+            updateClienteAnexosCollapse();
         }
 
         // Abre a imagem/PDF do anexo do cliente no visualizador já existente
@@ -10473,10 +10793,44 @@
             _clientAttachFile = null;
             document.getElementById('client-attach-file-input').value = '';
             document.getElementById('client-attach-name-input').value = '';
+            document.getElementById('client-attach-name-input').style.display = 'none';
             document.getElementById('client-attach-preview').innerHTML = '';
             document.getElementById('client-attach-picker').style.display = '';
+            populateClientAttachNameSelect();
             updateClientAttachSaveState();
             openSheet('client-attach-sheet');
+        }
+
+        // Preenche o select de nomes pré-definidos, ocultando os já usados pelo cliente
+        function populateClientAttachNameSelect() {
+            const select = document.getElementById('client-attach-name-select');
+            if (!select) return;
+
+            const client = getClient(_currentClientId);
+            const usados = new Set(((client && client.anexos) || []).map(a => a.file));
+
+            const disponiveis = CLIENT_ATTACH_PREDEFINED_NAMES.filter(n => !usados.has(n));
+
+            select.innerHTML = disponiveis.map(n => `<option value="${n}">${n}</option>`).join('')
+                + `<option value="__outro__">Outro...</option>`;
+
+            select.value = disponiveis.length ? disponiveis[0] : '__outro__';
+            onClientAttachNameSelectChange();
+        }
+
+        // Alterna a exibição do input de texto customizado quando "Outro..." é escolhido
+        function onClientAttachNameSelectChange() {
+            const select = document.getElementById('client-attach-name-select');
+            const input = document.getElementById('client-attach-name-input');
+            if (!select || !input) return;
+
+            if (select.value === '__outro__') {
+                input.style.display = '';
+            } else {
+                input.style.display = 'none';
+                input.value = '';
+            }
+            updateClientAttachSaveState();
         }
 
         // Preview do arquivo escolhido (apenas visual, ainda não envia para lugar nenhum)
@@ -10499,8 +10853,8 @@
                 const reader = new FileReader();
                 reader.onload = e => {
                     box.innerHTML = `
-                    <div class="card_comp_pag" style="padding:10px">
-                        <img src="${e.target.result}" style="width:100%; max-height:220px; object-fit:contain; border-radius:8px">
+                    <div class="card_comp_pag" style="padding:10px; cursor:pointer" onclick="openAttachPreview('image','${e.target.result}')">
+                        <img src="${e.target.result}" style=" width:100%; max-height:220px; object-fit:contain; border-radius:8px">
                         <div style="margin-top:8px; font-size:12px; text-align:center">${file.name}</div>
                     </div>
                     <div style="margin-top:8px; font-size:12px; color:var(--danger); cursor:pointer; text-align:center" onclick="removeClienteAttachPreview()">Remover</div>
@@ -10508,8 +10862,10 @@
                 };
                 reader.readAsDataURL(file);
             } else {
+                const pdfUrl = URL.createObjectURL(file);
+
                 box.innerHTML = `
-                <div class="card_comp_pag" style="padding:12px; display:flex; align-items:center; gap:10px">
+                <div class="card_comp_pag" style="padding:12px; display:flex; align-items:center; gap:10px; cursor:pointer" onclick="openAttachPreview('pdf','${pdfUrl}')">
                     <div style="font-size:32px">📄</div>
                     <div>
                         <div style="font-size:12px; font-weight:600">${file.name}</div>
@@ -10520,9 +10876,10 @@
                 `;
             }
 
-            // Pré-preenche o nome do anexo com o nome do arquivo, se o usuário ainda não tiver digitado nada
+            // Pré-preenche o nome do anexo com o nome do arquivo, se estiver no modo "Outro..." e o usuário ainda não tiver digitado nada
             const nameInput = document.getElementById('client-attach-name-input');
-            if (nameInput && !nameInput.value.trim()) {
+            const nameSelect = document.getElementById('client-attach-name-select');
+            if (nameInput && nameSelect && nameSelect.value === '__outro__' && !nameInput.value.trim()) {
                 nameInput.value = file.name.replace(/\.[^/.]+$/, '');
             }
 
@@ -10538,9 +10895,19 @@
             updateClientAttachSaveState();
         }
 
+        // Retorna o nome do anexo escolhido: valor do select, ou texto digitado quando "Outro..." está selecionado
+        function getClientAttachSelectedName() {
+            const select = document.getElementById('client-attach-name-select');
+            if (!select) return '';
+            if (select.value === '__outro__') {
+                return document.getElementById('client-attach-name-input')?.value.trim() || '';
+            }
+            return select.value;
+        }
+
         // Botão de salvar só fica habilitado com arquivo escolhido + nome preenchido
         function updateClientAttachSaveState() {
-            const nameVal = document.getElementById('client-attach-name-input')?.value.trim();
+            const nameVal = getClientAttachSelectedName();
             const btn = document.getElementById('client-attach-save-btn');
             if (btn) btn.disabled = !(_clientAttachFile && nameVal);
         }
@@ -10548,18 +10915,77 @@
         // TODO: implementar o envio de _clientAttachFile para o Drive/planilha,
         // salvar { file: nome, id: <id_do_drive> } em DB.clients[...].anexos
         // e então chamar renderClienteAnexos(getClient(_currentClientId)) + closeSheet(...)
-        function salvarAnexoCliente() {
+        async function add_anexo_cliente() {
             if (!_clientAttachFile || !_currentClientId) return;
-            const nome = document.getElementById('client-attach-name-input').value.trim();
-            showNotif('Função de salvar anexo do cliente ainda não configurada', 'warn');
+
+            showLoading(['CONVERTENDO ANEXO...', 'ENVIANDO PARA O DRIVE...', 'SALVANDO NA PASTA...', 'SINCRONIZANDO...', 'TERMINANDO...']);
+
+            const nome = _currentClientId;
+            const tipo = _clientAttachFile.type;
+            const data_ref = 0;
+
+            const file_name = getClientAttachSelectedName();
+
+            const reader = new FileReader();
+            reader.onload = async function () {
+                const base64 = reader.result.split(',')[1];
+
+                const dadosParaEnvio = {
+                    nome,
+                    tipo,
+                    base64: base64,
+                    data_ref,
+                    file: file_name,
+                    time: DB.time
+                };
+
+
+                try {
+                    console.log("Enviando anexo para planilha...");
+                    const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexo' };
+                    const res = await fetch(URL_SCRIPT,
+                        { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                    );
+
+                    if (!res.ok) { throw new Error("Erro ao realizar fetch - add anexo") };
+
+                    const novoDB = await res.json();
+
+                    if (novoDB.error) {
+                        throw new Error(novoDB.error);
+                    }
+
+                    console.log("Anexo adicionado com sucesso");
+                    DB = novoDB;
+                    console.log(DB);
+
+                    _clientAttachFile = null;
+
+                    const c = getClient(_currentClientId);
+                    // Atualizar Anexos do cliente
+                    renderClienteAnexos(c);
+                    closeSheet(document.getElementById('client-attach-sheet'))
+
+                    hideLoading();
+                    showToast('Anexo Salvo');
+                }
+                catch (err) {
+                    console.log("Erro ao adicionar o Anexo");
+                    console.log(err);
+
+                    hideLoading();
+
+                    showToast('Erro ao salvar anexo!', 'err');
+                    showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                    setTimeout(() => {
+                        return window.location.reload(true);
+                    }, 5000);
+                }
+            };
+
+            reader.readAsDataURL(_clientAttachFile);
         }
 
-        // TODO: implementar a remoção do anexo no Drive/planilha e em DB.clients[...].anexos,
-        // e então chamar renderClienteAnexos(getClient(_currentClientId))
-        function removerAnexoCliente(anexoId) {
-            if (!anexoId || !_currentClientId) return;
-            showNotif('Função de remover anexo do cliente ainda não configurada', 'warn');
-        }
 
         // Função para abrir o anexo em tela cheia
         // Variáveis globais para controle do estado do zoom
@@ -10877,10 +11303,10 @@
 
         // VARIAVEIS GLOBAIS
         // Meu Script
-        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
 
         // Script do Rafael
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbytXLOQJ_dSnl4l0rds_NQZLl3IzWNZBzoXk7mKNGWCWZCmUNBdYW08BVoVWrTZy8_1/exec";
+        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbytXLOQJ_dSnl4l0rds_NQZLl3IzWNZBzoXk7mKNGWCWZCmUNBdYW08BVoVWrTZy8_1/exec";
 
         var DB = {};
 
