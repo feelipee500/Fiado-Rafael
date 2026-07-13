@@ -20,7 +20,6 @@
             --bg1: #0f1117;
             --bg2: #161a24;
             --bg3: #1c2133;
-            --bg4: #222840;
             --acc: #00e8a2;
             --acc2: #3d7fff;
             --acc3: #f5a623;
@@ -29,11 +28,9 @@
             --txt0: #eef0f8;
             --txt1: #9198b5;
             --txt2: #9198b5;
-            --txt3: #2e3550;
             --brd: #ffffff0c;
             --brd2: #ffffff16;
             --brd3: #ffffff22;
-            --rad4: 4px;
             --rad8: 8px;
             --rad12: 12px;
             --rad16: 16px;
@@ -247,12 +244,6 @@
             stroke-width: 2.5;
         }
 
-        .bni-fab-lbl {
-            font-size: 10px;
-            font-weight: 500;
-            color: var(--txt2);
-        }
-
         /* SCREENS VISIBILITY */
         .scr {
             display: none;
@@ -315,64 +306,6 @@
             border: 1px solid var(--brd);
             border-radius: var(--rad12);
             padding: 1px 4px;
-        }
-
-        /* STAT GRID */
-        .sg {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-
-        .sg3 {
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-        }
-
-        .sc {
-            background: var(--bg1);
-            border: 1px solid var(--brd);
-            border-radius: var(--rad12);
-            padding: 12px 14px;
-        }
-
-        .sc.hi {
-            background: var(--acc);
-            border-color: transparent;
-            grid-column: 1/-1;
-        }
-
-        .sc.hi .slbl,
-        .sc.hi .schg {
-            color: rgba(0, 0, 0, .55);
-        }
-
-        .sc.hi .sval {
-            color: #000;
-        }
-
-        .slbl {
-            font-size: 10px;
-            color: var(--txt2);
-            text-transform: uppercase;
-            letter-spacing: .7px;
-            font-weight: 500;
-            margin-bottom: 5px;
-        }
-
-        .sval {
-            font-family: var(--font-d);
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: -.8px;
-            line-height: 1;
-        }
-
-        .schg {
-            font-size: 11px;
-            color: var(--txt2);
-            margin-top: 4px;
         }
 
         .c-g {
@@ -461,17 +394,6 @@
 
         .p-pend::before {
             background: var(--txt2);
-        }
-
-        .pill-xs {
-            padding: 2px 7px;
-            font-size: 11px;
-            gap: 3px;
-        }
-
-        .pill-xs::before {
-            width: 5px;
-            height: 5px;
         }
 
         /* LOAN CARD VIEW TOGGLE */
@@ -745,7 +667,6 @@
             font-weight: 600;
             white-space: nowrap;
         }
-
 
         /* AVATAR */
         .av {
@@ -1038,13 +959,6 @@
             font-size: 11px;
             color: var(--txt2);
             margin-top: 1px;
-        }
-
-        .emp-search-dd-empty {
-            padding: 16px 12px;
-            text-align: center;
-            font-size: 12px;
-            color: var(--txt2);
         }
 
         /* EMPRESTIMOS RESULT DASHBOARD (mesma ordem/visual original, unificado em 1 card) */
@@ -1359,8 +1273,6 @@
             color: var(--txt0);
         }
 
-
-
         /* PERIOD FILTER CHIP */
         .period-filter-chip {
             display: inline-flex;
@@ -1456,7 +1368,6 @@
             animation: sheetDown .5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
         }
 
-
         /* --- KEYFRAMES DO FUNDO --- */
         @keyframes fadeBgIn {
             from {
@@ -1519,7 +1430,6 @@
             overflow: hidden;
         }
 
-
         @keyframes shUp {
             from {
                 transform: translateY(100%);
@@ -1555,7 +1465,6 @@
             z-index: 5;
         }
 
-
         .sh-title {
             font-family: var(--font-d);
             font-size: 16px;
@@ -1585,7 +1494,6 @@
             flex: 1;
             min-height: 0;
         }
-
 
         /* TOAST */
         #toast {
@@ -1744,20 +1652,12 @@
             border-left: 3px solid var(--danger);
         }
 
-        .tl-card.tl-card-ok {
-            border-left: 3px solid var(--acc2);
-        }
-
         .tl-card.tl-card-green {
             border-left: 3px solid var(--acc);
         }
 
         .tl-card.tl-card-emit {
             border-left: 3px solid var(--acc2);
-        }
-
-        .tl-card.tl-card-today {
-            border-left: 3px solid var(--warn);
         }
 
         .tl-card.tl-card-done {
@@ -1994,47 +1894,6 @@
             padding: 8px 10px;
         }
 
-        /* PREVIEW TABLE */
-        .ptbl {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-
-        .ptbl th {
-            color: var(--txt1);
-            font-weight: 500;
-            padding: 6px 8px;
-            text-align: left;
-            border-bottom: 1px solid var(--brd2);
-        }
-
-        .ptbl td {
-            padding: 7px 8px;
-            border-bottom: 1px solid var(--brd);
-        }
-
-        .ptbl tr:last-child td {
-            border-bottom: none;
-        }
-
-        .ptbl tr.today {
-            background: #3d7fff10;
-        }
-
-        .ptbl tr.today td {
-            color: var(--acc2);
-        }
-
-        .ptbl tr.venc {
-            background: #00e8a210;
-        }
-
-        .ptbl tr.venc td:first-child {
-            color: var(--acc);
-            font-weight: 600;
-        }
-
         /* CLIENT CARD */
         .cc {
             background: var(--bg1);
@@ -2175,10 +2034,6 @@
             height: 10px;
         }
 
-        .rcpt-progress-wrap {
-            margin: 12px 0 4px;
-        }
-
         .rcpt-progress-bar {
             height: 8px;
             background: var(--brd2);
@@ -2214,24 +2069,6 @@
         .rcpt-alert.ok {
             background: #00e8a218;
             color: var(--acc);
-        }
-
-        .rcpt-divider {
-            height: 1px;
-            background: var(--brd2);
-            margin: 10px 0;
-            border-style: dashed;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: var(--bg2);
-            border: 1px dashed var(--brd3);
-            border-radius: var(--rad12);
-            padding: 14px;
-            cursor: pointer;
-            color: var(--txt1);
-            font-size: 13px;
         }
 
         .attach-item {
@@ -2384,26 +2221,6 @@
             cursor: pointer;
         }
 
-        /* INFO TAG */
-        .itag {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: var(--bg2);
-            border: 1px solid var(--brd2);
-            border-radius: var(--rad999);
-            padding: 4px 10px;
-            font-size: 11px;
-            color: var(--txt1);
-        }
-
-        /* PROGRESS RING */
-        .prog-wrap {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
         /* EMPTY */
         .empty {
             text-align: center;
@@ -2509,14 +2326,6 @@
             letter-spacing: -1px;
         }
 
-        /* TAG ROW */
-        .tag-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 6px;
-        }
-
         /* PREVIEW SCREEN */
         .prev-box {
             background: var(--bg1);
@@ -2579,10 +2388,6 @@
             margin-bottom: 12px;
         }
 
-        .mb16 {
-            margin-bottom: 16px;
-        }
-
         .fw6 {
             font-weight: 600;
         }
@@ -2615,11 +2420,6 @@
 
         .w-full {
             width: 100%;
-        }
-
-        .op0 {
-            opacity: 0;
-            pointer-events: none;
         }
 
         /* ===== DASHBOARD VISUAL ===== */
@@ -2755,61 +2555,6 @@
             letter-spacing: .5px;
             text-transform: uppercase;
             margin-top: 0px;
-        }
-
-
-        .dl-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            padding: 6px 8px;
-            border-radius: var(--rad8);
-            transition: background .15s;
-        }
-
-        .dl-item:active {
-            background: var(--bg2);
-        }
-
-        .dl-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .dl-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 3px;
-            flex-shrink: 0;
-        }
-
-        .dl-name {
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .dl-sub {
-            font-size: 10px;
-            color: var(--txt2);
-            margin-top: 1px;
-        }
-
-        .dl-right {
-            text-align: right;
-        }
-
-        .dl-count {
-            font-family: var(--font-d);
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: -.3px;
-        }
-
-        .dl-pct {
-            font-size: 10px;
-            color: var(--txt2);
         }
 
         /* Stat strip */
@@ -3172,27 +2917,6 @@
             }
         }
 
-        /* logo inside ring — small, fits inside the 120px ring */
-        .ls-logo {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 1px;
-            font-family: var(--font-d);
-            font-size: 9px;
-            font-weight: 900;
-            letter-spacing: .8px;
-            text-transform: uppercase;
-            line-height: 1;
-        }
-
-        .ls-logo span {
-            color: var(--acc);
-        }
-
         /* big title below the ring */
         .ls-title-big {
             font-family: var(--font-d);
@@ -3280,7 +3004,6 @@
             }
         }
 
-
         .card_comp_pag {
             background: var(--bg2);
             padding: 12px;
@@ -3291,13 +3014,6 @@
             font-weight: 700;
             font-size: 14px;
             margin-top: 4px;
-        }
-
-        .tiny {
-            font-size: 10px;
-            color: var(--txt2);
-            text-transform: uppercase;
-            letter-spacing: .5px;
         }
 
         #debug-back {
@@ -3313,7 +3029,6 @@
                 display: block;
             }
         }
-
 
         /* BOTÃO DE FECHAR ANEXO (VISUALIZADOR DE ANEXO) */
         .sh-close-anexo {
@@ -3505,7 +3220,8 @@
                     <div id="dash-atencao-wrap">
                         <div class="sh">
                             <div class="sh-t">Precisa de Atenção</div>
-                            <div class="sh-l" onclick="navTo('emprestimos','all'); renderEmprestimos('late', false)">Ver todos</div>
+                            <div class="sh-l" onclick="navTo('emprestimos','all'); renderEmprestimos('late', false)">Ver
+                                todos</div>
                         </div>
                         <div id="dash-atencao"></div>
                     </div>
@@ -3514,7 +3230,8 @@
                     <div id="dash-prox-wrap" class="mt8">
                         <div class="sh">
                             <div class="sh-t">Em Alerta</div>
-                            <div class="sh-l" onclick="navTo('emprestimos','all'); renderEmprestimos('warn', false)">Ver todos</div>
+                            <div class="sh-l" onclick="navTo('emprestimos','all'); renderEmprestimos('warn', false)">Ver
+                                todos</div>
                         </div>
                         <div id="dash-prox"></div>
                     </div>
@@ -3523,7 +3240,8 @@
                     <div id="dash-ok-wrap" class="mt8">
                         <div class="sh">
                             <div class="sh-t">Em Dia</div>
-                            <div class="sh-l" onclick="navTo('emprestimos','all'); renderEmprestimos('ok', false)">Ver todos</div>
+                            <div class="sh-l" onclick="navTo('emprestimos','all'); renderEmprestimos('ok', false)">Ver
+                                todos</div>
                         </div>
                         <div id="dash-ok"></div>
                     </div>
@@ -3532,7 +3250,8 @@
                     <div id="dash-done-wrap" class="mt8">
                         <div class="sh">
                             <div class="sh-t">Pagos</div>
-                            <div class="sh-l" onclick="navTo('emprestimos','all'); renderEmprestimos('done', false)">Ver todos</div>
+                            <div class="sh-l" onclick="navTo('emprestimos','all'); renderEmprestimos('done', false)">Ver
+                                todos</div>
                         </div>
                         <div id="dash-done"></div>
                     </div>
@@ -3602,7 +3321,7 @@
                                         <div class="erd4-dim" id="emp-total-exibido">- Exibidos</div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="erd4-hero-sub" id="erd-sub">—</div>
 
                                 <div class="erd4-kpi-row">
@@ -3711,7 +3430,8 @@
                     <div class="flex-sb mb4">
                         <div>
                             <div class="ptitle">Novo Empréstimo</div>
-                            <div class="psub" style="margin-bottom:0; font-weight: 700;">Passo 2 — Dados do empréstimo</div>
+                            <div class="psub" style="margin-bottom:0; font-weight: 700;">Passo 2 — Dados do empréstimo
+                            </div>
                         </div>
                         <div class="btn-icon" style="height:34px; align-self:flex-start; margin-top:4px"
                             onclick="openDefaultsSheet()">
@@ -3750,7 +3470,9 @@
                                 onclick="setModoCalculo('manual')">Manual / Livre</button>
                         </div>
                         <input type="hidden" id="ne-modo-calculo" value="padrao">
-                        <div class="sc-lbl mt12" style="text-align: center; font-size: 15px; font-weight: 700; margin-bottom: 10px;">Dados do Empréstimo</div>
+                        <div class="sc-lbl mt12"
+                            style="text-align: center; font-size: 15px; font-weight: 700; margin-bottom: 10px;">Dados do
+                            Empréstimo</div>
                         <div class="fr" style="display: flex; gap: 12px; width: 100%; ">
                             <div class="fg" id="wrap-ne-valor"
                                 style="flex: 1; transition: all 0.2s ease; white-space: nowrap; ">
@@ -3821,10 +3543,12 @@
                                 onchange="if(this.value==='' || parseInt(this.value)<1) this.value='1';">
                         </div>
                         <div id="novo-parcelas-info" style="margin-top: 12px; display: none;">
-                            <div style="text-align: center; font-size: 13px; color: #8892b0; margin-bottom: 8px; font-weight: 700;">
+                            <div
+                                style="text-align: center; font-size: 13px; color: #8892b0; margin-bottom: 8px; font-weight: 700;">
                                 Divisão das parcelas</div>
                             <div id="novo-parcelas-info-txt"
-                                style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; font-weight: 700; font-size: 12px;"></div>
+                                style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; font-weight: 700; font-size: 12px;">
+                            </div>
                         </div>
                         <div class="fg mt8">
                             <div class="fl" style="text-align: center; ">Juros por dia de atraso *</div>
@@ -4165,9 +3889,10 @@
 
                 <div class="pw" style="padding-top:10px">
                     <!-- ALERTA DE PARCELA ATRASADA -->
-                    <div id="ed-parcela-alert" class="warn-box" style="display:none">
+                    <div id="ed-parcela-alert" class="warn-box"
+                        style="display:none; flex-direction: column; align-items: start; text-align: center;">
                         <div class="wb-t">⚠ Parcela atrasada</div>
-                        <div class="wb-d">Não paga integralmente até o prazo: <span id="ed-parcela-alert-list"
+                        <div class="wb-d">Parcelas não pagas: <span id="ed-parcela-alert-list"
                                 style="font-weight:800; color:var(--warn)"></span></div>
                     </div>
 
@@ -4242,24 +3967,38 @@
                         </div>
 
                         <div
-                            style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; margin-bottom: 10px; margin-top: 10px;">
+                            style="display: flex; justify-content: space-between; align-items: center; gap: 40px; width: 100%; margin-bottom: 10px; margin-top: 10px;">
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: start;">
+                                <span class="fs10 tc2"
+                                    style="font-size: 10px; font-weight: 800; line-height: 1.2;">Lucro
+                                    Atual</span>
+                                <span
+                                    style="font-size: 10px; font-weight: 800; color: var(--acc); line-height: 1.2; white-space: nowrap;"
+                                    id="ed-lucro-atual">+R$ 0,00</span>
+                            </div>
                             <div
                                 style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
                                 <span class="fs10 tc2" id="ed-tempo-total-aberto-title">Em Aberto</span>
-                                <span style="font-size: 13px; font-weight: 800;" id="ed-tempo-total-aberto">--
+                                <span style="font-size: 13px; font-weight: 800; white-space: nowrap;"
+                                    id="ed-tempo-total-aberto">--
                                     dias</span>
                             </div>
                             <div
                                 style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
                                 <span class="fs10 tc2" id="ed-juros-dias-atraso-title">De Atraso</span>
-                                <span style="font-size: 13px; font-weight: 800; color: var(--danger);"
+                                <span
+                                    style="font-size: 13px; font-weight: 800; color: var(--danger); white-space: nowrap;"
                                     id="ed-juros-dias-atraso">-- dias</span>
                             </div>
-                            <div id="ed-prox-parcela-box"
-                                style="flex: 1; display: none; flex-direction: column; align-items: center; text-align: center;">
-                                <span class="fs10 tc2" id="ed-prox-parcela-title">1° Parcela</span>
-                                <span style="font-size: 13px; font-weight: 800; color: var(--acc2);"
-                                    id="ed-prox-parcela">-- dias</span>
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: end;">
+                                <span class="fs10 tc2"
+                                    style="font-size: 10px; font-weight: 800; line-height: 1.2;">Lucro
+                                    Prev.</span>
+                                <span
+                                    style="font-size: 10px; font-weight: 800; color: var(--acc); line-height: 1.2; white-space: nowrap;"
+                                    id="ed-lucro-prev">+R$ 0,00</span>
                             </div>
                         </div>
 
@@ -4267,19 +4006,30 @@
                             <div
                                 style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
                                 <span class="fs10 tc2">Total Pago</span>
-                                <span style="font-size: 17px; font-weight: 1000; color: var(--acc);"
+                                <span
+                                    style="font-size: 17px; font-weight: 1000; color: var(--acc); white-space: nowrap;"
                                     id="ed-total-pago">R$ -.---,--</span>
                             </div>
-                            <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <span class="fs10 tc2" id="ed-juros-acumulado-title">Juros Acm.</span>
-                                <span style="font-size: 13px; font-weight: 800; color: var(--danger);"
+                            <div style="flex: 1; display: none; flex-direction: column; align-items: center; text-align: center;"
+                                id="ed-juros-acumulado-item">
+                                <span class="fs10 tc2" style="font-size: 10px; font-weight: 800; line-height: 1.2;"
+                                    id="ed-juros-acumulado-title">Juros Acm.</span>
+                                <span
+                                    style="font-size: 12px; font-weight: 800; color: var(--danger); line-height: 1.2; white-space: nowrap; color: var(--danger);"
                                     id="ed-juros-acumulado">R$ ---,--</span>
+                            </div>
+                            <div id="ed-prox-parcela-box"
+                                style="flex: 1; display: none; flex-direction: column; align-items: center; text-align: center; white-space: nowrap;">
+                                <span class="fs10 tc2" style="font-size: 10px; font-weight: 800; line-height: 1.2;" id="ed-prox-parcela-title">1° Parcela</span>
+                                <span
+                                    style="font-size: 12px; font-weight: 800; color: var(--danger); line-height: 1.2; white-space: nowrap; color: var(--acc2);"
+                                    id="ed-prox-parcela">-- dias</span>
                             </div>
                             <div
                                 style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center;">
                                 <span class="fs10 tc2">Dívida Total</span>
-                                <span style="font-size: 17px; font-weight: 1000; color: var(--danger);"
+                                <span
+                                    style="font-size: 17px; font-weight: 1000; color: var(--danger); white-space: nowrap;"
                                     id="ed-valor-comb">R$ -.---,--</span>
                             </div>
                         </div>
@@ -5815,7 +5565,6 @@
             return events;
         }
 
-        function getClientName(id) { const c = DB.clients.find(x => x.id === id); return c ? c.nome : '?'; }
         function getClient(id) { return DB.clients.find(x => x.id === id) || null; }
         function getLoan(id) { return DB.loans.find(x => x.id === id) || null; }
         function getClientLoans(cid) { return DB.loans.filter(x => x.clientId === cid); }
@@ -5861,7 +5610,7 @@
                 !(_currentScreen == 'emp-detalhe' && scr == 'emprestimos') &&
                 !(_currentScreen == 'emprestimos' && scr == 'emp-detalhe')) {
                 _periodFilter = { mode: 'all', year: null, month: null, start: null, end: null };
-            } 
+            }
             _prevScreen = _currentScreen;
             _currentScreen = scr;
 
@@ -6074,11 +5823,6 @@
         // ==================== LOAN CARD VIEW MODE (padrão / minimalista) ====================
         let _loanCardMode = 'full';
         try { _loanCardMode = localStorage.getItem('loanCardMode') || 'full'; } catch (e) { }
-
-        // HTML do botão de alternância — pode ser inserido em qualquer tela que exiba loan cards
-        function loanModeToggleHTML() {
-            return `<div class="lc-mode-toggle" onclick="toggleLoanCardMode()">${loanModeToggleIconHTML()}<span>${_loanCardMode === 'mini' ? 'Compacto' : 'Detalhado'}</span></div>`;
-        }
 
         function loanModeToggleIconHTML() {
             return _loanCardMode === 'mini'
@@ -6597,7 +6341,7 @@
 
             document.getElementById('erd-emprestado').textContent = fmtMoney(emprestado);
             document.getElementById('erd-recebido').textContent = fmtMoney(recebido);
-            document.getElementById('erd-lucro-relativo').textContent = '+' +  fmtMoney(lucroRelativo);
+            document.getElementById('erd-lucro-relativo').textContent = '+' + fmtMoney(lucroRelativo);
             document.getElementById('erd-a-receber-total').textContent = fmtMoney(aReceber);
 
             const lucroRealEl = document.getElementById('erd-lucro-real');
@@ -8599,13 +8343,22 @@
             document.getElementById('ed-valor-comb').textContent = fmtMoney(calc.dividaTotal);
             document.getElementById('ed-total-pago').textContent = fmtMoney(calc.totalPago);
 
+            // Lucro atual (já recebido) e lucro previsto (considerando juros de atraso, se houver)
+            const lucro_atual = calc.totalPago > l.valor ? calc.totalPago - l.valor : 0;
+            const lucro_prev = calc.dividaTotal - l.valor;
+            document.getElementById('ed-lucro-atual').textContent = '+' + fmtMoney(lucro_atual);
+            document.getElementById('ed-lucro-prev').textContent = '+' + fmtMoney(lucro_prev);
+
             // Definir juros acumulado se houver
-            document.getElementById('ed-juros-acumulado').textContent = fmtMoney(calc.acumJuros);
             if (calc.acumJuros > 0) {
-                document.getElementById('ed-juros-acumulado').style.color = 'var(--danger)';
+                document.getElementById('ed-juros-acumulado-item').style.display = 'flex';
+
+                document.getElementById('ed-juros-acumulado').textContent = fmtMoney(calc.acumJuros);
             } else {
-                document.getElementById('ed-juros-acumulado').style.color = 'var(--txt1)';
+                document.getElementById('ed-juros-acumulado-item').style.display = 'none';
             }
+
+
 
             // Definir valores da barra de progresso de pagamento
             const percent_pago = calc.totalPago > 0 ? Math.max(1, Math.round(calc.totalPago / calc.dividaTotal * 100)) : 0;
@@ -10457,7 +10210,6 @@
             'Conferindo vencimentos…',
         ];
 
-        let _lsTimer = null;
         let _lsMsgTimer = null;
         let _lsMsgIndex = 0;
         let _lsResolve = null;
