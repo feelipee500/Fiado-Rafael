@@ -310,22 +310,27 @@
 
         .c-g {
             color: var(--acc);
+            font-weight: 600;
         }
 
         .c-r {
             color: var(--danger);
+            font-weight: 600;
         }
 
         .c-a {
             color: var(--acc3);
+            font-weight: 600;
         }
 
         .c-b {
             color: var(--acc2);
+            font-weight: 600;
         }
 
         .c-w {
             color: var(--warn);
+            font-weight: 600;
         }
 
         /* STATUS PILLS */
@@ -5870,8 +5875,8 @@
             const diasAtrasoOrVenc = c.isPago && c.saldoRestante > 0 ? `<span class="c-g">Quitado Man.</span>` :
                 c.isPago && c.saldoRestante <= 0 ? `<span class="c-g">Quitado</span>` :
                     c.diasAtraso > 0 ? `<span class="c-r">+${c.diasAtraso} dia${c.diasAtraso != 1 ? 's' : ''}</span>` :
-                        c.diasParaVencer == 0 ? `<span class="c-w">Hoje</span>` :
-                            c.diasParaVencer == 1 ? `<span class="c-w">Amanhã</span>` :
+                        c.diasParaVencer == 0 ? `<span class="c-w">Vence Hoje</span>` :
+                            c.diasParaVencer == 1 ? `<span class="c-w">Vence Amanhã</span>` :
                                 c.diasParaVencer == 2 ? `<span class="c-w">Restam 2 dias</span>` :
                                     `<span class="${c.status === 'warn' ? 'c-w' : 'c-b'}">Restam ${c.diasParaVencer} dias</span>`;
 
@@ -5940,7 +5945,7 @@
                     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; flex-shrink: 0;">
                         <div>${statusPill(c.status)}</div>
                         <div class="lc-mv" style="font-weight: 600; white-space: nowrap; font-size: 10px; margin-top: 2px;">${diasAtrasoOrVenc}</div>
-                        ${parcelaLine ? `<div class="lc-mv" style="font-weight: 600; white-space: nowrap; font-size: 9px; margin-top: 1px; opacity: 0.85;">${parcelaLine}</div>` : ''}
+                        ${parcelaLine ? `<div class="lc-mv" style="font-weight: 600; white-space: nowrap; font-size: 9px; margin-top: 1px;">${parcelaLine}</div>` : ''}
                     </div>
                 </div>
                 <div class="lc-bar" style="width: 100%;">
@@ -6019,7 +6024,7 @@
                         ${c.pago ? `
                             <div class="lc-id" style="font-weight: 600; font-size: 10px;">${fmtDateComp(c.pago)}✔</div>
                             ` : ``}
-                        ${parcelaLine ? `<div class="lc-mv" style="font-weight: 600; white-space: nowrap; font-size: 10px; margin-top: 2px; opacity: 0.85;">${parcelaLine}</div>` : ``}
+                        ${parcelaLine ? `<div class="lc-mv" style="font-weight: 600; white-space: nowrap; font-size: 10px; margin-top: 2px;">${parcelaLine}</div>` : ``}
                     </div>
                 </div>
 
