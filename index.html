@@ -401,6 +401,33 @@
             background: var(--txt2);
         }
 
+        .ed-notif-off-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: var(--rad999);
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            background: #ffb54720;
+            color: var(--warn);
+        }
+
+        .ed-notif-off-badge svg {
+            width: 12px;
+            height: 12px;
+            flex-shrink: 0;
+        }
+
+        .mi-warn {
+            background: #ffb54718;
+        }
+
+        .mi-warn svg {
+            stroke: var(--warn);
+        }
+
         /* LOAN CARD VIEW TOGGLE */
         .lc-mode-toggle {
             display: inline-flex;
@@ -3855,6 +3882,17 @@
                             </svg>Voltar
                         </div>
                         <div style="display:flex; align-items:center; gap:8px">
+                            <div id="ed-notif-off" class="ed-notif-off-badge" style="display:none"
+                                title="Notificações desativadas">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M8.7 3A6 6 0 0 1 18 8c0 3.5 1 5.5 1.8 6.4" />
+                                    <path d="M6.3 6.3C6.1 6.8 6 7.4 6 8c0 4.5-2 6-2 6h13" />
+                                    <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+                                    <line x1="3" y1="3" x2="21" y2="21" />
+                                </svg>
+                                <span>Notificações OFF</span>
+                            </div>
                             <div id="ed-status-pill"></div>
                             <div class="btn-icon" style="height:32px; width:32px" onclick="openEmpMenu()">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -4705,6 +4743,19 @@
                         </div>
                     </div>
                 </div>
+                <div class="menu-item" id="emp-menu-notif" onclick="openToggleNotifConfirm()">
+                    <div class="menu-item-left">
+                        <div class="menu-icon mi-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M8.7 3A6 6 0 0 1 18 8c0 3.5 1 5.5 1.8 6.4H4.2C5 13.5 6 11.5 6 8a6 6 0 0 1 .3-1.9" />
+                                <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+                            </svg></div>
+                        <div>
+                            <div class="menu-label" id="emp-menu-notif-lbl">Desativar Notificações</div>
+                            <div class="fs11 tc2" id="emp-menu-notif-sub">Desativa as notificações via Whatsapp</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="menu-item" onclick="closeSheet(document.getElementById('emp-menu-sheet')); openEditEmp()">
                     <div class="menu-item-left">
                         <div class="menu-icon mi-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -4900,6 +4951,22 @@
                     </svg></div>
             </div>
             <div class="sh-body" id="mark-paid-body"></div>
+        </div>
+    </div>
+
+    <!-- Confirmação ativar/desativar notificações -->
+    <div class="overlay" id="toggle-notif-confirm-sheet" data-backdrop="toggle-notif-confirm-sheet">
+        <div class="sheet" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title" id="toggle-notif-title">Notificações</div>
+                <div class="sh-close" onclick="closeSheet(document.getElementById('toggle-notif-confirm-sheet'))">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></div>
+            </div>
+            <div class="sh-body" id="toggle-notif-body"></div>
         </div>
     </div>
 
@@ -5901,7 +5968,7 @@
 
             return `
             <div class="lcm lcm-${c.status}" style="display: flex; flex-direction: column;" onclick="closeSheet(document.getElementById('notif-sheet')); openEmpDetalhe('${loan.id}')">
-                ${valoresON || (c.status === 'warn' && c.parcelaAnteriorAtrasada) ? `
+                ${valoresON || (c.status === 'warn' && c.parcelaAnteriorAtrasada) || Number(loan.not) === 0 ? `
                 <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0; gap: 30px; margin-bottom: -20px">
                     ${loan.entrada > 0 ? `
                     <span style="white-space: nowrap; font-weight: 600; font-size: 10px; color: var(--acc)">+${fmtMoney(loan.entrada)}</span>
@@ -5912,6 +5979,12 @@
                     ${c.status === 'warn' && c.parcelaAnteriorAtrasada ? `
                     <div style="font-size: 10px; align-items: right; font-weight: 700; color: var(--warn); white-space: nowrap">
                         ⚠ Parcela atrasada
+                    </div>
+                    ` : ''}
+                    ${Number(loan.not) === 0 ? `
+                    <div class="ed-notif-off-badge" style="font-size: 9px; padding: 2px 7px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.7 3A6 6 0 0 1 18 8c0 3.5 1 5.5 1.8 6.4"/><path d="M6.3 6.3C6.1 6.8 6 7.4 6 8c0 4.5-2 6-2 6h13"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+                        <span>OFF</span>
                     </div>
                     ` : ''}
                 </div>
@@ -6035,6 +6108,7 @@
                     </div>
                     
                     <div class="lc-mi" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        ${Number(loan.not) === 0 ? `<div class="ed-notif-off-badge" style="font-size: 9px; padding: 2px 7px; margin-bottom: 4px; margin-top: -20px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.7 3A6 6 0 0 1 18 8c0 3.5 1 5.5 1.8 6.4"/><path d="M6.3 6.3C6.1 6.8 6 7.4 6 8c0 4.5-2 6-2 6h13"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/><line x1="3" y1="3" x2="21" y2="21"/></svg><span>OFF</span></div>` : ''}
                         <div class="lc-id" style="font-weight: 600; font-size: 10px;">${loan.id}</div>
                     </div>
                     
@@ -7732,6 +7806,13 @@
             const icon = document.querySelector('#emp-menu-mark-paid .menu-icon');
             icon.className = isPago ? 'menu-icon mi-amber' : 'menu-icon mi-green';
 
+            const notifAtiva = Number(loan.not) !== 0;
+            document.getElementById('emp-menu-notif-lbl').textContent = notifAtiva ? 'Desativar Notificações' : 'Ativar Notificações';
+            document.getElementById('emp-menu-notif-sub').textContent = notifAtiva ? 'Desativa as notificações via Whatsapp' : 'Ativa as notificações via Whatsapp';
+
+            const notifIcon = document.querySelector('#emp-menu-notif .menu-icon');
+            notifIcon.className = notifAtiva ? 'menu-icon mi-warn' : 'menu-icon mi-green';
+
             openSheet('emp-menu-sheet');
         }
 
@@ -7956,6 +8037,91 @@
             hideLoading();
 
             showToast(novoEstado ? 'Marcado como pago! ✓' : 'Quitação removida', 'ok');
+        }
+
+
+        // ---- Ativar / desativar notificações ----
+        function openToggleNotifConfirm() {
+            const loan = getLoan(_currentLoanId);
+            if (!loan) return;
+
+            const client = getClient(loan.clientId);
+            const notifAtiva = Number(loan.not) !== 0;
+            const novoNot = notifAtiva ? 0 : 1;
+
+            document.getElementById('toggle-notif-title').textContent = notifAtiva ? 'Desativar Notificações' : 'Ativar Notificações';
+            document.getElementById('toggle-notif-body').innerHTML = `
+                <div class="warn-box" style="background:${notifAtiva ? '#ffb54714' : '#00e8a214'}; border-color:${notifAtiva ? '#ffb54740' : '#00e8a240'}; margin-bottom:12px">
+                <div class="wb-t" style="color:${notifAtiva ? 'var(--warn)' : 'var(--acc)'}">
+                    ${notifAtiva ? '⚠ Pausar notificações?' : '✓ Reativar notificações?'}
+                </div>
+                <div class="wb-d">${notifAtiva
+                    ? 'As notificações via Whatsapp deste empréstimo serão pausadas.'
+                    : 'As notificações via Whatsapp deste empréstimo voltarão a ser enviadas normalmente.'}</div>
+                </div>
+                <div class="card-sm mb12">
+                <div class="dr"><div class="dk">Cliente</div><div class="dv2 fw6">${client.nome}</div></div>
+                <div class="dr" style="border:none"><div class="dk">Contrato</div><div class="dv2">${loan.id}</div></div>
+                </div>
+                <div class="confirm-btns">
+                <button class="cbtn-n" onclick="closeSheet(document.getElementById('toggle-notif-confirm-sheet'))">Cancelar</button>
+                <button class="cbtn-y" onclick="edit_not(${novoNot})">Continuar</button>
+                </div>`;
+
+            closeSheet(document.getElementById('emp-menu-sheet'));
+            openSheet('toggle-notif-confirm-sheet');
+        }
+
+        async function edit_not(novoEstado) {
+            const loan = getLoan(_currentLoanId);
+            if (!loan) return;
+
+            showLoading(['ALTERANDO NOTIFICAÇÕES...', 'SALVANDO NA PLANILHA...', 'FINALIZANDO...']);
+
+            const id = loan.id;
+            const lin = loan.lin;
+            const novo_not = novoEstado;
+
+            const novo_not_x = { id, lin, novo_not, time: DB.time };
+
+            try {
+                console.log("ALTERANDO NOTIFICAÇÕES...");
+                const data_fetch = { data: novo_not_x, funcao: 'edit_not' };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - edit not") };
+
+                const novoDB = await res.json();
+
+                if (novoDB.error) {
+                    throw new Error(novoDB.error);
+                }
+
+                console.log("NOTIFICAÇÕES ALTERADAS com sucesso");
+                DB = novoDB;
+            }
+            catch (err) {
+                console.log("Erro ao ALTERAR NOTIFICAÇÕES");
+                console.log(err);
+
+                showToast("Erro ao ALTERAR NOTIFICAÇÕES", 'err');
+                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                setTimeout(() => {
+                    return window.location.reload(true);
+                }, 5000);
+            }
+
+            // Salvar backup local
+            backup_local();
+
+            closeSheet(document.getElementById('toggle-notif-confirm-sheet'));
+            openEmpDetalhe(_currentLoanId);
+
+            hideLoading();
+
+            showToast(novoEstado ? 'Notificações ativadas! ✓' : 'Notificações desativadas', 'ok');
         }
 
 
@@ -8266,6 +8432,7 @@
             document.getElementById('ed-desc').textContent = c.desc;
             document.getElementById('ed-client-name').textContent = c.nome;
             document.getElementById('ed-status-pill').innerHTML = statusPill(calc.status);
+            document.getElementById('ed-notif-off').style.display = (Number(l.not) === 0) ? '' : 'none';
             document.getElementById('ed-parcela-alert').style.display = (calc.status === 'warn' && calc.parcelaAnteriorAtrasada) ? '' : 'none';
 
             // Dados iniciais
