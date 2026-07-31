@@ -2426,6 +2426,17 @@
             font-weight: 700;
         }
 
+        /* Variante compacta, usada na lista de seleção de cliente ao criar um novo empréstimo */
+        .choice-item.compact {
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            gap: 10px;
+        }
+
+        .choice-item.compact .choice-label {
+            font-size: 14px;
+        }
+
         /* SELECT STYLES */
         .fs option {
             background: var(--bg2);
@@ -3502,7 +3513,7 @@
             <!-- ========== TELA 3: NOVO EMPRÉSTIMO (FLOW) ========== -->
             <div id="scr-novo" class="scr">
                 <div id="novo-step-1" class="pw">
-                    <div class="flex-sb mb4">
+                    <div class="flex-sb mb4" style="margin-left: 10px; margin-right: 10px;">
                         <div>
                             <div class="ptitle">Novo Empréstimo</div>
                             <div class="psub" style="margin-bottom:0">Passo 1 — Escolher cliente</div>
@@ -3517,9 +3528,26 @@
                             </svg>
                         </div>
                     </div>
-                    <div class="sh" style="margin-top:4px">
+                    <div class="sh" style="margin-top:4px; margin-left: 10px; margin-right: 10px;">
                         <div class="sh-t">Clientes cadastrados</div>
                         <div class="sh-l" onclick="showNovoClienteForm()">+ Novo cliente</div>
+                    </div>
+                    <div class="srch-wrap">
+                        <svg class="srch-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-linecap="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <input class="srch" id="novo-cli-search-input" placeholder="Buscar Cliente…"
+                            oninput="filterNovoClientList(this.value)">
+                        <div class="srch-clear" id="novo-cli-search-clear" style="display: flex"
+                            onmousedown="event.preventDefault()" onclick="clearNovoClientSearch()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </div>
                     </div>
                     <div id="novo-client-list"></div>
                     <div id="novo-client-form" style="display:none">
@@ -3719,7 +3747,7 @@
             <!-- ========== TELA 4: CLIENTES ========== -->
             <div id="scr-clientes" class="scr">
                 <div
-                    style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top: 20px;">
+                    style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top: 20px; margin-left: 10px; margin-right: 10px;">
                     <div class="ptitle">Clientes</div>
                     <div class="psub" id="cli-subtitle" style="text-align:right;">—</div>
                 </div>
@@ -6685,8 +6713,12 @@
 
         // ==================== NOVO ====================
         let _novoSelectedClientId = null;
+        let _novoCliSearchVal = '';
         function renderNovo() {
             _novoSelectedClientId = null;
+            _novoCliSearchVal = '';
+            const novoSearchInput = document.getElementById('novo-cli-search-input');
+            if (novoSearchInput) novoSearchInput.value = '';
             // Always fully reset step visibility
             document.getElementById('novo-step-1').style.display = '';
             document.getElementById('novo-step-2').style.display = 'none';
@@ -6700,13 +6732,32 @@
                 _newLoanClientId = null;
             }
         }
+
+        // Filtra a lista de clientes na tela "Novo Empréstimo" conforme se digita
+        function filterNovoClientList(v) {
+            _novoCliSearchVal = v;
+            const term = (v || '').toLowerCase().trim();
+            const items = document.querySelectorAll('#novo-client-list .choice-item');
+            items.forEach(el => {
+                const name = el.querySelector('.choice-label')?.textContent.toLowerCase() || '';
+                el.style.display = !term || name.includes(term) ? '' : 'none';
+            });
+        }
+
+        function clearNovoClientSearch() {
+            _novoCliSearchVal = '';
+            const input = document.getElementById('novo-cli-search-input');
+            if (input) input.value = '';
+            filterNovoClientList('');
+            input?.focus();
+        }
         function renderNovoClientList() {
             const el = document.getElementById('novo-client-list');
             if (!DB.clients.length) { el.innerHTML = '<div class="empty"><p>Nenhum cliente cadastrado ainda</p></div>'; return; }
             el.innerHTML = DB.clients.map(c => `
-            <div class="choice-item ${_novoSelectedClientId === c.id ? 'sel' : ''}" onclick="selectNovoClient('${c.id}')">
-            <div class="av ${c.color}" style="width:32px; height:32px; font-size:11px">${c.initials}</div>
-            <div style="flex:1"><div class="choice-label">${c.nome}</div><div class="choice-sub">${c.tel}</div></div>
+            <div class="choice-item compact ${_novoSelectedClientId === c.id ? 'sel' : ''}" onclick="selectNovoClient('${c.id}')">
+            <div class="av ${c.color}" style="width:26px; height:26px; font-size:10px">${c.initials}</div>
+            <div style="flex:1"><div class="choice-label">${c.nome}</div></div>
             <div class="choice-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
             </div>
         `).join('');
@@ -8460,14 +8511,17 @@
                 let cmp;
                 if (_cliSort.criteria === 'nome') {
                     cmp = a.c.nome.localeCompare(b.c.nome, 'pt-BR', { sensitivity: 'base' });
-                } else {
-                    let av, bv;
-                    if (_cliSort.criteria === 'valor') { av = a.totalEmp; bv = b.totalEmp; }
-                    else { av = a.restante; bv = b.restante; } // divida atual
-                    cmp = av - bv;
-                    if (cmp === 0) cmp = a.c.nome.localeCompare(b.c.nome, 'pt-BR', { sensitivity: 'base' });
+                    return _cliSort.dir === 'desc' ? -cmp : cmp;
                 }
-                return _cliSort.dir === 'desc' ? -cmp : cmp;
+
+                let av, bv;
+                if (_cliSort.criteria === 'valor') { av = a.totalEmp; bv = b.totalEmp; }
+                else { av = a.restante; bv = b.restante; } // divida atual
+                cmp = av - bv;
+                if (_cliSort.dir === 'desc') cmp = -cmp;
+                // Empate: sempre respeita a ordem alfabética (A-Z), independente da direção escolhida
+                if (cmp === 0) cmp = a.c.nome.localeCompare(b.c.nome, 'pt-BR', { sensitivity: 'base' });
+                return cmp;
             });
 
             list.innerHTML = rows.map(({ c, loans, totalEmp, totalPago, restante, LucroRelativo, statusC, open, progressPct }) => {
@@ -8480,7 +8534,7 @@
                         <div class="cc-sub">${c.desc}</div>
                     </div>
                     <div class="cc-pill-wrap">
-                        ${statusPill(statusC)}
+                        ${loans.length ? statusPill(statusC) : ''}
                         <div class="cc-expand-btn" onclick="toggleClienteCard(event,'${c.id}')">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                         </div>
@@ -11578,10 +11632,10 @@
 
         // VARIAVEIS GLOBAIS
         // Meu Script
-        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
 
         // Script do Rafael
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzkicXkp2YFZubl5MqRQCFUh7d42YVs8TZbshypuR3yU92owy2whRHZVLmVDsUmhNjT/exec";
+        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzkicXkp2YFZubl5MqRQCFUh7d42YVs8TZbshypuR3yU92owy2whRHZVLmVDsUmhNjT/exec";
 
         var DB = {};
 
