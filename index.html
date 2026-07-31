@@ -1931,7 +1931,7 @@
             background: var(--bg1);
             border: 1px solid var(--brd);
             border-radius: var(--rad16);
-            padding: 14px;
+            padding: 12px 14px;
             margin-bottom: 10px;
             cursor: pointer;
             transition: border-color .15s;
@@ -1945,11 +1945,12 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 0;
         }
 
         .cc-info {
             flex: 1;
+            min-width: 0;
         }
 
         .cc-name {
@@ -1962,6 +1963,90 @@
             color: var(--txt1);
             margin-top: 1px;
             font-weight: 700;
+        }
+
+        .cc-pill-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .cc-expand-btn {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--bg2);
+            border: 1px solid var(--brd);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background .15s;
+            flex-shrink: 0;
+        }
+
+        .cc-expand-btn:active {
+            background: var(--bg3);
+        }
+
+        .cc-expand-btn svg {
+            width: 12px;
+            height: 12px;
+            transition: transform .25s ease;
+        }
+
+        .cc.expanded .cc-expand-btn svg {
+            transform: rotate(180deg);
+        }
+
+        /* Botão de expandir/recolher todos os cards de clientes, no cabeçalho */
+        .cli-toggle-all-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--bg2);
+            border: 1px solid var(--brd);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            color: var(--txt1);
+            transition: background .15s, border-color .15s, color .15s;
+        }
+
+        .cli-toggle-all-btn:active {
+            background: var(--bg3);
+        }
+
+        .cli-toggle-all-btn svg {
+            width: 15px;
+            height: 15px;
+        }
+
+        .cli-toggle-all-btn.active {
+            border-color: var(--acc2);
+            color: var(--acc2);
+        }
+
+        /* Conteúdo que só aparece com o card expandido: linha de empréstimos + stats */
+        .cc-expand-content {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            margin-top: 0;
+            transition: max-height .28s ease, opacity .2s ease, margin-top .28s ease;
+        }
+
+        .cc.expanded .cc-expand-content {
+            max-height: 300px;
+            opacity: 1;
+            margin-top: 10px;
+        }
+
+        .cc-loans-line {
+            margin-bottom: 8px;
         }
 
         .cc-stats {
@@ -1992,11 +2077,17 @@
         }
 
         .cc-bar {
-            margin-top: 15px;
-            height: 5px;
+            margin-top: 10px;
+            height: 3px;
             background: var(--brd2);
             border-radius: 2px;
             overflow: hidden;
+            transition: height .2s ease, margin-top .2s ease;
+        }
+
+        .cc.expanded .cc-bar {
+            margin-top: 12px;
+            height: 5px;
         }
 
         /* COMPROVANTE / RECEIPT */
@@ -3303,7 +3394,7 @@
                             </svg>
                             <input class="srch" id="emp-search-input" placeholder="Buscar Cliente…"
                                 style="padding:8px 28px 8px 32px; font-size:12px;"
-                                onchange="handleEmpSearchInput(this.value, 'emp-search-dd'); openEmpSearchDropdown('emp-search-dd')"
+                                oninput="handleEmpSearchInput(this.value, 'emp-search-dd')"
                                 onfocus="openEmpSearchDropdown('emp-search-dd')"
                                 onblur="setTimeout(closeEmpSearchDropdown, 150)">
                             <div class="srch-clear" id="emp-search-clear" style="display: flex"
@@ -3630,26 +3721,38 @@
                 <div
                     style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top: 20px;">
                     <div class="ptitle">Clientes</div>
-                    <div class="period-filter-chip" id="cli-period-btn" onclick="openPeriodSheet()">
+                    <div class="psub" id="cli-subtitle" style="text-align:right;">—</div>
+                </div>
+
+                <div
+                    style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top: 10px;">
+                    <div class="period-filter-chip" id="cli-sort-btn" onclick="openCliSortSheet()"
+                        style="margin-bottom:0;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" />
-                            <line x1="16" y1="2" x2="16" y2="6" />
-                            <line x1="8" y1="2" x2="8" y2="6" />
-                            <line x1="3" y1="10" x2="21" y2="10" />
+                            <line x1="4" y1="6" x2="14" y2="6" />
+                            <line x1="4" y1="12" x2="11" y2="12" />
+                            <line x1="4" y1="18" x2="8" y2="18" />
+                            <polyline points="17 4 17 20" />
+                            <polyline points="13 16 17 20 21 16" />
                         </svg>
-                        <span id="cli-period-label">Todo o período</span>
+                        <span id="cli-sort-label">Nome ↑</span>
                         <svg class="pfc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 12 15 18 9" />
                         </svg>
                     </div>
-                </div>
 
-                <div
-                    style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top: 5px;">
-                    <div class="psub" id="cli-subtitle">—</div>
-                    <div class="srch-wrap" style="flex:1; max-width:170px; margin-bottom:0;">
+                    <div class="cli-toggle-all-btn" id="cli-toggle-all-btn" onclick="toggleAllClienteCards()"
+                        title="Expandir/Recolher todos">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="7 8 12 3 17 8" />
+                            <polyline points="7 16 12 21 17 16" />
+                        </svg>
+                    </div>
+
+                    <div class="srch-wrap" style="flex:1; max-width:150px; margin-bottom:0;">
                         <svg class="srch-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-linecap="round">
                             <circle cx="11" cy="11" r="8" />
@@ -3657,18 +3760,15 @@
                         </svg>
                         <input class="srch" id="cli-search-input" placeholder="Buscar Cliente…"
                             style="padding:8px 28px 8px 32px; font-size:12px;"
-                            onchange="handleEmpSearchInput(this.value, 'cli-search-dd')"
-                            onfocus="openEmpSearchDropdown('cli-search-dd')"
-                            onblur="setTimeout(closeEmpSearchDropdown, 150)">
+                            oninput="filterClientes(this.value)">
                         <div class="srch-clear" id="cli-search-clear" style="display: flex"
-                            onmousedown="event.preventDefault()" onclick="clearEmpSearch('cli-search-input')">
+                            onmousedown="event.preventDefault()" onclick="clearCliSearch()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                                 stroke-linecap="round">
                                 <line x1="18" y1="6" x2="6" y2="18" />
                                 <line x1="6" y1="6" x2="18" y2="18" />
                             </svg>
                         </div>
-                        <div class="emp-search-dd" id="cli-search-dd"></div>
                     </div>
                 </div>
 
@@ -4445,6 +4545,32 @@
                     <button class="cbtn-n" onclick="clearPeriodFilter()">Limpar filtro</button>
                     <button class="cbtn-y" onclick="applyCustomPeriod()">Aplicar</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ordenar Clientes -->
+    <div class="overlay" id="cli-sort-sheet" data-backdrop="cli-sort-sheet">
+        <div class="sheet" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title">Ordenar Clientes</div>
+                <div class="sh-close" onclick="closeSheet(document.getElementById('cli-sort-sheet'))"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></div>
+            </div>
+            <div class="sh-body">
+                <div class="sc-lbl">Critério</div>
+                <div class="fs12 tc1 mb12">Escolha como os clientes devem ser ordenados na lista.</div>
+                <div id="cli-sort-list"></div>
+                <div class="sc-lbl mt16">Direção</div>
+                <div class="tbar mt8" id="cli-sort-dir-tabs">
+                    <div class="tbtn" data-dir="asc" onclick="selectClienteSortDir('asc')">↑ Crescente</div>
+                    <div class="tbtn" data-dir="desc" onclick="selectClienteSortDir('desc')">↓ Decrescente</div>
+                </div>
+                <button class="btn-p mt16" onclick="closeSheet(document.getElementById('cli-sort-sheet'))">OK</button>
             </div>
         </div>
     </div>
@@ -6486,46 +6612,39 @@
             renderEmprestimos(filter, false);
         }
 
-        // ==================== BUSCA: DROPDOWN DE CLIENTES ====================
+        // ==================== BUSCA: DROPDOWN DE CLIENTES (tela Empréstimos) ====================
         let _cliSearchVal;
         function handleEmpSearchInput(v, el) {
-            if (el == 'emp-search-dd') {
-                _empSearchVal = v;
-                filterEmprestimos(v);
-            } else {
-                _cliSearchVal = v;
-                filterClientes(v);
-            }
+            _empSearchVal = v;
+            filterEmprestimos(v);
 
             renderEmpSearchDropdown(v, el);
             document.getElementById(el)?.classList.add('open');
         }
 
         function openEmpSearchDropdown(el) {
-            if (el == 'emp-search-dd') {
-                renderEmpSearchDropdown(_empSearchVal, el);
-            } else {
-                renderEmpSearchDropdown(_cliSearchVal, el);
-            }
-
+            renderEmpSearchDropdown(_empSearchVal, el);
             document.getElementById(el)?.classList.add('open');
         }
 
         function closeEmpSearchDropdown() {
             document.getElementById('emp-search-dd')?.classList.remove('open');
-            document.getElementById('cli-search-dd')?.classList.remove('open');
         }
 
         function clearEmpSearch(el) {
-            if (el == 'emp-search-input') {
-                _empSearchVal = '';
-            } else {
-                _cliSearchVal = '';
-            }
+            _empSearchVal = '';
 
             const input = document.getElementById(el);
             if (input) input.value = '';
-            handleEmpSearchInput('');
+            handleEmpSearchInput('', 'emp-search-dd');
+            input?.focus();
+        }
+
+        // Busca simples da tela de Clientes: sem dropdown, só filtra a lista de cards
+        function clearCliSearch() {
+            const input = document.getElementById('cli-search-input');
+            if (input) input.value = '';
+            filterClientes('');
             input?.focus();
         }
 
@@ -6557,15 +6676,8 @@
             const c = getClient(clientId);
             if (!c) return;
 
-            let input;
-            if (el == 'emp-search-dd') {
-                input = document.getElementById('emp-search-input');
-                filterEmprestimos(c.nome);
-            } else {
-                input = document.getElementById('cli-search-input');
-                filterClientes(c.nome);
-            }
-
+            const input = document.getElementById('emp-search-input');
+            filterEmprestimos(c.nome);
 
             if (input) input.value = c.nome;
             closeEmpSearchDropdown();
@@ -8217,17 +8329,114 @@
         }
 
         // ==================== CLIENTES ====================
+        // Estado de ordenação da lista de clientes (persistido no localStorage)
+        let _cliSort = { criteria: 'nome', dir: 'asc' };
+        try {
+            const _savedCliSort = JSON.parse(localStorage.getItem('cliSortPref'));
+            const _validCriteria = ['nome', 'valor', 'divida'];
+            if (_savedCliSort && _validCriteria.includes(_savedCliSort.criteria) && ['asc', 'desc'].includes(_savedCliSort.dir)) {
+                _cliSort = _savedCliSort;
+            }
+        } catch (e) { }
+        function saveCliSortPref() {
+            try { localStorage.setItem('cliSortPref', JSON.stringify(_cliSort)); } catch (e) { }
+        }
+        const _cliExpanded = new Set(); // ids dos cards expandidos, para manter o estado entre re-renders
+
+        const CLI_SORT_OPTIONS = [
+            { key: 'nome', label: 'Ordem alfabética', sub: 'Organiza pelo nome do cliente', short: 'Nome' },
+            { key: 'valor', label: 'Valor emprestado', sub: 'Organiza pelo total enviado ao cliente', short: 'Valor emprestado' },
+            { key: 'divida', label: 'Dívida atual', sub: 'Organiza pelo saldo restante a receber', short: 'Dívida atual' }
+        ];
+
+        function openCliSortSheet() {
+            renderCliSortSheet();
+            openSheet('cli-sort-sheet');
+        }
+
+        function renderCliSortSheet() {
+            const list = document.getElementById('cli-sort-list');
+            if (list) {
+                list.innerHTML = CLI_SORT_OPTIONS.map(o => `
+                    <div class="choice-item ${_cliSort.criteria === o.key ? 'sel' : ''}" onclick="selectClienteSortCriteria('${o.key}')">
+                        <div style="flex:1"><div class="choice-label">${o.label}</div><div class="choice-sub">${o.sub}</div></div>
+                        <div class="choice-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                    </div>
+                `).join('');
+            }
+            document.querySelectorAll('#cli-sort-dir-tabs .tbtn').forEach(t => {
+                t.classList.toggle('act', t.dataset.dir === _cliSort.dir);
+            });
+            updateCliSortChipLabel();
+        }
+
+        function selectClienteSortCriteria(key) {
+            _cliSort.criteria = key;
+            saveCliSortPref();
+            renderCliSortSheet();
+            renderClientes();
+        }
+
+        function selectClienteSortDir(dir) {
+            _cliSort.dir = dir;
+            saveCliSortPref();
+            renderCliSortSheet();
+            renderClientes();
+        }
+
+        function updateCliSortChipLabel() {
+            const lbl = document.getElementById('cli-sort-label');
+            if (!lbl) return;
+            const opt = CLI_SORT_OPTIONS.find(o => o.key === _cliSort.criteria) || CLI_SORT_OPTIONS[0];
+            const arrow = _cliSort.dir === 'asc' ? '↑' : '↓';
+            lbl.textContent = `${opt.short} ${arrow}`;
+        }
+
+        // Expande/recolhe o card do cliente (mostrando/ocultando o "cc-stats")
+        function toggleClienteCard(ev, cid) {
+            if (ev) { ev.stopPropagation(); ev.preventDefault(); }
+            const card = document.getElementById(`cc-${cid}`);
+            if (!card) return;
+            const isExpanded = card.classList.toggle('expanded');
+            if (isExpanded) _cliExpanded.add(cid); else _cliExpanded.delete(cid);
+            updateCliToggleAllBtn();
+        }
+
+        // Expande ou recolhe todos os cards de uma vez, a partir do botão no cabeçalho
+        function toggleAllClienteCards() {
+            const allExpanded = DB.clients.length > 0 && _cliExpanded.size >= DB.clients.length;
+            _cliExpanded.clear();
+            if (!allExpanded) {
+                DB.clients.forEach(c => _cliExpanded.add(c.id));
+            }
+            renderClientes();
+        }
+
+        function updateCliToggleAllBtn() {
+            const btn = document.getElementById('cli-toggle-all-btn');
+            if (!btn) return;
+            const allExpanded = DB.clients.length > 0 && _cliExpanded.size >= DB.clients.length;
+            btn.classList.toggle('active', allExpanded);
+        }
+
         function renderClientes() {
-            updatePeriodUI();
             const list = document.getElementById('cli-list');
             document.getElementById('cli-subtitle').textContent = `${DB.clients.length} clientes cadastrados`;
+            updateCliSortChipLabel();
+            updateCliToggleAllBtn();
             if (!DB.clients.length) { list.innerHTML = '<div class="empty"><p>Nenhum cliente ainda</p></div>'; return; }
-            list.innerHTML = DB.clients.map(c => {
-                const loans = getClientLoans(c.id).filter(loanInPeriod);
+
+            const rows = DB.clients.map(c => {
+                const loans = getClientLoans(c.id);
                 const totalEmp = loans.reduce((s, l) => s + l.valor, 0);
                 const totalPago = loans.reduce((s, l) => s + l.pagamentos.reduce((ss, p) => ss + p.valor, 0), 0);
                 const dividaTotal = loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0);
-                const restante = Math.max(0, dividaTotal - totalPago);
+                // Saldo restante real: ignora o saldo de empréstimos quitados manualmente,
+                // considerando apenas os empréstimos que realmente continuam em aberto.
+                const restante = loans.reduce((s, l) => {
+                    const calc = getLoanCalc(l);
+                    return s + (calc.isPago ? 0 : calc.saldoRestante);
+                }, 0);
 
                 const LucroRelativo = loans.reduce((accLucro, l) => {
                     const pagoNoEmprestimo = l.pagamentos.reduce((ss, p) => ss + p.valor, 0);
@@ -8243,33 +8452,60 @@
 
                 const progressPct = totalPago == 0 ? 0 : Math.min(100, totalPago / Math.max(5, loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0)) * 100);
 
-                return `<div class="cc" onclick="openClienteDetalhe('${c.id}')">
+                return { c, loans, totalEmp, totalPago, dividaTotal, restante, LucroRelativo, statusC, open, progressPct };
+            });
+
+            // Ordenação: respeita sempre a ordem alfabética como critério de desempate
+            rows.sort((a, b) => {
+                let cmp;
+                if (_cliSort.criteria === 'nome') {
+                    cmp = a.c.nome.localeCompare(b.c.nome, 'pt-BR', { sensitivity: 'base' });
+                } else {
+                    let av, bv;
+                    if (_cliSort.criteria === 'valor') { av = a.totalEmp; bv = b.totalEmp; }
+                    else { av = a.restante; bv = b.restante; } // divida atual
+                    cmp = av - bv;
+                    if (cmp === 0) cmp = a.c.nome.localeCompare(b.c.nome, 'pt-BR', { sensitivity: 'base' });
+                }
+                return _cliSort.dir === 'desc' ? -cmp : cmp;
+            });
+
+            list.innerHTML = rows.map(({ c, loans, totalEmp, totalPago, restante, LucroRelativo, statusC, open, progressPct }) => {
+                const isExpanded = _cliExpanded.has(c.id);
+                return `<div class="cc ${isExpanded ? 'expanded' : ''}" id="cc-${c.id}" onclick="openClienteDetalhe('${c.id}')">
                     <div class="cc-top">
                     <div class="av ${c.color}">${c.initials}</div>
                     <div class="cc-info">
                         <div class="cc-name">${c.nome}</div> 
                         <div class="cc-sub">${c.desc}</div>
-                        <div class="cc-sub">${loans.length} empréstimo${loans.length !== 1 ? 's' : ''} · ${open} em aberto</div>
                     </div>
-                    ${statusPill(statusC)}
+                    <div class="cc-pill-wrap">
+                        ${statusPill(statusC)}
+                        <div class="cc-expand-btn" onclick="toggleClienteCard(event,'${c.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </div>
                     </div>
-                    <div class="cc-stats">
-                        <div class="cc-s">
-                            <div class="cc-sl" style="font-size: 10px">Enviado</div>
-                            <div class="cc-sv" style="font-size: 10px">${fmtMoney(totalEmp)}</div>
-                            <div class="cc-sv" style="font-size: 16px; font-weight:800;">${fmtMoney(Math.max(0, loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0)))}</div>
-                            <div class="cc-sl">A Receber</div>
-                        </div>
-                        <div class="cc-s">
-                            <div class="cc-sl" style="font-size: 10px">Lucro</div>
-                            <div class="cc-sv c-g" style="font-size: 10px">+${fmtMoney(LucroRelativo)}</div>
-                            <div class="cc-sv c-g" style="font-size: 16px; font-weight:800;">${fmtMoney(totalPago)}</div>
-                            <div class="cc-sl">Pago</div>
-                        </div>
-                        <div class="cc-s" style="display: flex; flex-direction: column; justify-content: center;">
-                            <div class="cc-sl" style="margin-top: 4px;">Saldo</div>
-                            <div class="cc-sv c-r" style="font-size: 18px; font-weight:800; line-height: 1.2;">${fmtMoney(restante)}</div>
-                            <div class="cc-sl" style="margin-top: 4px;">Restante</div>
+                    </div>
+                    <div class="cc-expand-content">
+                        <div class="cc-sub cc-loans-line">${loans.length} empréstimo${loans.length !== 1 ? 's' : ''} · ${open} em aberto</div>
+                        <div class="cc-stats">
+                            <div class="cc-s">
+                                <div class="cc-sl" style="font-size: 10px">Enviado</div>
+                                <div class="cc-sv" style="font-size: 10px">${fmtMoney(totalEmp)}</div>
+                                <div class="cc-sv" style="font-size: 16px; font-weight:800;">${fmtMoney(Math.max(0, loans.reduce((s, l) => s + getLoanCalc(l).dividaTotal, 0)))}</div>
+                                <div class="cc-sl">A Receber</div>
+                            </div>
+                            <div class="cc-s">
+                                <div class="cc-sl" style="font-size: 10px">Lucro</div>
+                                <div class="cc-sv c-g" style="font-size: 10px">+${fmtMoney(LucroRelativo)}</div>
+                                <div class="cc-sv c-g" style="font-size: 16px; font-weight:800;">${fmtMoney(totalPago)}</div>
+                                <div class="cc-sl">Pago</div>
+                            </div>
+                            <div class="cc-s" style="display: flex; flex-direction: column; justify-content: center;">
+                                <div class="cc-sl" style="margin-top: 4px;">Saldo</div>
+                                <div class="cc-sv c-r" style="font-size: 18px; font-weight:800; line-height: 1.2;">${fmtMoney(restante)}</div>
+                                <div class="cc-sl" style="margin-top: 4px;">Restante</div>
+                            </div>
                         </div>
                     </div>
                     <div class="cc-bar">
