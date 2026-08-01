@@ -8989,9 +8989,42 @@
             inputPag.value = _saldoRestante;
 
             const boxPag = document.getElementById('ed-pag-form-wrap');
-            boxPag.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            boxPag.scrollIntoView({ behavior: 'smooth', block: 'start' });
             boxPag.focus({ preventScroll: true });
 
+            showToast('Valor adicionado ao pagamento', 'ok');
+        }
+
+        // Clique num evento de parcela/vencimento no histórico ("ed-timeline"): preenche o
+        // campo de pagamento com o valor que falta para quitar aquela parcela específica —
+        // comparando o TOTAL pago até hoje (independente da data dos pagamentos) com o valor
+        // esperado acumulado até a parcela clicada. Se o total pago já cobre essa parcela,
+        // nenhum valor é preenchido.
+        function selecionarParcelaTimeline(loanId, numero) {
+            const loan = getLoan(loanId);
+            if (!loan) return;
+            const calc = getLoanCalc(loan);
+            if (calc.isPago) return;
+
+            const valorParcela = calc.valorBase / calc.numParcelas;
+            const esperadoAcumulado = valorParcela * numero;
+
+            if (calc.totalPago >= esperadoAcumulado) {
+                showToast('Esta parcela já está paga', 'ok');
+                return;
+            }
+
+            const valorFaltante = Math.round((esperadoAcumulado - calc.totalPago) * 100) / 100;
+
+            const inputPag = document.getElementById('ed-pag-valor');
+            inputPag.value = valorFaltante;
+            onPagValorChange();
+
+            const boxPag = document.getElementById('ed-pag-form-wrap');
+            boxPag.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            boxPag.focus({ preventScroll: true });
+
+            showToast('Valor adicionado ao pagamento', 'ok');
         }
 
         function renderAttachList(file) {
@@ -9242,7 +9275,10 @@
 
         function tlEventHTML(e, loanId, anexos) {
             const isPag = e.tipo === 'pagamento';
-            const clickAttr = isPag && loanId ? `onclick="openTlEvent('${loanId}','${e.pId}')"` : '';
+            const isParcelaEvent = (e.tipo === 'parcela' || e.tipo === 'vencimento') && e.numero;
+            const clickAttr = isPag && loanId ? `onclick="openTlEvent('${loanId}','${e.pId}')"`
+                : isParcelaEvent && loanId ? `onclick="selecionarParcelaTimeline('${loanId}', ${e.numero})"`
+                : '';
 
             const anexos_on = anexos ? anexos : false;
 
@@ -9465,7 +9501,7 @@
             }
 
             return `
-            <li class="tl-item${isPag ? ' clickable' : ''}" ${clickAttr}>
+            <li class="tl-item${(isPag || isParcelaEvent) ? ' clickable' : ''}" ${clickAttr}>
                 <div class="tl-dot ${dotClass}" style="margin-top:10px">${iconSvg}</div>
                     <div class="tl-card ${cardClass}">
                     <div class="tl-card-top">
@@ -11743,10 +11779,10 @@
 
         // VARIAVEIS GLOBAIS
         // Meu Script
-        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
 
         // Script do Rafael
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzkicXkp2YFZubl5MqRQCFUh7d42YVs8TZbshypuR3yU92owy2whRHZVLmVDsUmhNjT/exec";
+        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzkicXkp2YFZubl5MqRQCFUh7d42YVs8TZbshypuR3yU92owy2whRHZVLmVDsUmhNjT/exec";
 
         var DB = {};
 
