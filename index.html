@@ -274,6 +274,33 @@
             padding: 10px 5px 24px;
         }
 
+        /* NOVO EMPRÉSTIMO — PASSO 1: cabeçalho/busca fixos, lista de clientes com scroll interno */
+        #scr-novo.act {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        #novo-step-1 {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding-bottom: 0;
+        }
+
+        #novo-step-1 .novo-fixed-top {
+            flex-shrink: 0;
+        }
+
+        #novo-step-1 .novo-scroll-area {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 24px;
+        }
+
         .ptitle {
             font-family: var(--font-d);
             font-size: 25px;
@@ -806,6 +833,21 @@
             color: var(--txt2);
         }
 
+        #edit-emp-sheet .fi,
+        #edit-emp-sheet .fs {
+            font-size: 12px;
+            text-align: center;
+            padding: 10px 6px;
+        }
+
+        #edit-emp-sheet select.fs {
+            text-align-last: center;
+        }
+
+        #edit-emp-sheet .fl {
+            text-align: center;
+        }
+
         .fr {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1205,6 +1247,7 @@
             font-size: 10.5px;
             color: var(--txt2);
             font-weight: 600;
+            white-space: nowrap;
         }
 
         .erd-chart-col.act .erd-chart-lbl {
@@ -2450,6 +2493,7 @@
             text-transform: uppercase;
             letter-spacing: .8px;
             font-weight: 800;
+            text-align: center;
         }
 
         /* AMOUNT HIGHLIGHT */
@@ -3513,66 +3557,70 @@
             <!-- ========== TELA 3: NOVO EMPRÉSTIMO (FLOW) ========== -->
             <div id="scr-novo" class="scr">
                 <div id="novo-step-1" class="pw">
-                    <div class="flex-sb mb4" style="margin-left: 10px; margin-right: 10px;">
-                        <div>
-                            <div class="ptitle">Novo Empréstimo</div>
-                            <div class="psub" style="margin-bottom:0">Passo 1 — Escolher cliente</div>
+                    <div class="novo-fixed-top">
+                        <div class="flex-sb mb4" style="margin-left: 10px; margin-right: 10px;">
+                            <div>
+                                <div class="ptitle">Novo Empréstimo</div>
+                                <div class="psub" style="margin-bottom:0">Passo 1 — Escolher cliente</div>
+                            </div>
+                            <div class="btn-icon" style="height:34px; align-self:flex-start; margin-top:4px"
+                                onclick="openDefaultsSheet()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round">
+                                    <circle cx="12" cy="5" r="1" fill="currentColor" />
+                                    <circle cx="12" cy="12" r="1" fill="currentColor" />
+                                    <circle cx="12" cy="19" r="1" fill="currentColor" />
+                                </svg>
+                            </div>
                         </div>
-                        <div class="btn-icon" style="height:34px; align-self:flex-start; margin-top:4px"
-                            onclick="openDefaultsSheet()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        <div class="sh" style="margin-top:4px; margin-left: 10px; margin-right: 10px;">
+                            <div class="sh-t">Clientes cadastrados</div>
+                            <div class="sh-l" onclick="showNovoClienteForm()">+ Novo cliente</div>
+                        </div>
+                        <div class="srch-wrap">
+                            <svg class="srch-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-linecap="round">
-                                <circle cx="12" cy="5" r="1" fill="currentColor" />
-                                <circle cx="12" cy="12" r="1" fill="currentColor" />
-                                <circle cx="12" cy="19" r="1" fill="currentColor" />
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
                             </svg>
+                            <input class="srch" id="novo-cli-search-input" placeholder="Buscar Cliente…"
+                                oninput="filterNovoClientList(this.value)">
+                            <div class="srch-clear" id="novo-cli-search-clear" style="display: flex"
+                                onmousedown="event.preventDefault()" onclick="clearNovoClientSearch()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                    stroke-linecap="round">
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            </div>
                         </div>
                     </div>
-                    <div class="sh" style="margin-top:4px; margin-left: 10px; margin-right: 10px;">
-                        <div class="sh-t">Clientes cadastrados</div>
-                        <div class="sh-l" onclick="showNovoClienteForm()">+ Novo cliente</div>
-                    </div>
-                    <div class="srch-wrap">
-                        <svg class="srch-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-linecap="round">
-                            <circle cx="11" cy="11" r="8" />
-                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                        </svg>
-                        <input class="srch" id="novo-cli-search-input" placeholder="Buscar Cliente…"
-                            oninput="filterNovoClientList(this.value)">
-                        <div class="srch-clear" id="novo-cli-search-clear" style="display: flex"
-                            onmousedown="event.preventDefault()" onclick="clearNovoClientSearch()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                                stroke-linecap="round">
-                                <line x1="18" y1="6" x2="6" y2="18" />
-                                <line x1="6" y1="6" x2="18" y2="18" />
-                            </svg>
-                        </div>
-                    </div>
-                    <div id="novo-client-list"></div>
-                    <div id="novo-client-form" style="display:none">
-                        <div class="card mt8">
-                            <div class="sc-lbl">Novo Cliente</div>
-                            <div class="fg">
-                                <div class="fl">Nome completo *</div><input class="fi" id="nc-nome"
-                                    placeholder="Ex: João da Silva"
-                                    oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, ''); att_cliente('nc-nome'); ">
+                    <div class="novo-scroll-area">
+                        <div id="novo-client-list"></div>
+                        <div id="novo-client-form" style="display:none">
+                            <div class="card mt8">
+                                <div class="sc-lbl">Novo Cliente</div>
+                                <div class="fg">
+                                    <div class="fl">Nome completo *</div><input class="fi" id="nc-nome"
+                                        placeholder="Ex: João da Silva"
+                                        oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, ''); att_cliente('nc-nome'); ">
+                                </div>
+                                <div class="fg">
+                                    <div class="fl">Telefone *</div><input class="fi" id="nc-tel" type="tel"
+                                        placeholder="Ex: 12912345678"
+                                        oninput="this.value=this.value.replace(/[^0-9]/g,''); att_cliente('nc-tel'); ">
+                                </div>
+                                <div class="fg">
+                                    <div class="fl">E-mail</div><input class="fi" id="nc-email" type="email"
+                                        placeholder="Ex: joao@email.com">
+                                </div>
+                                <div class="fg">
+                                    <div class="fl">Descrição (opcional)</div><textarea class="fi fi-ta" id="nc-desc"
+                                        placeholder="Observações sobre o cliente…"></textarea>
+                                </div>
+                                <button class="btn-p" onclick="add_cliente()">Salvar e continuar</button>
+                                <button class="btn-s" onclick="cancelNovoCliente()">Cancelar</button>
                             </div>
-                            <div class="fg">
-                                <div class="fl">Telefone *</div><input class="fi" id="nc-tel" type="tel"
-                                    placeholder="Ex: 12912345678"
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,''); att_cliente('nc-tel'); ">
-                            </div>
-                            <div class="fg">
-                                <div class="fl">E-mail</div><input class="fi" id="nc-email" type="email"
-                                    placeholder="Ex: joao@email.com">
-                            </div>
-                            <div class="fg">
-                                <div class="fl">Descrição (opcional)</div><textarea class="fi fi-ta" id="nc-desc"
-                                    placeholder="Observações sobre o cliente…"></textarea>
-                            </div>
-                            <button class="btn-p" onclick="add_cliente()">Salvar e continuar</button>
-                            <button class="btn-s" onclick="cancelNovoCliente()">Cancelar</button>
                         </div>
                     </div>
                 </div>
@@ -4979,33 +5027,43 @@
                         </div>
                     </div>
 
-                    <div class="fr" style="margin-top:8px; display: flex; gap: 12px; ">
-                        <div class="fg" style="flex:1; ">
-                            <div class="fl">Data de emissão *</div>
-                            <input class="fi" id="ee-data-edit" type="date" onchange="updateNovoPreview_edit()">
+                    <div class="fr"
+                        style="margin-top:8px; display: grid; grid-template-columns: minmax(0, 1fr) 63px minmax(0, 1fr); gap: 8px; width: 100%; box-sizing: border-box;">
+
+                        <div class="fg" style="width: 100%; min-width: 0;">
+                            <div class="fl"
+                                style="text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                Data de Emissão *</div>
+                            <input class="fi" id="ee-data-edit" type="date"
+                                style="width: 100%; text-align: center; box-sizing: border-box; min-width: 0;"
+                                onchange="updateNovoPreview_edit('prazo')">
                         </div>
 
-                        <div class="fg" style="flex:1; ">
-                            <div class="fl">Prazo (dias) *</div>
+                        <div class="fg" style="width: 100%; min-width: 0;">
+                            <div class="fl" style="text-align: center; white-space: nowrap;">Prazo *</div>
                             <input class="fi" id="ee-prazo-manual-edit" type="text" inputmode="numeric"
                                 placeholder="Ex: 15"
-                                oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit(); ">
+                                style="width: 100%; text-align: center; white-space: nowrap; box-sizing: border-box;"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit('prazo'); ">
                         </div>
 
-                        <div class="fg" style="flex:1; ">
-                            <div class="fl">Parcelas *</div>
-                            <input class="fi" id="ee-parcelas-edit" type="text" inputmode="numeric" min="1" value="1"
-                                placeholder="Ex: 1"
-                                oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit();"
-                                onchange="if(this.value==='' || parseInt(this.value)<1) this.value='1';">
+                        <div class="fg" style="width: 100%; min-width: 0;">
+                            <div class="fl"
+                                style="text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                Vencimento *</div>
+                            <input class="fi" id="ee-data-venc-edit" type="date"
+                                style="width: 100%; text-align: center; box-sizing: border-box; min-width: 0;"
+                                oninput="updateNovoPreview_edit('data')">
                         </div>
+
                     </div>
 
-                    <div id="custom-prazo-wrap-edit" style="display:none; " class="fg mt8">
-                        <div class="fl">Prazo em dias *</div>
-                        <input class="fi" id="ee-prazo-custom-edit" type="text" inputmode="numeric" min="1"
-                            placeholder="Ex: 10"
-                            oninput="this.value=this.value.replace(/[^0-9\s]/g, ''); updateNovoPreview_edit()">
+                    <div class="fg mt8">
+                        <div class="fl">Parcelas *</div>
+                        <input class="fi" id="ee-parcelas-edit" type="text" inputmode="numeric" min="1" value="1"
+                            placeholder="Ex: 1"
+                            oninput="this.value=this.value.replace(/[^0-9]/g,''); updateNovoPreview_edit();"
+                            onchange="if(this.value==='' || parseInt(this.value)<1) this.value='1';">
                     </div>
 
                     <div id="ee-parcelas-info" style="display:none" class="fg mt8">
@@ -5540,14 +5598,15 @@
             const ultimaParcela = proximaParcela.numero >= numParcelas;
 
             // Verifica quais parcelas já vencidas (data já passada) ficaram com pagamento
-            // incompleto até o seu prazo — independe de já ter sido "alcançada" ou não hoje.
+            // incompleto — compara o TOTAL pago até hoje (independente da data do pagamento)
+            // com o valor acumulado esperado até aquela parcela; só entra na lista se a
+            // data da parcela já tiver passado.
             let parcelasAtrasadasNumeros = [];
             for (const ck of checkpoints) {
                 const dataCk = ck.data + (23 * 60 * 60 * 1000);
                 if (dataCk >= TODAY) break;
-                const totalPagoAteData = sortedPags.filter(p => p.data <= dataCk).reduce((s, p) => s + p.valor, 0);
                 const esperadoAcumulado = valorParcela * ck.numero;
-                if (totalPagoAteData < esperadoAcumulado) {
+                if (totalPago < esperadoAcumulado) {
                     parcelasAtrasadasNumeros.push(ck.numero);
                 }
             }
@@ -6390,12 +6449,45 @@
                 : t0;
 
             const isRefCurrent = (ref.year === t0.year && ref.month === t0.month);
-            let months;
-            if (isRefCurrent) {
-                months = [addMonths(ref.year, ref.month, -1), ref];
-            } else {
-                months = [addMonths(ref.year, ref.month, -1), ref, addMonths(ref.year, ref.month, 1)];
+
+            // Monta, em uma única varredura, o conjunto de meses (chave ano*100+mês) que possuem
+            // algum dado (empréstimo emitido ou pagamento recebido). Evita varrer o array de
+            // empréstimos repetidamente mês a mês para achar o anterior/seguinte com dados.
+            const monthKey = (y, m) => y * 100 + m;
+            const keyToYM = (k) => ({ year: Math.floor(k / 100), month: k % 100 });
+
+            const monthsWithData = new Set();
+            loansBase.forEach(l => {
+                const em = new Date(l.emissao);
+                monthsWithData.add(monthKey(em.getFullYear(), em.getMonth()));
+                (l.pagamentos || []).forEach(p => {
+                    const pm = new Date(p.data);
+                    monthsWithData.add(monthKey(pm.getFullYear(), pm.getMonth()));
+                });
+            });
+            const sortedKeys = [...monthsWithData].sort((a, b) => a - b);
+
+            const refKey = monthKey(ref.year, ref.month);
+            const t0Key = monthKey(t0.year, t0.month);
+
+            // Mês anterior com dados: a maior chave da lista que seja menor que a referência
+            let prevM = null;
+            for (let i = sortedKeys.length - 1; i >= 0; i--) {
+                if (sortedKeys[i] < refKey) { prevM = keyToYM(sortedKeys[i]); break; }
             }
+
+            // Mês seguinte com dados: a menor chave da lista que seja maior que a referência (sem passar do mês atual)
+            let nextM = null;
+            if (!isRefCurrent) {
+                for (let i = 0; i < sortedKeys.length; i++) {
+                    if (sortedKeys[i] > refKey && sortedKeys[i] <= t0Key) { nextM = keyToYM(sortedKeys[i]); break; }
+                }
+            }
+
+            let months = [];
+            if (prevM) months.push(prevM);
+            months.push(ref);
+            if (nextM) months.push(nextM);
             months.push({ year: 3000, month: 12 });
 
             // Calcula os 4 indicadores de cada mês:
@@ -6452,7 +6544,7 @@
                 let all_card = d.year == 3000;
                 const label = all_card
                     ? 'Tudo'
-                    : MESES_PT_ABREV[d.month] + (d.year !== t0.year ? `/${String(d.year).slice(2)}` : '');
+                    : MESES_PT_ABREV[d.month] + (d.year !== t0.year ? ` ${d.year}` : '');
 
                 const lucroColor = d.lucroReal >= 0 ? 'var(--acc)' : 'var(--warn)';
                 const tip = `Emprestado ${fmtMoney(d.emprestado)} · Recebido ${fmtMoney(d.recebido)} · `
@@ -6540,7 +6632,9 @@
 
                         if (p.lin < lin_min) {
                             lin_min = p.lin;
-                            loan_valid.entrada = p.valor;
+                            if (loan_valid) {
+                                loan_valid.entrada = p.valor;
+                            }
 
                             if (p.totalPagoAntes > 0) {
                                 totalPagoAntes_inicial = p.totalPagoAntes;
@@ -6549,7 +6643,9 @@
                             recebido_x += totalPagoAntes_inicial + p.valor;
                             lucroRelativo_x = totalPagoAntes_inicial >= l.valor ? p.valor : recebido_x > l.valor ? recebido_x - l.valor : 0;
                         } else {
-                            loan_valid.entrada += p.valor;
+                            if (loan_valid) {
+                                loan_valid.entrada += p.valor;
+                            }
 
                             if (totalPagoAntes_inicial >= l.valor) {
                                 lucroRelativo_x += p.valor;
@@ -6565,7 +6661,7 @@
             });
 
             const lucroReal = recebido - emprestado;
-            const restante = aReceber - recebido;
+            const restante = Math.max(0, aReceber - recebido);
 
             document.getElementById('erd-lucro-prev').textContent = fmtMoney(lucroContratado);
             document.getElementById('erd-sub').textContent = restante > 0 ? 'Restante a Receber' : 'Dividas Quitadas';
@@ -7779,20 +7875,18 @@
         }
 
 
-        function updateNovoPreview_edit() {
+        function updateNovoPreview_edit(tipo) {
             const loan = getLoan(_currentLoanId);
             if (!loan) return;
             const c = getLoanCalc(loan);
 
             const inputValor = document.getElementById('ee-valor-edit');
             const inputReceber = document.getElementById('ee-receber-manual-edit');
-            const inputPrazo = document.getElementById('ee-prazo-custom-edit');
+            const inputPrazo = document.getElementById('ee-prazo-manual-edit');
             const inputData = document.getElementById('ee-data-edit');
+            const inputDataVenc = document.getElementById('ee-data-venc-edit');
             const inputJurosVal = document.getElementById('ee-juros-val-edit');
             const inputJurosTipo = document.getElementById('ee-juros-tipo-edit');
-
-            const modo = document.getElementById('ee-modo-calculo-edit')?.value || 'padrao';
-            const customWrap = document.getElementById('custom-prazo-wrap-edit');
 
             const impactEl = document.getElementById('ee-impact');
             const statusBox = document.getElementById('ee-status-box');
@@ -7802,10 +7896,26 @@
             const novaData = parseDate(inputData.value);
             const novoTipo = inputJurosTipo.value;
 
-            let novoPrazo = 0;
+            // Sincronização bidirecional entre Prazo e Vencimento (igual ao modo manual de "Novo Empréstimo")
+            if (tipo === 'data') {
+                const venc_time = parseDate(inputDataVenc.value);
+                if (venc_time && venc_time !== '' && novaData) {
+                    inputPrazo.value = diffDays(novaData, venc_time);
+                } else {
+                    inputPrazo.value = '';
+                }
+            }
 
-            customWrap.style.display = 'none';
-            novoPrazo = parseInt(document.getElementById('ee-prazo-manual-edit').value) || 0;
+            let novoPrazo = parseInt(inputPrazo.value) || 0;
+
+            if (tipo === 'prazo' || !tipo) {
+                if (novaData) inputDataVenc.min = dateStr(addDays(novaData, 1));
+                if (novoPrazo > 0 && novaData) {
+                    inputDataVenc.value = dateStr(addDays(novaData, novoPrazo));
+                } else if (tipo === 'prazo') {
+                    inputDataVenc.value = '';
+                }
+            }
 
             const novoParcelas = Math.max(1, parseInt(document.getElementById('ee-parcelas-edit').value) || 1);
             const parcelasInfoWrap = document.getElementById('ee-parcelas-info');
@@ -7987,6 +8097,7 @@
             document.getElementById('ee-data-edit').value = dateStr(loan.emissao);
             document.getElementById('ee-data-edit').max = dateStr(TODAY);
             document.getElementById('ee-prazo-manual-edit').value = loan.prazo;
+            document.getElementById('ee-data-venc-edit').value = dateStr(addDays(loan.emissao, loan.prazo));
             document.getElementById('ee-parcelas-edit').value = Math.max(1, parseInt(loan.parcelas) || 1);
             document.getElementById('ee-juros-tipo-edit').value = loan.juros_tipo;
             document.getElementById('ee-juros-val-edit').value = loan.juros_val;
