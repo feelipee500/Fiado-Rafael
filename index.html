@@ -46,6 +46,22 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            /* Remove o menu de "Copiar/Compartilhar" que aparece no toque longo em iOS/Android */
+            -webkit-touch-callout: none;
+        }
+
+        /* Campos de texto continuam selecionáveis normalmente (digitar, colar, selecionar) */
+        input,
+        textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+            -webkit-touch-callout: default;
         }
 
         html,
@@ -2406,6 +2422,15 @@
 
         .empty p {
             font-size: 13px;
+            font-weight: 700;
+            color: var(--txt1);
+        }
+
+        .empty p.empty-sub {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--txt2);
+            margin-top: 4px;
         }
 
         /* CHOICE LIST */
@@ -2590,6 +2615,89 @@
         .tc1 {
             color: var(--txt1);
             font-weight: 800;
+        }
+
+        /* ===== HIERARQUIA DE DENSIDADE DE INFORMAÇÃO ===== */
+        .stat-primary {
+            font-size: 17px;
+            font-weight: 900;
+            letter-spacing: -.2px;
+            white-space: nowrap;
+        }
+
+        .stat-secondary {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--txt1);
+        }
+
+        .info-summary-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 6px 4px;
+            cursor: pointer;
+        }
+
+        .info-summary-main {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1px;
+        }
+
+        .info-summary-chip {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--acc2);
+            background: #3d7fff14;
+            border-radius: var(--rad999);
+            padding: 4px 10px;
+            white-space: nowrap;
+        }
+
+        .info-toggle-row {
+            display: flex;
+            justify-content: center;
+            padding: 6px 0 2px;
+            cursor: pointer;
+        }
+
+        .info-toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--acc2);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .info-toggle-btn svg {
+            width: 12px;
+            height: 12px;
+            stroke-width: 2.5;
+            transition: transform .25s ease;
+        }
+
+        .info-toggle-btn.open svg {
+            transform: rotate(180deg);
+        }
+
+        .info-collapse-body {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            margin-top: 0;
+            transition: max-height .3s ease, opacity .25s ease, margin-top .25s ease;
+        }
+
+        .info-collapse-body.open {
+            max-height: 600px;
+            opacity: 1;
+            margin-top: 6px;
         }
 
         .text-center {
@@ -3244,6 +3352,152 @@
         .sh-close-anexo:active {
             transform: scale(0.9);
             background: rgba(0, 0, 0, 0.8);
+        }
+
+        /* ===================================================================
+           FEEDBACK TÁTIL EM BOTÕES E ELEMENTOS INTERATIVOS (sem vibração)
+           Como o app não pode usar vibração no toque, todo elemento clicável
+           recebe um leve "afundar" visual + escurecimento ao ser pressionado,
+           pra dar a sensação de que o botão realmente reagiu ao toque.
+           Isso complementa (não substitui) os efeitos de cor já existentes.
+           =================================================================== */
+        #notif-fab,
+        .bni,
+        .bni-fab,
+        .lc-mode-toggle,
+        .chip-btn,
+        .file-picker-btn,
+        .lc,
+        .lcm,
+        .sh-l,
+        .btn-s,
+        .btn-icon,
+        .srch-clear,
+        .emp-search-dd-item,
+        .erd4-period-chip,
+        .erd-chart-col,
+        .period-filter-chip,
+        .tbtn,
+        .sh-close,
+        .back-btn,
+        .menu-item,
+        .tl-item.clickable,
+        .cc,
+        .cc-expand-btn,
+        .cli-toggle-all-btn,
+        .attach-item,
+        .cd-anexos-toggle,
+        .attach-item-ver,
+        .attach-item-del,
+        .cbtn-y,
+        .cbtn-n,
+        .cbtn-r,
+        .choice-item,
+        .info-summary-row,
+        .info-toggle-row,
+        .info-toggle-btn,
+        .ds-item {
+            transition: transform .12s cubic-bezier(.4, 0, .2, 1), filter .12s ease, background .15s ease, border-color .15s ease, opacity .15s ease;
+        }
+
+        #notif-fab:active,
+        .bni:active,
+        .lc-mode-toggle:active,
+        .chip-btn:active,
+        .file-picker-btn:active,
+        .sh-l:active,
+        .btn-s:active,
+        .btn-icon:active,
+        .srch-clear:active,
+        .emp-search-dd-item:active,
+        .erd4-period-chip:active,
+        .erd-chart-col:active,
+        .period-filter-chip:active,
+        .tbtn:active,
+        .sh-close:active,
+        .back-btn:active,
+        .menu-item:active,
+        .tl-item.clickable:active,
+        .cc-expand-btn:active,
+        .cli-toggle-all-btn:active,
+        .cd-anexos-toggle:active,
+        .attach-item-ver:active,
+        .attach-item-del:active,
+        .cbtn-y:active,
+        .cbtn-n:active,
+        .cbtn-r:active,
+        .choice-item:active,
+        .info-summary-row:active,
+        .info-toggle-row:active,
+        .info-toggle-btn:active,
+        .ds-item:active {
+            transform: scale(.94);
+            filter: brightness(.94);
+        }
+
+        /* Cards maiores (empréstimo/cliente/anexo) recebem uma "afundada" mais sutil,
+           pra não parecer exagerado num elemento grande */
+        .lc:active,
+        .lcm:active,
+        .cc:active,
+        .attach-item:active {
+            transform: scale(.985);
+            filter: brightness(.96);
+        }
+
+        /* O botão flutuante central (+) ganha um efeito um pouco mais expressivo,
+           já que é a ação principal do app */
+        .bni-fab:active {
+            transform: scale(.87);
+        }
+
+        /* ===================================================================
+           FEEDBACK TÁTIL VIA JAVASCRIPT (mais confiável que :active puro)
+           Alguns elementos ficam dentro de listas com rolagem (cards de
+           empréstimo/cliente) ou são SVG/sem classe (donut, WhatsApp), onde o
+           :active do navegador é inconsistente no toque. A classe .press-fx é
+           adicionada/removida via JS (pointerdown/pointerup) pra garantir que
+           o retorno visual apareça sempre, imediatamente.
+           =================================================================== */
+        #ed-whatsapp-btn {
+            transition: transform .12s cubic-bezier(.4, 0, .2, 1), filter .12s ease;
+        }
+
+        #ed-whatsapp-btn.press-fx {
+            transform: scale(.92);
+            filter: brightness(.85);
+        }
+
+        #ed-sit-box {
+            transition: transform .12s cubic-bezier(.4, 0, .2, 1), filter .12s ease;
+        }
+
+        #ed-sit-box.press-fx {
+            transform: scale(.96);
+            filter: brightness(.9);
+        }
+
+        .lc.press-fx,
+        .lcm.press-fx,
+        .cc.press-fx {
+            transform: scale(.97) !important;
+            filter: brightness(.96);
+        }
+
+        .ds-item.press-fx {
+            transform: scale(.94) !important;
+            filter: brightness(.93);
+        }
+
+        #donut-svg .donut-seg {
+            transition: opacity .15s ease, transform .12s ease;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        #donut-svg .donut-seg.press-fx {
+            opacity: .5 !important;
+            transform: scale(.95);
         }
     </style>
 </head>
@@ -3904,18 +4158,18 @@
 
                     <!-- ANEXOS CLIENTE -->
                     <div class="card-sm"
-                        style="padding: 10px; display: flex; flex-direction: column; gap: 8px; margin-top: 5px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <span class="fs11 tc2"
-                                style="text-transform: uppercase; letter-spacing: .5px; font-weight: 800;">Anexos do
-                                Cliente</span>
-                            <div class="chip-btn" onclick="openClienteAnexoSheet()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="12" y1="5" x2="12" y2="19" />
-                                    <line x1="5" y1="12" x2="19" y2="12" />
-                                </svg>
-                                <span>Adicionar</span>
+                        style="padding: 10px; display: flex; flex-direction: column; gap: 6px; margin-top: 5px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 6px; min-width: 0;">
+                                <span class="fs11 tc2"
+                                    style="text-transform: uppercase; letter-spacing: .5px; font-weight: 800; white-space: nowrap;">Anexos
+                                    do Cliente</span>
+                                <span id="cd-anexos-count" class="info-summary-chip"
+                                    style="display:none; padding:2px 8px; font-size:10px;"></span>
+                            </div>
+                            <div class="chip-btn" onclick="openClienteAnexoSheet()"
+                                style="background:transparent; border:1px solid var(--brd2); color:var(--txt2); padding:4px 9px; font-size:11px; font-weight:600;">
+                                <span>+ Adicionar 📎</span>
                             </div>
                         </div>
 
@@ -3937,50 +4191,61 @@
                         </div>
 
 
+                        <!-- Sempre visível: o que motiva a próxima ação -->
                         <div
-                            style="display: flex; justify-content: center; align-items: center; gap: 40px; width: 100%; margin-bottom: 20px;">
-                            <div
-                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <span class="fs10 tc2"
-                                    style="color: var(--txt1); font-weight: 800;">Lucro<br>Previsto</span>
-                                <span style="font-size: 13px; font-weight: 800; color: var(--acc); white-space:nowrap;"
-                                    id="cd-lucro-prev">R$ 0.000,00</span>
+                            style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 64px; margin-bottom: 4px; margin-top: 12px; width: 100%;">
+                            <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <span class="fs10 tc2">Total Pago</span>
+                                <span class="stat-primary" style="color: var(--acc);"
+                                    id="cd-total-pago">R$ -.---,--</span>
                             </div>
-                            <div
-                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <span class="fs10 tc2">Valor<br>Emprestado</span>
-                                <span style="font-size: 13px; font-weight: 800; color: var(--acc2); white-space:nowrap;"
-                                    id="cd-total-emp">R$ 000,00</span>
-                            </div>
-                            <div
-                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <span class="fs10 tc2">Juros<br>Acm.</span>
-                                <span
-                                    style="font-size: 13px; font-weight: 800; color: var(--danger); white-space:nowrap;"
-                                    id="cd-juros-acm">R$ 0.000,00</span>
+                            <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <span class="fs10 tc2">Dívida Total</span>
+                                <span class="stat-primary" style="color: var(--danger);"
+                                    id="cd-total-divida">R$ -.---,--</span>
                             </div>
                         </div>
 
+                        <div class="info-toggle-row" onclick="toggleInfoCollapse('cd-status-extra')">
+                            <div class="info-toggle-btn" id="cd-status-extra-toggle" data-label-open="Ver menos"
+                                data-label-closed="Ver mais">
+                                <span class="itb-label">Ver mais</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </div>
+                        </div>
 
-                        <div style="display: flex; align-items: center; margin-bottom: 0px; width: 100%;">
+                        <!-- Métricas de referência / menos usadas no dia a dia -->
+                        <div class="info-collapse-body" id="cd-status-extra-body">
                             <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
-                                <span class="fs10 tc2">Total Pago</span>
-                                <span style="font-size: 15px; font-weight: 1000; color: var(--acc); white-space:nowrap;"
-                                    id="cd-total-pago">R$ -.---,--</span>
-                            </div>
-                            <div
-                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <span class="fs10 tc2" style="font-size: 12px;">Lucro Relativo</span>
-                                <span style="font-size: 12px; font-weight: 800; color: var(--acc); white-space:nowrap;"
-                                    id="cd-lucro-rel">+R$ -.---,--</span>
-                            </div>
-                            <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center;">
-                                <span class="fs10 tc2">Dívida Total</span>
-                                <span
-                                    style="font-size: 15px; font-weight: 1000; color: var(--danger); white-space:nowrap;"
-                                    id="cd-total-divida">R$ -.---,--</span>
+                                style="display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; margin-bottom: 10px;">
+                                <div
+                                    style="flex: 1; display: flex; flex-direction: column; align-items: flex-start; text-align: left;">
+                                    <span class="stat-secondary">Valor<br>Emprestado</span>
+                                    <span style="font-size: 12px; font-weight: 700; color: var(--acc2); white-space:nowrap;"
+                                        id="cd-total-emp">R$ 000,00</span>
+                                </div>
+                                <div
+                                    style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                    <span class="stat-secondary">Juros<br>Acm.</span>
+                                    <span
+                                        style="font-size: 12px; font-weight: 700; color: var(--danger); white-space:nowrap;"
+                                        id="cd-juros-acm">R$ 0.000,00</span>
+                                </div>
+                                <div
+                                    style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                    <span class="stat-secondary">Lucro<br>Previsto</span>
+                                    <span style="font-size: 12px; font-weight: 700; color: var(--acc); white-space:nowrap;"
+                                        id="cd-lucro-prev">R$ 0.000,00</span>
+                                </div>
+                                <div
+                                    style="flex: 1; display: flex; flex-direction: column; align-items: flex-end; text-align: right;">
+                                    <span class="stat-secondary">Lucro<br>Relativo</span>
+                                    <span style="font-size: 12px; font-weight: 700; color: var(--acc); white-space:nowrap;"
+                                        id="cd-lucro-rel">+R$ -.---,--</span>
+                                </div>
                             </div>
                         </div>
 
@@ -4116,7 +4381,7 @@
                     </div>
 
                     <!-- DADOS INICIAIS -->
-                    <div class="card-sm" style="padding: 3px; display: flex; flex-direction: column; gap: 10px;">
+                    <div class="card-sm" style="padding: 3px; display: flex; flex-direction: column; gap: 0px;">
                         <div
                             style="display: flex; flex-direction: column; align-items: center; gap: 6px; border-bottom: 1px solid var(--brd); padding-bottom: 3px;">
                             <span class="fs11 tc2"
@@ -4124,51 +4389,57 @@
                                 INICIAIS</span>
                         </div>
 
-                        <div style="display: flex; align-items: center; margin-bottom: 2px; width: 100%;">
-                            <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
-                                <span class="fs10 tc2">Emissão</span>
-                                <span style="font-size: 13px; font-weight: 800;" id="ed-data-emissao">--/--/----</span>
-                            </div>
-                            <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <span class="fs10 tc2">Prazo</span>
-                                <span style="font-size: 13px; font-weight: 800; color: var(--acc2);" id="ed-prazo">0
-                                    dias</span>
-                            </div>
-                            <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center;">
+                        <!-- Resumo sempre visível: só o que motiva ação (vencimento + prazo) -->
+                        <div class="info-summary-row" onclick="toggleInfoCollapse('ed-dados-iniciais')">
+                            <div class="info-summary-main">
                                 <span class="fs10 tc2">Vencimento</span>
-                                <span style="font-size: 13px; font-weight: 800;" id="ed-data-venc">--/--/----</span>
+                                <span class="stat-primary" id="ed-data-venc">--/--/----</span>
+                            </div>
+                            <div class="info-summary-chip" id="ed-prazo">0 dias</div>
+                            <div class="info-toggle-btn" id="ed-dados-iniciais-toggle" data-label-open="Ocultar"
+                                data-label-closed="Detalhes">
+                                <span class="itb-label">Detalhes</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
                             </div>
                         </div>
 
-                        <div style="display: flex; align-items: center; margin-bottom: 2px; width: 100%;">
-                            <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
-                                <span class="fs10 tc2">Enviado</span>
-                                <span style="font-size: 13px; font-weight: 800;" id="ed-valor-emp">R$ 0.000,00</span>
-                            </div>
-                            <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <span class="fs10 tc2">A Receber</span>
-                                <span style="font-size: 13px; font-weight: 800;" id="ed-valor-receber">R$
-                                    0.000,00</span>
-                                <span style="font-size: 10px; font-weight: 800; color:var(--acc)"
-                                    id="ed-valor-lucro">+R$ 000,00</span>
-                            </div>
-                            <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center;">
-                                <span class="fs10 tc2">Juros</span>
-                                <span style="font-size: 13px; font-weight: 800;" id="ed-juros-dia">---</span>
+                        <!-- Dados de referência: consultados ocasionalmente, ficam colapsados por padrão -->
+                        <div class="info-collapse-body" id="ed-dados-iniciais-body">
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; width: 100%;">
+                                <div
+                                    style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                    <span class="stat-secondary">Emissão</span>
+                                    <span style="font-size: 11px; font-weight: 700; white-space: nowrap;" id="ed-data-emissao">--/--/----</span>
+                                </div>
+                                <div
+                                    style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                    <span class="stat-secondary">Enviado</span>
+                                    <span style="font-size: 11px; font-weight: 700; white-space: nowrap;" id="ed-valor-emp">R$ 0.000,00</span>
+                                </div>
+                                <div
+                                    style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                    <span class="stat-secondary">A Receber</span>
+                                    <span style="font-size: 11px; font-weight: 700; white-space: nowrap;" id="ed-valor-receber">R$
+                                        0.000,00</span>
+                                    <span style="font-size: 9px; font-weight: 800; color:var(--acc); white-space: nowrap;"
+                                        id="ed-valor-lucro">+R$ 000,00</span>
+                                </div>
+                                <div
+                                    style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                    <span class="stat-secondary">Juros</span>
+                                    <span style="font-size: 11px; font-weight: 700; white-space: nowrap;" id="ed-juros-dia">---</span>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Comprovante de envio -->
-                        <div style="background:var(--bg2); border:1px solid var(--brd); border-radius:var(--rad12); padding:3px 3px; margin-bottom:0px; display: flex; flex-direction: column; align-items: center;"
+                        <!-- Comprovante de envio: sempre visível, discreto -->
+                        <div style="border-top:1px solid var(--brd); margin-top:6px; padding-top:6px; display: flex; flex-direction: column; align-items: center;"
                             onclick="openAttachSheet('loan')">
-                            <div id="ed-comp-envio-btn" class="fs11 fw6" style="color:var(--acc3); cursor:pointer">+
-                                Anexar Comprovante de Envio</div>
+                            <div id="ed-comp-envio-btn" class="fs10 fw6" style="color:var(--txt2); cursor:pointer">📎
+                                Comprovante de envio</div>
                             <div id="ed-comp-envio-list"></div>
                         </div>
                     </div>
@@ -4185,71 +4456,82 @@
                                 ATUAL</span>
                         </div>
 
+                        <!-- Sempre visível: o que motiva a próxima ação -->
                         <div
-                            style="display: flex; justify-content: space-between; align-items: center; gap: 40px; width: 100%; margin-bottom: 10px; margin-top: 10px;">
-                            <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: start;">
-                                <span class="fs10 tc2"
-                                    style="font-size: 10px; font-weight: 800; line-height: 1.2; white-space: nowrap;">Lucro
-                                    Atual</span>
-                                <span
-                                    style="font-size: 10px; font-weight: 800; color: var(--acc); line-height: 1.2; white-space: nowrap;"
-                                    id="ed-lucro-atual">+R$ 0,00</span>
-                            </div>
-                            <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <span class="fs10 tc2" id="ed-tempo-total-aberto-title" style="white-space: nowrap;">Em Aberto</span>
-                                <span style="font-size: 13px; font-weight: 800; white-space: nowrap;"
-                                    id="ed-tempo-total-aberto">--
-                                    dias</span>
-                            </div>
-                            <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <span class="fs10 tc2" id="ed-juros-dias-atraso-title" style="white-space: nowrap;">De Atraso</span>
-                                <span
-                                    style="font-size: 13px; font-weight: 800; color: var(--danger); white-space: nowrap;"
-                                    id="ed-juros-dias-atraso">-- dias</span>
-                            </div>
-                            <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: end;">
-                                <span class="fs10 tc2"
-                                    style="font-size: 10px; font-weight: 800; line-height: 1.2; white-space: nowrap;">Lucro
-                                    Prev.</span>
-                                <span
-                                    style="font-size: 10px; font-weight: 800; color: var(--acc); line-height: 1.2; white-space: nowrap;"
-                                    id="ed-lucro-prev">+R$ 0,00</span>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; align-items: center; margin-bottom: 0px; width: 100%;">
+                            style="display: flex; align-items: center; margin-bottom: 4px; margin-top: 10px; width: 100%;">
                             <div
                                 style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
                                 <span class="fs10 tc2">Total Pago</span>
-                                <span
-                                    style="font-size: 17px; font-weight: 1000; color: var(--acc); white-space: nowrap;"
-                                    id="ed-total-pago">R$ -.---,--</span>
-                            </div>
-                            <div style="flex: 1; display: none; flex-direction: column; align-items: center; text-align: center;"
-                                id="ed-juros-acumulado-item">
-                                <span class="fs10 tc2" style="font-size: 10px; font-weight: 800; line-height: 1.2; white-space: nowrap;"
-                                    id="ed-juros-acumulado-title">Juros Acm.</span>
-                                <span
-                                    style="font-size: 12px; font-weight: 800; color: var(--danger); line-height: 1.2; white-space: nowrap; color: var(--danger);"
-                                    id="ed-juros-acumulado">R$ ---,--</span>
-                            </div>
-                            <div id="ed-prox-parcela-box"
-                                style="flex: 1; display: none; flex-direction: column; align-items: center; text-align: center; white-space: nowrap;">
-                                <span class="fs10 tc2" style="font-size: 10px; font-weight: 800; line-height: 1.2; white-space: nowrap;" id="ed-prox-parcela-title">1° Parcela</span>
-                                <span
-                                    style="font-size: 12px; font-weight: 800; color: var(--danger); line-height: 1.2; white-space: nowrap; color: var(--acc2);"
-                                    id="ed-prox-parcela">-- dias</span>
+                                <span class="stat-primary" style="color: var(--acc);" id="ed-total-pago">R$
+                                    -.---,--</span>
                             </div>
                             <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center; white-space: nowrap;">
+                                style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <span class="fs10 tc2" id="ed-juros-dias-atraso-title" style="white-space: nowrap;">De
+                                    Atraso</span>
+                                <span style="font-size: 13px; font-weight: 800; color: var(--danger); white-space: nowrap;"
+                                    id="ed-juros-dias-atraso">-- dias</span>
+                            </div>
+                            <div
+                                style="flex: 1; display: flex; flex-direction: column; align-items: end; text-align: center;">
                                 <span class="fs10 tc2">Dívida Total</span>
-                                <span
-                                    style="font-size: 17px; font-weight: 1000; color: var(--danger); white-space: nowrap;"
-                                    id="ed-valor-comb">R$ -.---,--</span>
+                                <span class="stat-primary" style="color: var(--danger);" id="ed-valor-comb">R$
+                                    -.---,--</span>
+                            </div>
+                        </div>
+
+                        <div class="info-toggle-row" onclick="toggleInfoCollapse('ed-status-extra')">
+                            <div class="info-toggle-btn" id="ed-status-extra-toggle" data-label-open="Ver menos"
+                                data-label-closed="Ver mais">
+                                <span class="itb-label">Ver mais</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Métricas de referência / menos usadas no dia a dia -->
+                        <div class="info-collapse-body" id="ed-status-extra-body">
+                            <div
+                                style="display: flex; align-items: center; justify-content: space-between; gap: 4px; width: 100%; margin-bottom: 4px;">
+                                <div
+                                    style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                    <span class="stat-secondary">Lucro Atual</span>
+                                    <span
+                                        style="font-size: 11px; font-weight: 700; color: var(--acc); white-space: nowrap;"
+                                        id="ed-lucro-atual">+R$ 0,00</span>
+                                </div>
+                                <div
+                                    style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                    <span class="stat-secondary" id="ed-tempo-total-aberto-title" style="white-space: nowrap;">Em
+                                        Aberto</span>
+                                    <span style="font-size: 11px; font-weight: 700; white-space: nowrap;"
+                                        id="ed-tempo-total-aberto">--
+                                        dias</span>
+                                </div>
+                                <div
+                                    style="flex: 1; min-width: 0; display: none; flex-direction: column; align-items: center; text-align: center;"
+                                    id="ed-juros-acumulado-item">
+                                    <span class="stat-secondary" id="ed-juros-acumulado-title" style="white-space: nowrap;">Juros Acm.</span>
+                                    <span
+                                        style="font-size: 11px; font-weight: 700; color: var(--danger); white-space: nowrap;"
+                                        id="ed-juros-acumulado">R$ ---,--</span>
+                                </div>
+                                <div id="ed-prox-parcela-box"
+                                    style="flex: 1; min-width: 0; display: none; flex-direction: column; align-items: center; text-align: center; white-space: nowrap;">
+                                    <span class="stat-secondary" id="ed-prox-parcela-title" style="white-space: nowrap;">1° Parcela</span>
+                                    <span
+                                        style="font-size: 11px; font-weight: 700; color: var(--acc2); white-space: nowrap;"
+                                        id="ed-prox-parcela">-- dias</span>
+                                </div>
+                                <div
+                                    style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                    <span class="stat-secondary">Lucro Prev.</span>
+                                    <span
+                                        style="font-size: 11px; font-weight: 700; color: var(--acc); white-space: nowrap;"
+                                        id="ed-lucro-prev">+R$ 0,00</span>
+                                </div>
                             </div>
                         </div>
 
@@ -6076,6 +6358,7 @@
                     // Segmento único (100%) — arco de 0→360 degenera, usar <circle> completo
                     if (seg.count === total) {
                         svgHTML += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
+                            class="donut-seg"
                             stroke="${seg.color}" stroke-width="${stroke}"
                             style="cursor:pointer; transition:opacity .15s"
                             onclick="navTo('emprestimos','all'); renderEmprestimos('${seg.filter}', false)"
@@ -6091,6 +6374,7 @@
                     if (e - s > 0.5) {
                         const d = arcPath(cx, cy, r, s, e);
                         svgHTML += `<path d="${d}" fill="none"
+                            class="donut-seg"
                             stroke="${seg.color}" stroke-width="${stroke}" stroke-linecap="butt"
                             style="cursor:pointer; transition:opacity .15s"
                             onclick="navTo('emprestimos','all'); renderEmprestimos('${seg.filter}', false)"
@@ -6436,7 +6720,11 @@
             const total = sortedLoansValido.length;
             document.getElementById('emp-total').textContent = `${loans_total} Empréstimo${loans_total == 1 ? '' : 's'}`;
             document.getElementById('emp-total-exibido').textContent = `${total} Exibido${total == 1 ? '' : 's'}`;
-            document.getElementById('emp-list').innerHTML = sortedLoansValido.length ? renderLoanCards(sortedLoansValido, true, true) : '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><p>Nenhum empréstimo encontrado</p></div>';
+            const empIconDoc = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+            const empEmptyMsg = DB.loans.length === 0
+                ? `<div class="empty">${empIconDoc}<p>Nenhum empréstimo cadastrado ainda</p><p class="empty-sub">Toque em "Novo" para criar o primeiro</p></div>`
+                : `<div class="empty">${empIconDoc}<p>Nenhum empréstimo encontrado</p><p class="empty-sub">Tente mudar o filtro, a busca ou o período</p></div>`;
+            document.getElementById('emp-list').innerHTML = sortedLoansValido.length ? renderLoanCards(sortedLoansValido, true, true) : empEmptyMsg;
             syncLoanModeToggles();
         }
 
@@ -6849,7 +7137,7 @@
         }
         function renderNovoClientList() {
             const el = document.getElementById('novo-client-list');
-            if (!DB.clients.length) { el.innerHTML = '<div class="empty"><p>Nenhum cliente cadastrado ainda</p></div>'; return; }
+            if (!DB.clients.length) { el.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><p>Nenhum cliente cadastrado ainda</p><p class="empty-sub">Toque em "+ Novo cliente" acima para cadastrar</p></div>'; return; }
             el.innerHTML = DB.clients.map(c => `
             <div class="choice-item compact ${_novoSelectedClientId === c.id ? 'sel' : ''}" onclick="selectNovoClient('${c.id}')">
             <div class="av ${c.color}" style="width:26px; height:26px; font-size:10px">${c.initials}</div>
@@ -8586,7 +8874,10 @@
             document.getElementById('cli-subtitle').textContent = `${DB.clients.length} clientes cadastrados`;
             updateCliSortChipLabel();
             updateCliToggleAllBtn();
-            if (!DB.clients.length) { list.innerHTML = '<div class="empty"><p>Nenhum cliente ainda</p></div>'; return; }
+            if (!DB.clients.length) {
+                list.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><p>Nenhum cliente cadastrado ainda</p><p class="empty-sub">Cadastre um cliente ao criar um novo empréstimo</p></div>';
+                return;
+            }
 
             const rows = DB.clients.map(c => {
                 const loans = getClientLoans(c.id);
@@ -8696,6 +8987,9 @@
             const c = getClient(cid);
             if (!c) return;
 
+            // Sempre abre com os blocos de métricas secundárias fechados
+            closeInfoCollapse('cd-status-extra');
+
             // Definir dados do cliente no cabeçario
             document.getElementById('cd-av').className = `av ${c.color}`;
             document.getElementById('cd-av').style.cssText = 'width:48px; height:48px; font-size:16px';
@@ -8801,7 +9095,7 @@
                 .map(item => item.original);
 
             document.getElementById('cd-emp-list').innerHTML = sortedLoansValido.length ? renderLoanCards(sortedLoansValido, true, false) :
-                `<div class="empty"><p>${_periodFilter.mode !== 'all' ? 'Nenhum empréstimo neste período' :
+                `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>${_periodFilter.mode !== 'all' ? 'Nenhum empréstimo neste período' :
                     'Nenhum empréstimo ainda'}</p></div>`;
 
             navTo('cliente-detalhe');
@@ -8827,6 +9121,10 @@
             _currentClientId = l.clientId;
             const calc = getLoanCalc(l);
             const venc = addDays(l.emissao, l.prazo);
+
+            // Sempre abre com os blocos de detalhes/métricas secundárias fechados
+            closeInfoCollapse('ed-dados-iniciais');
+            closeInfoCollapse('ed-status-extra');
 
             // Topo
             document.getElementById('ed-id').textContent = l.id;
@@ -9010,7 +9308,7 @@
             const esperadoAcumulado = valorParcela * numero;
 
             if (calc.totalPago >= esperadoAcumulado) {
-                showToast('Esta parcela já está paga', 'ok');
+                showToast('Nada a ser pago aqui', 'ok');
                 return;
             }
 
@@ -10442,7 +10740,7 @@
                 .map(item => item.original);
 
             let html = '';
-            if (!LoansAlert.length) { html = '<div class="empty"><p>Nenhuma notificação</p></div>'; }
+            if (!LoansAlert.length) { html = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><p>Nenhuma notificação</p><p class="empty-sub">Tudo em dia por aqui ✓</p></div>'; }
             html += renderLoanCards(LoansAlert, true, false);
             document.getElementById('notif-body').innerHTML = html;
             syncLoanModeToggles();
@@ -10467,6 +10765,33 @@
         }
 
         // ==================== SHEETS / OVERLAYS ====================
+        // Fecha um bloco de informação secundária (usado ao trocar de empréstimo/cliente, pra sempre abrir fechado por padrão)
+        function closeInfoCollapse(id) {
+            const body = document.getElementById(id + '-body');
+            const btn = document.getElementById(id + '-toggle');
+            if (body) body.classList.remove('open');
+            if (btn) {
+                btn.classList.remove('open');
+                const label = btn.querySelector('.itb-label');
+                if (label && btn.dataset.labelClosed) label.textContent = btn.dataset.labelClosed;
+            }
+        }
+
+        // Alterna a expansão dos blocos de informação secundária (densidade de informação)
+        function toggleInfoCollapse(id) {
+            const body = document.getElementById(id + '-body');
+            const btn = document.getElementById(id + '-toggle');
+            if (!body) return;
+            const isOpen = body.classList.toggle('open');
+            if (btn) {
+                btn.classList.toggle('open', isOpen);
+                const label = btn.querySelector('.itb-label');
+                if (label && btn.dataset.labelOpen && btn.dataset.labelClosed) {
+                    label.textContent = isOpen ? btn.dataset.labelOpen : btn.dataset.labelClosed;
+                }
+            }
+        }
+
         function openSheet(id, animate = true) {
             if (id === 'notif-sheet') {
                 notif_view = true;
@@ -11176,15 +11501,25 @@
         function renderClienteAnexos(client) {
             const el = document.getElementById('cd-anexos-list');
             const toggleBtn = document.getElementById('cd-anexos-toggle-btn');
+            const countEl = document.getElementById('cd-anexos-count');
             if (!el) return;
             const anexos = (client && client.anexos) || [];
 
             // Sempre renderiza recolhido por padrão
             _clienteAnexosExpanded = false;
 
+            if (countEl) {
+                if (anexos.length) {
+                    countEl.style.display = '';
+                    countEl.textContent = anexos.length + (anexos.length === 1 ? ' anexo' : ' anexos');
+                } else {
+                    countEl.style.display = 'none';
+                }
+            }
+
             if (!anexos.length) {
-                el.innerHTML = '<div class="fs12 tc2" style="text-align:center; padding:8px 0;">Nenhum anexo adicionado</div>';
-                el.style.maxHeight = '';
+                el.innerHTML = '';
+                el.style.maxHeight = '0px';
                 if (toggleBtn) toggleBtn.style.display = 'none';
                 return;
             }
@@ -11205,56 +11540,27 @@
                 </div>
             `).join('');
 
-            updateClienteAnexosCollapse();
+            // Por padrão o box de anexos fica recolhido (só título + contagem + botão "Mostrar Tudo")
+            el.style.maxHeight = '0px';
+            if (toggleBtn) {
+                toggleBtn.style.display = '';
+                toggleBtn.textContent = 'Mostrar Tudo';
+            }
         }
 
-        // Ajusta a altura visível de #cd-anexos-list conforme o estado recolhido/expandido
-        // e mostra/oculta o botão "Mostrar Tudo" / "Recolher" quando há mais de uma linha de anexos
-        function updateClienteAnexosCollapse() {
-            // Adiado com rAF: no momento da chamada a tela do cliente pode ainda não estar
-            // visível (ex: chamada antes do navTo trocar a tela), o que faria offsetTop/offsetHeight
-            // retornarem 0 para todos os itens. Esperar dois frames garante que a troca de tela
-            // (adição da classe "act") já foi aplicada e o layout já foi calculado.
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    const el = document.getElementById('cd-anexos-list');
-                    const btn = document.getElementById('cd-anexos-toggle-btn');
-                    if (!el || !btn) return;
-
-                    const items = Array.from(el.children).filter(c => c.classList.contains('attach-item'));
-                    if (!items.length) {
-                        el.style.maxHeight = '';
-                        btn.style.display = 'none';
-                        return;
-                    }
-
-                    const firstTop = items[0].offsetTop;
-                    const hasMultipleRows = items.some(it => it.offsetTop > firstTop + 5);
-
-                    if (!hasMultipleRows) {
-                        el.style.maxHeight = '';
-                        btn.style.display = 'none';
-                        return;
-                    }
-
-                    btn.style.display = '';
-
-                    if (_clienteAnexosExpanded) {
-                        el.style.maxHeight = el.scrollHeight + 'px';
-                        btn.textContent = 'Recolher';
-                    } else {
-                        const rowHeight = Math.max(...items.filter(it => it.offsetTop === firstTop).map(it => it.offsetHeight)) + 1;
-                        el.style.maxHeight = rowHeight + 'px';
-                        btn.textContent = 'Mostrar Tudo';
-                    }
-                });
-            });
-        }
-
-        // Alterna entre recolhido (só a primeira linha) e expandido (todos os anexos)
+        // Alterna entre recolhido (nenhum anexo visível) e expandido (todos os anexos)
         function toggleClienteAnexosExpand() {
             _clienteAnexosExpanded = !_clienteAnexosExpanded;
-            updateClienteAnexosCollapse();
+            const el = document.getElementById('cd-anexos-list');
+            const btn = document.getElementById('cd-anexos-toggle-btn');
+            if (!el || !btn) return;
+            if (_clienteAnexosExpanded) {
+                el.style.maxHeight = el.scrollHeight + 'px';
+                btn.textContent = 'Recolher';
+            } else {
+                el.style.maxHeight = '0px';
+                btn.textContent = 'Mostrar Tudo';
+            }
         }
 
         // Abre a imagem/PDF do anexo do cliente no visualizador já existente
@@ -11722,18 +12028,41 @@
         }
 
 
+        // Faz uma tentativa de fetch inicial com timeout. Retorna os dados em caso de sucesso
+        // ou lança um erro (incluindo AbortError em caso de timeout).
+        async function tentarFetchDB(timeoutMs) {
+            const data_fetch = { data: '', funcao: '' };
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+            let res;
+            try {
+                res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" }, signal: controller.signal }
+                );
+            } finally {
+                clearTimeout(timeoutId);
+            }
+
+            if (!res.ok) { throw new Error("Erro ao realizar fetch inicial") };
+            return await res.json();
+        }
+
         async function loadDB() {
             console.log("Realizando Fetch inicial...");
             try {
-                const data_fetch = { data: '', funcao: '' };
-
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch inicial") };
-
-                let json_data = await res.json();
+                // 1ª tentativa: timeout curto. Se o Apps Script estiver "dormindo" (cold start),
+                // essa 1ª chamada é justamente o que faz ele "acordar".
+                let json_data;
+                try {
+                    json_data = await tentarFetchDB(12000);
+                } catch (err1) {
+                    const motivo = err1.name === 'AbortError' ? 'timeout' : err1.message;
+                    console.warn(`1ª tentativa de fetch falhou (${motivo}), tentando novamente com mais tempo...`);
+                    showLoading(['Conexão lenta…', 'Tentando de novo…']);
+                    // 2ª tentativa: timeout mais longo, já que o script provavelmente já "acordou" na 1ª chamada
+                    json_data = await tentarFetchDB(25000);
+                }
 
                 if (json_data) {
                     DB = json_data;
@@ -11746,14 +12075,26 @@
                 console.log("Fetch inicial - Sucesso");
             }
             catch (err) {
-                console.error(err);
+                if (err.name === 'AbortError') {
+                    console.error('Fetch inicial demorou demais e foi cancelado (timeout) mesmo após nova tentativa');
+                } else {
+                    console.error(err);
+                }
                 console.log("Fetch inicial - Erro");
                 console.log("Usando DB local");
 
                 DB = pegarJsonDoLocalStorage("DB_Local");
 
-                showNotif('Erro ao sincronizar', 'err');
+                showNotif(err.name === 'AbortError' ? 'Conexão lenta — dados salvos' : 'Erro ao sincronizar', 'err');
             }
+
+            // Garante que sempre sobra uma estrutura válida, mesmo sem backup local
+            // (ex: primeiro uso do app, sem internet e sem dados salvos ainda)
+            if (!DB || typeof DB !== 'object') {
+                DB = { loans: [], clients: [] };
+            }
+            if (!Array.isArray(DB.loans)) DB.loans = [];
+            if (!Array.isArray(DB.clients)) DB.clients = [];
         }
 
         // Funçção para salvar o DB no localstorage
@@ -11807,6 +12148,38 @@
             history.replaceState({ scr: 'dash' }, '', '');
             _navStack.push({ scr: 'dash' });
         }
+
+        // ===================================================================
+        // FEEDBACK TÁTIL VIA JS — cards de empréstimo/cliente, botão do
+        // WhatsApp e segmentos do donut. Usa delegação de evento (funciona
+        // pra elementos recriados dinamicamente via innerHTML) e reage no
+        // pointerdown/pointerup pra ser instantâneo, mesmo dentro de listas
+        // com rolagem (onde o :active do navegador costuma falhar).
+        // ===================================================================
+        (function setupPressFeedback() {
+            const PRESS_SELECTOR = '.lc, .lcm, .cc, #ed-whatsapp-btn, #ed-sit-box, .ds-item, .donut-seg';
+            let pressedEl = null;
+
+            function addPress(e) {
+                const el = e.target.closest(PRESS_SELECTOR);
+                if (!el) return;
+                pressedEl = el;
+                el.classList.add('press-fx');
+            }
+
+            function removePress() {
+                if (pressedEl) {
+                    pressedEl.classList.remove('press-fx');
+                    pressedEl = null;
+                }
+            }
+
+            document.addEventListener('pointerdown', addPress, { passive: true });
+            document.addEventListener('pointerup', removePress, { passive: true });
+            document.addEventListener('pointercancel', removePress, { passive: true });
+            // Se o dedo sair arrastando (virou scroll), cancela o efeito
+            document.addEventListener('touchmove', removePress, { passive: true });
+        })();
 
         iniciar_site();
         setupKeyboardAutoClose();
