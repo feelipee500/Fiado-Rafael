@@ -2519,6 +2519,66 @@
             font-size: 14px;
         }
 
+        /* SELETOR DE INTERVALO DE MESES (rolagem horizontal) — usado no sheet de período */
+        .period-month-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px 2px 10px;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x proximity;
+        }
+
+        .period-month-chip {
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            min-width: 62px;
+            padding: 10px 8px;
+            border-radius: var(--rad12);
+            background: var(--bg2);
+            border: 1px solid var(--brd);
+            cursor: pointer;
+            transition: background .15s, border-color .15s;
+        }
+
+        .period-month-chip .pmc-month {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--txt0);
+        }
+
+        .period-month-chip .pmc-year {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--txt2);
+        }
+
+        /* Extremidade do intervalo (o mês exato tocado pra abrir/fechar o período) */
+        .period-month-chip.endpoint {
+            background: var(--acc);
+            border-color: var(--acc);
+        }
+
+        .period-month-chip.endpoint .pmc-month,
+        .period-month-chip.endpoint .pmc-year {
+            color: #000;
+        }
+
+        /* Meses "no meio" do intervalo selecionado */
+        .period-month-chip.in-range {
+            background: #00e8a222;
+            border-color: #00e8a255;
+        }
+
+        .period-month-chip.in-range .pmc-month {
+            color: var(--acc);
+        }
+
         /* SELECT STYLES */
         .fs option {
             background: var(--bg2);
@@ -3773,7 +3833,7 @@
                             <!-- Comparativo dos últimos meses -->
                             <div class="erd4-section erd4-section-first">
                                 <div class="erd4-section-head">
-                                    <div class="erd4-section-title" id="erd-bars-title">Comparativo dos Últimos Meses
+                                    <div class="erd4-section-title" id="erd-bars-title">Comparativo dos Meses
                                     </div>
                                     <div class="erd4-period-chip" id="emp-period-btn" onclick="openPeriodSheet()">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -4932,24 +4992,17 @@
                 <div class="tbar" id="period-preset-tabs">
                     <div class="tbtn" data-mode="last-month" onclick="selectPeriodPreset('last-month')">Mês Passado
                     </div>
-                    <div class="tbtn" data-mode="this-month" onclick="selectPeriodPreset('this-month')">Este Mês
+                    <div class="tbtn" data-mode="this-month" onclick="selectPeriodPreset('this-month')">Mês Atual
                     </div>
                     <div class="tbtn" data-mode="all" onclick="selectPeriodPreset('all')">Tudo</div>
                 </div>
-                <div class="sc-lbl mt16">Período personalizado</div>
-                <div class="fr">
-                    <div class="fg">
-                        <div class="fl">De</div>
-                        <input class="fi" id="period-start" type="date" onchange="att_periods('period-start')">
-                    </div>
-                    <div class="fg">
-                        <div class="fl">Até</div>
-                        <input class="fi" id="period-end" type="date" onchange="att_periods('period-end')">
-                    </div>
-                </div>
+                <div class="sc-lbl mt16">Selecionar período</div>
+                <div class="fs12 tc1 mb12">Toque em um mês pra começar e em outro pra fechar o intervalo — tudo
+                    entre eles é selecionado. Toque em um terceiro mês pra recomeçar.</div>
+                <div class="period-month-scroll" id="period-month-list"></div>
                 <div class="confirm-btns mt12">
                     <button class="cbtn-n" onclick="clearPeriodFilter()">Limpar filtro</button>
-                    <button class="cbtn-y" onclick="applyCustomPeriod()">Aplicar</button>
+                    <button class="cbtn-y" onclick="applyMonthsPeriod()">Aplicar</button>
                 </div>
             </div>
         </div>
@@ -5692,7 +5745,13 @@
 
         // ==================== FILTRO DE PERÍODO ====================
         // mode: 'all' | 'month' | 'custom'
-        let _periodFilter = { mode: 'all', year: null, month: null, start: null, end: null };
+        let _periodFilter = { mode: 'all', months: [] };
+        // Os até 2 meses "tocados" pra abrir/fechar o intervalo (não é a lista final —
+        // a lista final, com todos os meses entre eles, fica em _periodMonthsBuffer)
+        let _periodRangeAnchors = [];
+        // Seleção em andamento dentro do sheet, antes de clicar em "Aplicar" —
+        // sempre um intervalo contínuo (calculado a partir de _periodRangeAnchors)
+        let _periodMonthsBuffer = [];
 
         const MESES_PT = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
         const MESES_PT_ABREV = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -5716,32 +5775,54 @@
             return { start, end };
         }
 
+        // Varre todos os empréstimos (emissão e pagamentos) e monta a lista de meses
+        // que realmente têm algum dado, mais recentes primeiro — é essa lista que
+        // aparece pro usuário escolher no sheet de período.
+        function getMonthsWithData() {
+            const map = new Map();
+            (DB.loans || []).forEach(loan => {
+                if (loan.emissao) {
+                    const d = new Date(loan.emissao);
+                    const key = d.getFullYear() + '-' + d.getMonth();
+                    if (!map.has(key)) map.set(key, { year: d.getFullYear(), month: d.getMonth() });
+                }
+                (loan.pagamentos || []).forEach(p => {
+                    if (!p || !p.data) return;
+                    const d = new Date(p.data);
+                    const key = d.getFullYear() + '-' + d.getMonth();
+                    if (!map.has(key)) map.set(key, { year: d.getFullYear(), month: d.getMonth() });
+                });
+            });
+            return Array.from(map.values()).sort((a, b) => (b.year - a.year) || (b.month - a.month));
+        }
+
         function loanInPeriod(loan) {
-            if (_periodFilter.mode === 'all') return true;
-            if (_periodFilter.start == null || _periodFilter.end == null) return true;
+            if (_periodFilter.mode === 'all' || !_periodFilter.months.length) return true;
             const calc = getLoanCalc(loan);
             const dataLimit = calc.isPago ? calc.pago : TODAY;
 
-            return (loan.emissao >= _periodFilter.start && loan.emissao <= _periodFilter.end) || (dataLimit >= _periodFilter.start && dataLimit <= _periodFilter.end);
+            return _periodFilter.months.some(m => {
+                const r = monthRange(m.year, m.month);
+                return (loan.emissao >= r.start && loan.emissao <= r.end) || (dataLimit >= r.start && dataLimit <= r.end);
+            });
         }
 
         function periodLabelText() {
-            if (_periodFilter.mode === 'all') return 'Todo o período';
-            if (_periodFilter.mode === 'custom') {
-                return `${fmtDate(_periodFilter.start)} – ${fmtDate(_periodFilter.end)}`;
-            }
-            if (_periodFilter.mode === 'month') {
+            if (_periodFilter.mode === 'all' || !_periodFilter.months.length) return 'Todo o período';
+
+            if (_periodFilter.months.length === 1) {
                 const t0 = todayYM();
-                if (_periodFilter.year === t0.year && _periodFilter.month === t0.month) return 'Este Mês';
                 const p = addMonths(t0.year, t0.month, -1);
-                if (_periodFilter.year === p.year && _periodFilter.month === p.month) return 'Mês Passado';
-                return `${MESES_PT[_periodFilter.month]} ${_periodFilter.year}`;
+                const m = _periodFilter.months[0];
+                if (m.year === t0.year && m.month === t0.month) return 'Mês Atual';
+                if (m.year === p.year && m.month === p.month) return 'Mês Passado';
+                return `${MESES_PT[m.month]} ${m.year}`;
             }
-            return 'Período';
+
+            return `${_periodFilter.months.length} meses selecionados`;
         }
 
         function updatePeriodUI() {
-            const active = _periodFilter.mode === 'all';
             const label = periodLabelText();
 
             const empLbl = document.getElementById('emp-period-label');
@@ -5757,45 +5838,97 @@
                 const bm = t.dataset.mode;
                 let isActive = false;
                 if (bm === 'all') isActive = _periodFilter.mode === 'all';
-                else if (bm === 'this-month') isActive = _periodFilter.mode === 'month' && _periodFilter.year === t0.year && _periodFilter.month === t0.month;
-                else if (bm === 'last-month') isActive = _periodFilter.mode === 'month' && _periodFilter.year === lastM.year && _periodFilter.month === lastM.month;
+                else if (bm === 'this-month') isActive = _periodFilter.months.length === 1 && _periodFilter.months[0].year === t0.year && _periodFilter.months[0].month === t0.month;
+                else if (bm === 'last-month') isActive = _periodFilter.months.length === 1 && _periodFilter.months[0].year === lastM.year && _periodFilter.months[0].month === lastM.month;
                 t.classList.toggle('act', isActive);
             });
 
-            const startInput = document.getElementById('period-start');
-            const endInput = document.getElementById('period-end');
+            renderPeriodMonthList();
+        }
 
-            startInput.value = dateStr(TODAY);
-            startInput.max = dateStr(TODAY);
-            endInput.value = dateStr(TODAY);
-            endInput.max = dateStr(TODAY);
+        // Desenha os chips de mês em rolagem horizontal, destacando as extremidades
+        // do intervalo tocado e os meses "no meio" que fazem parte da seleção
+        function renderPeriodMonthList() {
+            const el = document.getElementById('period-month-list');
+            if (!el) return;
 
-            if (_periodFilter.mode === 'custom') {
-                if (startInput) startInput.value = dateStr(_periodFilter.start);
-                if (endInput) endInput.value = dateStr(_periodFilter.end);
+            const months = getMonthsWithData();
+            if (!months.length) {
+                el.innerHTML = '<div class="empty"><p>Nenhum mês com dados ainda</p></div>';
+                return;
             }
+
+            // A lista de meses com dados vem do mais recente pro mais antigo; pra rolagem
+            // horizontal de um período no tempo, faz mais sentido do mais antigo pro mais recente
+            const monthsAsc = [...months].reverse();
+
+            el.innerHTML = monthsAsc.map(m => {
+                const isEndpoint = _periodRangeAnchors.some(a => a.year === m.year && a.month === m.month);
+                const isInRange = !isEndpoint && _periodMonthsBuffer.some(b => b.year === m.year && b.month === m.month);
+                const cls = isEndpoint ? 'endpoint' : (isInRange ? 'in-range' : '');
+                return `
+                    <div class="period-month-chip ${cls}" onclick="toggleMonthBuffer(${m.year}, ${m.month})">
+                        <div class="pmc-month">${MESES_PT_ABREV[m.month]}</div>
+                        <div class="pmc-year">${m.year}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Calcula todos os meses entre as duas extremidades tocadas (inclusive),
+        // preenchendo o intervalo contínuo mesmo que existam meses sem dados no meio
+        function computeRangeMonths(anchors) {
+            if (!anchors.length) return [];
+            if (anchors.length === 1) return [{ ...anchors[0] }];
+
+            const sorted = [...anchors].sort((a, b) => (a.year - b.year) || (a.month - b.month));
+            const from = sorted[0], to = sorted[sorted.length - 1];
+
+            const result = [];
+            let cur = { year: from.year, month: from.month };
+            let guard = 0;
+            while ((cur.year < to.year || (cur.year === to.year && cur.month <= to.month)) && guard < 600) {
+                result.push({ ...cur });
+                cur = addMonths(cur.year, cur.month, 1);
+                guard++;
+            }
+            return result;
+        }
+
+        // Toca num mês pra abrir ou fechar o intervalo. Regras:
+        // - nenhum tocado ainda -> vira o início do intervalo
+        // - já tem 1 tocado -> esse novo vira o fim, e tudo entre eles é selecionado
+        // - tocar de novo no único mês selecionado -> desmarca tudo
+        // - já tem um intervalo fechado (2 pontas) -> recomeça a seleção nesse novo mês
+        function toggleMonthBuffer(year, month) {
+            const clicked = { year, month };
+            const isSameAsOnlyAnchor = _periodRangeAnchors.length === 1
+                && _periodRangeAnchors[0].year === year && _periodRangeAnchors[0].month === month;
+
+            if (isSameAsOnlyAnchor) {
+                _periodRangeAnchors = [];
+            } else if (_periodRangeAnchors.length >= 2) {
+                _periodRangeAnchors = [clicked];
+            } else {
+                _periodRangeAnchors.push(clicked);
+            }
+
+            _periodMonthsBuffer = computeRangeMonths(_periodRangeAnchors);
+            renderPeriodMonthList();
         }
 
         function openPeriodSheet() {
+            // Reinicia a seleção em andamento a partir do filtro atualmente aplicado
+            if (_periodFilter.months.length <= 1) {
+                _periodRangeAnchors = _periodFilter.months.map(m => ({ ...m }));
+            } else {
+                const first = _periodFilter.months[0];
+                const last = _periodFilter.months[_periodFilter.months.length - 1];
+                _periodRangeAnchors = [{ ...first }, { ...last }];
+            }
+            _periodMonthsBuffer = computeRangeMonths(_periodRangeAnchors);
             updatePeriodUI();
             openSheet('period-sheet');
-        }
-
-        function att_periods(el) {
-            const startInput = document.getElementById('period-start');
-            const endInput = document.getElementById('period-end');
-            const data_start = startInput.value;
-            const data_end = endInput.value;
-            const data_start_time = parseDate(data_start);
-            const data_end_time = parseDate(data_end);
-
-            if (el = 'period-start') {
-                endInput.value = data_end_time < data_start_time ? dateStr(data_start_time) : endInput.value;
-                endInput.min = dateStr(data_start_time);
-            } else if (el = 'period-end') {
-                startInput.value = data_start_time > data_end_time ? dateStr(data_end_time) : startInput.value;
-                startInput.max = dateStr(data_end_time);
-            }
         }
 
         function applyPeriodFilter() {
@@ -5807,19 +5940,17 @@
 
         function selectPeriodPreset(mode) {
             if (mode === 'all') {
-                _periodFilter = { mode: 'all', year: null, month: null, start: null, end: null };
+                _periodFilter = { mode: 'all', months: [] };
             } else if (mode === 'this-month') {
                 const t0 = todayYM();
-                const r = monthRange(t0.year, t0.month);
-                _periodFilter = { mode: 'month', year: t0.year, month: t0.month, start: r.start, end: r.end };
+                _periodFilter = { mode: 'months', months: [{ year: t0.year, month: t0.month }] };
             } else if (mode === 'last-month') {
                 const t0 = todayYM();
                 const p = addMonths(t0.year, t0.month, -1);
-                const r = monthRange(p.year, p.month);
-                _periodFilter = { mode: 'month', year: p.year, month: p.month, start: r.start, end: r.end };
+                _periodFilter = { mode: 'months', months: [{ year: p.year, month: p.month }] };
             }
-            document.getElementById('period-start').value = '';
-            document.getElementById('period-end').value = '';
+            _periodRangeAnchors = _periodFilter.months.map(m => ({ ...m }));
+            _periodMonthsBuffer = _periodFilter.months.map(m => ({ ...m }));
             applyPeriodFilter();
             closeSheet(document.getElementById('period-sheet'));
         }
@@ -5827,36 +5958,34 @@
         // Seleciona um mês específico (usado ao clicar em uma coluna do gráfico comparativo)
         function selectChartMonth(year, month) {
             if (year != 3000 && month != 12) {
-                const r = monthRange(year, month);
-                _periodFilter = { mode: 'month', year, month, start: r.start, end: r.end };
+                _periodFilter = { mode: 'months', months: [{ year, month }] };
+                _periodRangeAnchors = _periodFilter.months.map(m => ({ ...m }));
+                _periodMonthsBuffer = _periodFilter.months.map(m => ({ ...m }));
                 applyPeriodFilter();
             } else {
-                _periodFilter = { mode: 'all', year: null, month: null, start: null, end: null };
+                _periodFilter = { mode: 'all', months: [] };
+                _periodRangeAnchors = [];
+                _periodMonthsBuffer = [];
                 applyPeriodFilter();
             }
 
         }
 
-        function applyCustomPeriod() {
-            const startVal = document.getElementById('period-start').value;
-            const endVal = document.getElementById('period-end').value;
-            if (!startVal || !endVal) {
-                showToast('Selecione as duas datas do período', 'err');
+        // Confirma a seleção de meses feita no sheet (um ou vários) e aplica o filtro
+        function applyMonthsPeriod() {
+            if (!_periodMonthsBuffer.length) {
+                showToast('Selecione ao menos um mês', 'err');
                 return;
             }
-            let start = parseDate(startVal);
-            let end = parseDate(endVal);
-            end = new Date(end).setHours(23, 59, 59, 999);
-            if (start > end) { const tmp = start; start = end; end = tmp; }
-            _periodFilter = { mode: 'custom', year: null, month: null, start, end };
+            _periodFilter = { mode: 'months', months: _periodMonthsBuffer.map(m => ({ ...m })) };
             applyPeriodFilter();
             closeSheet(document.getElementById('period-sheet'));
         }
 
         function clearPeriodFilter() {
-            _periodFilter = { mode: 'all', year: null, month: null, start: null, end: null };
-            document.getElementById('period-start').value = '';
-            document.getElementById('period-end').value = '';
+            _periodFilter = { mode: 'all', months: [] };
+            _periodRangeAnchors = [];
+            _periodMonthsBuffer = [];
             applyPeriodFilter();
             closeSheet(document.getElementById('period-sheet'));
         }
@@ -6238,7 +6367,7 @@
                 !(_currentScreen == 'emp-detalhe' && scr == 'cliente-detalhe') &&
                 !(_currentScreen == 'emp-detalhe' && scr == 'emprestimos') &&
                 !(_currentScreen == 'emprestimos' && scr == 'emp-detalhe')) {
-                _periodFilter = { mode: 'all', year: null, month: null, start: null, end: null };
+                _periodFilter = { mode: 'all', months: [] };
             }
             _prevScreen = _currentScreen;
             _currentScreen = scr;
@@ -6794,8 +6923,8 @@
         // Constrói o mini gráfico comparativo de 3 meses (Emprestado/Recebido/Lucro) para o bloco de resultado
         function buildMonthChart(loansBase) {
             const t0 = todayYM();
-            const ref = _periodFilter.mode === 'month'
-                ? { year: _periodFilter.year, month: _periodFilter.month }
+            const ref = (_periodFilter.mode === 'months' && _periodFilter.months.length === 1)
+                ? { year: _periodFilter.months[0].year, month: _periodFilter.months[0].month }
                 : t0;
 
             const isRefCurrent = (ref.year === t0.year && ref.month === t0.month);
@@ -6924,26 +7053,26 @@
 
 
             const t0 = todayYM();
-            const ref = _periodFilter.mode === 'month' ? { year: _periodFilter.year, month: _periodFilter.month } : t0;
 
-            let months;
-
-            if (_periodFilter.mode == 'all') {
-                months = { year: 3000, month: 12 };
-            } else {
-                months = ref;
-            }
+            // Verifica se um timestamp cai em algum dos meses selecionados (ou sempre
+            // verdadeiro quando o filtro é "Todo o período")
+            const inSelectedPeriod = (timestamp) => {
+                if (_periodFilter.mode === 'all' || !_periodFilter.months.length) return true;
+                return _periodFilter.months.some(m => {
+                    const r = monthRange(m.year, m.month);
+                    return timestamp >= r.start && timestamp <= r.end;
+                });
+            };
 
             // Calcula os indicadores de cada mês:
-            // Emprestado e A Receber -> empréstimos EMITIDOS naquele mês
-            // Recebido -> pagamentos EFETUADOS naquele mês (independente do mês de emissão do empréstimo)
+            // Emprestado e A Receber -> empréstimos EMITIDOS naquele(s) mês(es)
+            // Recebido -> pagamentos EFETUADOS naquele(s) mês(es) (independente do mês de emissão do empréstimo)
             // Lucro Real -> Recebido - Emprestado
 
-            const r = monthRange(months.year, months.month);
             loansBase.forEach(l => {
                 loan_valid = sortedLoansValido.find(p => p.id === l.id);
 
-                if ((l.emissao >= r.start && l.emissao <= r.end) || (months.year == 3000 && months.month == 12)) {
+                if (inSelectedPeriod(l.emissao)) {
                     const c = getLoanCalc(l);
                     loanCount_x++;
                     emprestado += l.valor;
@@ -6976,7 +7105,7 @@
                     loan_valid.entrada = 0;
                 }
                 (l.pagamentos || []).forEach(p => {
-                    if ((p.data >= r.start && p.data <= r.end) || (months.year == 3000 && months.month == 12)) {
+                    if (inSelectedPeriod(p.data)) {
                         pagCount++;
                         recebido += p.valor;
 
@@ -7029,30 +7158,19 @@
             lucroRealEl.classList.remove('c-g', 'c-w');
             lucroRealEl.classList.add(lucroReal >= 0 ? 'c-g' : 'c-w');
 
-            // Emprestado x Recebido x Lucro: comparativo de 3 meses, ou só o período (se personalizado)
+            // Emprestado x Recebido x Lucro: comparativo de 3 meses, ou totais do período (se vários meses selecionados)
             const barsTitleEl = document.getElementById('erd-bars-title');
             const barsEl = document.getElementById('erd-bars');
 
-            if (_periodFilter.mode === 'custom') {
-                barsTitleEl.textContent = 'Emprestado × Recebido × Lucro do Período';
-                const maxVal = Math.max(emprestado, recebido, lucroContratado, 1);
-                const barRow = (label, value, color) => {
-                    const pct = value > 0 ? Math.max(3, Math.round(value / maxVal * 100)) : 0;
-                    return `<div class="edb-row">
-                        <div class="edb-row-top">
-                            <span class="edb-row-lbl"><span class="edb-row-dot" style="background:${color}"></span>${label}</span>
-                            <span class="edb-row-val">${fmtMoney(value)}</span>
-                        </div>
-                        <div class="edb-bar-track"><div class="edb-bar-fill" style="width:${pct}%; background:${color}"></div></div>
-                    </div>`;
-                };
-                barsEl.innerHTML =
-                    barRow('Emprestado', emprestado, 'var(--acc2)') +
-                    barRow('Total a Receber', aReceber, 'var(--danger)') +
-                    barRow('Recebido', recebido, 'var(--acc)') +
-                    barRow('Lucro Previsto', lucroContratado, 'var(--acc3)');
+            if (_periodFilter.mode === 'months' && _periodFilter.months.length > 1) {
+                const first = _periodFilter.months[0];
+                const last = _periodFilter.months[_periodFilter.months.length - 1];
+                barsTitleEl.textContent = `${MESES_PT_ABREV[first.month]} ${first.year} até ${MESES_PT_ABREV[last.month]} ${last.year}`;
+                barsEl.innerHTML = '';
+                barsEl.style.display = 'none';
             } else {
-                barsTitleEl.textContent = 'Comparativo dos Últimos Meses';
+                barsTitleEl.textContent = 'Comparativo dos Meses';
+                barsEl.style.display = '';
                 barsEl.innerHTML = buildMonthChart(loansBase);
             }
 
@@ -12250,6 +12368,20 @@
         }
 
 
+        // VARIAVEIS GLOBAIS
+        // Meu Script
+        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
+
+        // Script do Rafael
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzkicXkp2YFZubl5MqRQCFUh7d42YVs8TZbshypuR3yU92owy2whRHZVLmVDsUmhNjT/exec";
+
+        // ===================================================================
+        // VALIDADOR DE ACESSO — gera (ou recupera) um identificador único e fixo
+        // pra este navegador/aparelho, salvo no localStorage. Esse ID é enviado
+        // em toda chamada ao Apps Script, que decide se autoriza ou não o acesso
+        // aos dados (a validação em si acontece no lado do script do Google).
+        // ===================================================================
+
         // Gera uma string aleatória com letras minúsculas, maiúsculas, números e
         // caracteres especiais — usada como identificador único do navegador
         function gerarHashAleatorio(tamanho = 20) {
@@ -12323,18 +12455,12 @@
         setupKeyboardAutoClose();
 
 
-        // Meu Script
-        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
-
-        // Script do Rafael
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzkicXkp2YFZubl5MqRQCFUh7d42YVs8TZbshypuR3yU92owy2whRHZVLmVDsUmhNjT/exec";
-
-
     </script> <!-- SIDE NOTIFICATION -->
     <div id="side-notif">
         <div class="sn-dot"></div>
         <div class="sn-msg"></div>
     </div>
+
 
 </body>
 
