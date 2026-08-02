@@ -52,6 +52,10 @@
             user-select: none;
             /* Remove o menu de "Copiar/Compartilhar" que aparece no toque longo em iOS/Android */
             -webkit-touch-callout: none;
+            /* Evita que o navegador cancele o clique quando o elemento muda de
+               tamanho (scale) durante o toque — comum em botões com animação
+               de "pressionado". Também remove o delay de 300ms pra registrar o toque. */
+            touch-action: manipulation;
         }
 
         /* Campos de texto continuam selecionáveis normalmente (digitar, colar, selecionar) */
@@ -192,6 +196,9 @@
             overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
+            /* Compensa a altura da navegação inferior, que agora é fixa (position: fixed)
+               e não ocupa mais espaço no fluxo normal do layout */
+            padding-bottom: 78px;
         }
 
         /* BOTTOM NAV */
@@ -201,6 +208,13 @@
             border-top: 1px solid var(--brd);
             padding: 6px 0 10px;
             flex-shrink: 0;
+            /* Fixo na parte de baixo da tela: não sai do lugar nem fica "rolável"
+               quando o teclado abre ou a tela é redimensionada. */
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 50;
         }
 
         .bni {
@@ -314,7 +328,7 @@
             min-height: 0;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 24px;
+            padding-bottom: 78px;
         }
 
         .ptitle {
@@ -3065,6 +3079,60 @@
             transition: opacity .35s ease;
         }
 
+        /* TELA DE ACESSO NÃO AUTORIZADO */
+        #unauthorized-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: var(--bg0);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 32px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity .25s ease;
+        }
+
+        #unauthorized-screen.us-visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .us-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #ff4d4d1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+        }
+
+        .us-icon svg {
+            width: 30px;
+            height: 30px;
+            stroke: var(--danger);
+        }
+
+        .us-title {
+            font-family: var(--font-d);
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--txt0);
+        }
+
+        .us-sub {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--txt1);
+            max-width: 280px;
+            line-height: 1.5;
+        }
+
         body.ls-lock {
             overflow: hidden !important;
             touch-action: none;
@@ -3451,51 +3519,31 @@
             transform: scale(.87);
         }
 
-        /* ===================================================================
-           FEEDBACK TÁTIL VIA JAVASCRIPT (mais confiável que :active puro)
-           Alguns elementos ficam dentro de listas com rolagem (cards de
-           empréstimo/cliente) ou são SVG/sem classe (donut, WhatsApp), onde o
-           :active do navegador é inconsistente no toque. A classe .press-fx é
-           adicionada/removida via JS (pointerdown/pointerup) pra garantir que
-           o retorno visual apareça sempre, imediatamente.
-           =================================================================== */
-        #ed-whatsapp-btn {
-            transition: transform .12s cubic-bezier(.4, 0, .2, 1), filter .12s ease;
-        }
-
-        #ed-whatsapp-btn.press-fx {
-            transform: scale(.92);
-            filter: brightness(.85);
-        }
-
+        /* Botão do WhatsApp e box "Valor a Pagar Hoje": não tinham classe própria,
+           então o efeito é aplicado direto pelo id */
+        #ed-whatsapp-btn,
         #ed-sit-box {
             transition: transform .12s cubic-bezier(.4, 0, .2, 1), filter .12s ease;
         }
 
-        #ed-sit-box.press-fx {
+        #ed-whatsapp-btn:active {
+            transform: scale(.92);
+            filter: brightness(.85);
+        }
+
+        #ed-sit-box:active {
             transform: scale(.96);
             filter: brightness(.9);
         }
 
-        .lc.press-fx,
-        .lcm.press-fx,
-        .cc.press-fx {
-            transform: scale(.97) !important;
-            filter: brightness(.96);
-        }
-
-        .ds-item.press-fx {
-            transform: scale(.94) !important;
-            filter: brightness(.93);
-        }
-
+        /* Segmentos do donut: SVG também responde a :active normalmente */
         #donut-svg .donut-seg {
             transition: opacity .15s ease, transform .12s ease;
             transform-box: fill-box;
             transform-origin: center;
         }
 
-        #donut-svg .donut-seg.press-fx {
+        #donut-svg .donut-seg:active {
             opacity: .5 !important;
             transform: scale(.95);
         }
@@ -4555,7 +4603,7 @@
                         <!-- Display do valor restante -->
                         <div id="ed-sit-box"
                             style="position:relative; display: flex; flex-direction: column; align-items: center; margin-top:5px"
-                            onclick="pagarTudo(); onPagValorChange()">
+                            onclick="pagarTudo()">
                             <div class="fs11 tc2" style="margin-bottom:2px; white-space: nowrap;" id="ed-valor-hoje-title">Valor a pagar hoje
                             </div>
                             <div style="font-size: 13px; font-weight: 1000; color: var(--acc3); white-space: nowrap;"
@@ -5533,6 +5581,20 @@
         <div class="ls-bar-wrap">
             <div class="ls-bar-fill"></div>
         </div>
+    </div>
+
+    <div id="unauthorized-screen">
+        <div class="us-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                <line x1="12" y1="15" x2="12" y2="17" />
+            </svg>
+        </div>
+        <div class="us-title">Acesso não autorizado</div>
+        <div class="us-sub">Este navegador não tem permissão para acessar os dados. Se você acredita que isso é um
+            erro, entre em contato com o responsável pelo sistema.</div>
     </div>
 
     <script>
@@ -9280,14 +9342,61 @@
             navTo('emp-detalhe');
         }
 
-        function pagarTudo() {
+        // Espera a rolagem suave de um elemento realmente terminar, em vez de usar um
+        // tempo fixo "chutado". Usa o evento nativo 'scrollend' quando o navegador suporta,
+        // e como reforço/alternativa verifica se a posição do scroll parou de mudar.
+        // Sempre tem um teto máximo de espera, por segurança.
+        function waitForScrollEnd(container, maxWaitMs = 1500) {
+            return new Promise(resolve => {
+                if (!container) { resolve(); return; }
+
+                let resolved = false;
+                let lastTop = container.scrollTop;
+                let stableTicks = 0;
+
+                function finish() {
+                    if (resolved) return;
+                    resolved = true;
+                    container.removeEventListener('scrollend', onScrollEnd);
+                    clearInterval(pollId);
+                    clearTimeout(maxTimer);
+                    resolve();
+                }
+
+                function onScrollEnd() { finish(); }
+                container.addEventListener('scrollend', onScrollEnd, { once: true });
+
+                // Fallback: navegadores sem suporte a 'scrollend' (ex: Safari mais antigo)
+                // — considera a rolagem finalizada quando a posição fica parada por ~120ms
+                const pollId = setInterval(() => {
+                    const top = container.scrollTop;
+                    if (Math.abs(top - lastTop) < 1) {
+                        stableTicks++;
+                        if (stableTicks >= 3) finish();
+                    } else {
+                        stableTicks = 0;
+                        lastTop = top;
+                    }
+                }, 40);
+
+                // Teto de segurança: nunca trava esperando pra sempre
+                const maxTimer = setTimeout(finish, maxWaitMs);
+            });
+        }
+
+        async function pagarTudo() {
             if (document.getElementById('ed-valor-hoje-ignorado').style.display == '' || !_saldoRestante) return;
+
+            const boxPag = document.getElementById('ed-pag-form-wrap');
+            const scrollContainer = document.getElementById('screens');
+            boxPag.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Só preenche o valor depois que a rolagem até o box de pagamento realmente terminou
+            await waitForScrollEnd(scrollContainer);
 
             const inputPag = document.getElementById('ed-pag-valor');
             inputPag.value = _saldoRestante;
-
-            const boxPag = document.getElementById('ed-pag-form-wrap');
-            boxPag.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            onPagValorChange();
             boxPag.focus({ preventScroll: true });
 
             showToast('Valor adicionado ao pagamento', 'ok');
@@ -9298,7 +9407,7 @@
         // comparando o TOTAL pago até hoje (independente da data dos pagamentos) com o valor
         // esperado acumulado até a parcela clicada. Se o total pago já cobre essa parcela,
         // nenhum valor é preenchido.
-        function selecionarParcelaTimeline(loanId, numero) {
+        async function selecionarParcelaTimeline(loanId, numero) {
             const loan = getLoan(loanId);
             if (!loan) return;
             const calc = getLoanCalc(loan);
@@ -9314,12 +9423,16 @@
 
             const valorFaltante = Math.round((esperadoAcumulado - calc.totalPago) * 100) / 100;
 
+            const boxPag = document.getElementById('ed-pag-form-wrap');
+            const scrollContainer = document.getElementById('screens');
+            boxPag.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Só preenche o valor depois que a rolagem até o box de pagamento realmente terminou
+            await waitForScrollEnd(scrollContainer);
+
             const inputPag = document.getElementById('ed-pag-valor');
             inputPag.value = valorFaltante;
             onPagValorChange();
-
-            const boxPag = document.getElementById('ed-pag-form-wrap');
-            boxPag.scrollIntoView({ behavior: 'smooth', block: 'start' });
             boxPag.focus({ preventScroll: true });
 
             showToast('Valor adicionado ao pagamento', 'ok');
@@ -12031,7 +12144,7 @@
         // Faz uma tentativa de fetch inicial com timeout. Retorna os dados em caso de sucesso
         // ou lança um erro (incluindo AbortError em caso de timeout).
         async function tentarFetchDB(timeoutMs) {
-            const data_fetch = { data: '', funcao: '' };
+            const data_fetch = { data: '', funcao: '', id_usuario: ID_USUARIO };
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -12064,6 +12177,20 @@
                     json_data = await tentarFetchDB(25000);
                 }
 
+                // O script do Google decide se este ID_USUARIO é autorizado. Quando não é,
+                // ele deve responder com { authorized: false } (sem os dados da planilha).
+                if (json_data && json_data.authorized === false) {
+                    USUARIO_NAO_AUTORIZADO = true;
+                    console.warn('Acesso não autorizado para este navegador (ID_USUARIO recusado pelo script)');
+
+                    // Remove qualquer backup local de dados que possa ter ficado salvo
+                    // de um acesso autorizado anterior (ex: ID revogado depois de já ter usado o app)
+                    localStorage.removeItem("DB_Local");
+                    DB = null;
+
+                    return;
+                }
+
                 if (json_data) {
                     DB = json_data;
                     console.log(DB);
@@ -12087,6 +12214,11 @@
 
                 showNotif(err.name === 'AbortError' ? 'Conexão lenta — dados salvos' : 'Erro ao sincronizar', 'err');
             }
+
+            // Se o acesso deste navegador não foi autorizado pelo script, não usa
+            // fallback nem estrutura vazia — a tela de "não autorizado" cuida de
+            // bloquear o app antes de qualquer renderização de dados.
+            if (USUARIO_NAO_AUTORIZADO) return;
 
             // Garante que sempre sobra uma estrutura válida, mesmo sem backup local
             // (ex: primeiro uso do app, sem internet e sem dados salvos ainda)
@@ -12118,12 +12250,35 @@
         }
 
 
-        // VARIAVEIS GLOBAIS
-        // Meu Script
-        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
+        // Gera uma string aleatória com letras minúsculas, maiúsculas, números e
+        // caracteres especiais — usada como identificador único do navegador
+        function gerarHashAleatorio(tamanho = 20) {
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*_-+=?';
+            let hash = '';
+            for (let i = 0; i < tamanho; i++) {
+                hash += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return hash;
+        }
 
-        // Script do Rafael
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzkicXkp2YFZubl5MqRQCFUh7d42YVs8TZbshypuR3yU92owy2whRHZVLmVDsUmhNjT/exec";
+        // Busca o ID_USUARIO já salvo no localStorage, ou cria um novo (só na
+        // primeiríssima vez que o site roda neste navegador) e salva pra sempre
+        function getOrCreateUserId() {
+            let id = localStorage.getItem('ID_USUARIO');
+            if (!id) {
+                id = gerarHashAleatorio(20);
+                localStorage.setItem('ID_USUARIO', id);
+                console.log('Novo ID_USUARIO gerado para este navegador');
+            }
+            return id;
+        }
+
+        const ID_USUARIO = getOrCreateUserId();
+
+        // Fica true se o Apps Script recusar o acesso deste ID_USUARIO.
+        // Quando true, o app não usa fallback local nem renderiza nenhum dado —
+        // só mostra a tela de "acesso não autorizado".
+        let USUARIO_NAO_AUTORIZADO = false;
 
         var DB = {};
 
@@ -12133,6 +12288,13 @@
             showLoading(['Iniciando…', 'Carregando dados…', 'Preparando o painel…', 'Calculando saldos…']);
             await loadDB();
             hideLoading();
+
+            // Acesso recusado pelo script: encerra o carregamento, mostra o aviso
+            // de bloqueio e não segue com nenhuma renderização de dados.
+            if (USUARIO_NAO_AUTORIZADO) {
+                showUnauthorizedScreen();
+                return;
+            }
 
             if (!DB) {
                 showToast("Erro ao iniciar", 'err');
@@ -12149,40 +12311,23 @@
             _navStack.push({ scr: 'dash' });
         }
 
-        // ===================================================================
-        // FEEDBACK TÁTIL VIA JS — cards de empréstimo/cliente, botão do
-        // WhatsApp e segmentos do donut. Usa delegação de evento (funciona
-        // pra elementos recriados dinamicamente via innerHTML) e reage no
-        // pointerdown/pointerup pra ser instantâneo, mesmo dentro de listas
-        // com rolagem (onde o :active do navegador costuma falhar).
-        // ===================================================================
-        (function setupPressFeedback() {
-            const PRESS_SELECTOR = '.lc, .lcm, .cc, #ed-whatsapp-btn, #ed-sit-box, .ds-item, .donut-seg';
-            let pressedEl = null;
-
-            function addPress(e) {
-                const el = e.target.closest(PRESS_SELECTOR);
-                if (!el) return;
-                pressedEl = el;
-                el.classList.add('press-fx');
-            }
-
-            function removePress() {
-                if (pressedEl) {
-                    pressedEl.classList.remove('press-fx');
-                    pressedEl = null;
-                }
-            }
-
-            document.addEventListener('pointerdown', addPress, { passive: true });
-            document.addEventListener('pointerup', removePress, { passive: true });
-            document.addEventListener('pointercancel', removePress, { passive: true });
-            // Se o dedo sair arrastando (virou scroll), cancela o efeito
-            document.addEventListener('touchmove', removePress, { passive: true });
-        })();
+        // Mostra a tela de bloqueio de acesso (navegador não autorizado) e garante
+        // que nada mais do app fica visível por trás dela
+        function showUnauthorizedScreen() {
+            document.body.classList.add('ls-lock');
+            const el = document.getElementById('unauthorized-screen');
+            if (el) el.classList.add('us-visible');
+        }
 
         iniciar_site();
         setupKeyboardAutoClose();
+
+
+        // Meu Script
+        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
+
+        // Script do Rafael
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzkicXkp2YFZubl5MqRQCFUh7d42YVs8TZbshypuR3yU92owy2whRHZVLmVDsUmhNjT/exec";
 
 
     </script> <!-- SIDE NOTIFICATION -->
@@ -12190,7 +12335,6 @@
         <div class="sn-dot"></div>
         <div class="sn-msg"></div>
     </div>
-
 
 </body>
 
