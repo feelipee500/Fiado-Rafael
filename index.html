@@ -347,6 +347,11 @@
             font-weight: 700;
         }
 
+        #dash-date {
+            color: var(--txt2);
+            font-weight: 600;
+        }
+
         /* CARDS */
         .card {
             background: var(--bg1);
@@ -810,13 +815,34 @@
             font-size: 14px;
             font-weight: 700;
             letter-spacing: -.2px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .sh-t::before {
+            content: '';
+            width: 3px;
+            height: 13px;
+            border-radius: 2px;
+            background: var(--acc);
+            flex-shrink: 0;
         }
 
         .sh-l {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--acc);
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: .2px;
             cursor: pointer;
+            padding: 5px 11px;
+            border-radius: 20px;
+            background: #00e8a212;
+            transition: background .15s;
+        }
+
+        .sh-l:active {
+            background: #00e8a224;
         }
 
         /* DIVIDER */
@@ -2785,13 +2811,14 @@
 
         /* ===== DASHBOARD VISUAL ===== */
         .dash-hero {
-            background: var(--bg1);
+            background: linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 100%);
             border: 1px solid var(--brd);
             border-radius: var(--rad20);
-            padding: 18px 16px 16px;
-            margin-bottom: 12px;
+            padding: 20px 18px 18px;
+            margin-bottom: 14px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, .22);
         }
 
         .dash-hero::before {
@@ -2802,17 +2829,29 @@
             width: 160px;
             height: 160px;
             border-radius: 50%;
-            background: radial-gradient(circle, #00e8a210 0%, transparent 70%);
+            background: radial-gradient(circle, #00e8a212 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .dash-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -55px;
+            left: -55px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #3d7fff0d 0%, transparent 70%);
             pointer-events: none;
         }
 
         .dash-hero-lbl {
-            font-size: 15px;
-            color: var(--txt1);
+            font-size: 12px;
+            color: var(--acc);
             text-transform: uppercase;
-            letter-spacing: .5px;
+            letter-spacing: 1px;
             font-weight: 800;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             white-space: nowrap;
         }
 
@@ -2826,9 +2865,9 @@
         }
 
         .dash-hero-sub {
-            font-size: 14px;
-            color: var(--txt1);
-            font-weight: 700;
+            font-size: 13px;
+            color: var(--txt2);
+            font-weight: 600;
         }
 
         /* ===== CALENDÁRIO DO PAINEL ===== */
@@ -2844,6 +2883,13 @@
             justify-content: space-between;
             cursor: pointer;
             user-select: none;
+            padding: 4px 2px;
+            border-radius: 10px;
+            transition: opacity .15s;
+        }
+
+        .dash-calendar-toggle:active {
+            opacity: .6;
         }
 
         .dash-calendar-toggle-label {
@@ -2926,6 +2972,7 @@
             border: 1px solid var(--brd);
             border-radius: 12px;
             cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .12);
         }
 
         .dash-proxevt-date {
@@ -2997,6 +3044,7 @@
             border-radius: 12px;
             border: 1px solid;
             cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .12);
         }
 
         .dash-proxcli-card.is-late {
@@ -3044,46 +3092,14 @@
             color: var(--warn);
         }
 
-        /* Lista de empréstimos dentro do popup de aviso do cliente */
-        .proxevt-loan-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            background: var(--bg1);
-            border: 1px solid var(--brd);
-            border-radius: 12px;
-            padding: 10px 12px;
-            margin-bottom: 8px;
-            cursor: pointer;
-        }
-
-        .proxevt-loan-id {
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .proxevt-loan-sub {
-            font-size: 10px;
-            color: var(--txt2);
-            font-weight: 600;
-            margin-top: 1px;
-        }
-
-        .proxevt-loan-val {
-            text-align: right;
-            flex-shrink: 0;
-        }
-
-        .proxevt-loan-val-num {
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        .proxevt-loan-val-lbl {
-            font-size: 9px;
-            color: var(--txt2);
-            font-weight: 600;
+        /* Cards mini dentro do popup de aviso do cliente — reduz do mesmo jeito que o
+           painel de notificações (#notif-body): encolhe visualmente com scale e
+           compensa a largura, em vez de reorganizar as colunas internas */
+        #proxevt-client-sheet-body {
+            transform: scale(.8);
+            transform-origin: top left;
+            width: 125%;
+            margin-bottom: 0px;
         }
 
         .cal-month {
@@ -3378,86 +3394,111 @@
             display: flex !important;
             flex-direction: column;
             align-items: stretch !important;
+            padding: 8px 10px !important;
         }
 
-        .cal-ev-top {
+        /* Título do evento: iniciais + nome do cliente na esquerda, título do evento
+           centralizado no meio, id do empréstimo na direita */
+        .cal-ev-title-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 6px;
+            padding-bottom: 6px;
+            margin-bottom: 6px;
+            border-bottom: 1px solid var(--brd);
+        }
+
+        .cal-ev-title-left {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .cal-ev-info {
-            flex: 1;
+            gap: 4px;
             min-width: 0;
+            justify-self: start;
         }
 
-        .cal-ev-name {
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .cal-ev-divida {
-            text-align: right;
+        .cal-ev-title-av {
+            width: 16px;
+            height: 16px;
+            font-size: 7px;
             flex-shrink: 0;
         }
 
-        .cal-ev-divida-val {
-            font-size: 12px;
-            font-weight: 800;
-            color: var(--txt0);
-            white-space: nowrap;
-        }
-
-        .cal-ev-divida-lbl {
+        .cal-ev-title-name {
             font-size: 9px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--txt2);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70px;
         }
 
-        .cal-ev-event {
+        .cal-ev-title-center {
             display: flex;
             align-items: center;
-            gap: 6px;
-            padding-top: 8px;
-            border-top: 1px solid var(--brd);
-            font-size: 11px;
+            justify-content: center;
+            gap: 5px;
+            font-size: 10px;
             font-weight: 800;
-            margin-bottom: 6px;
+            text-align: center;
+            white-space: nowrap;
+            justify-self: center;
         }
 
         .cal-ev-event-icon svg {
-            width: 11px;
-            height: 11px;
+            width: 10px;
+            height: 10px;
             display: block;
         }
 
-        .cal-ev-event-label {
-            flex: 1;
+        .cal-ev-title-right {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--txt2);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            justify-self: end;
+            max-width: 70px;
         }
 
-        .cal-ev-details {
+        /* Colunas compactas (estilo mini card) — valor em cima, rótulo pequeno embaixo,
+           lado a lado pra ocupar menos altura */
+        .cal-ev-cols {
+            display: flex;
+            flex-direction: row;
+            gap: 4px;
+        }
+
+        .cal-ev-col {
+            flex: 1;
+            min-width: 0;
             display: flex;
             flex-direction: column;
-            gap: 3px;
-        }
-
-        .cal-ev-detail-row {
-            display: flex;
             align-items: center;
-            justify-content: space-between;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--txt1);
+            text-align: center;
         }
 
-        .cal-ev-detail-row span:last-child {
+        .cal-ev-detail-val {
+            font-size: 11px;
             font-weight: 800;
             color: var(--txt0);
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .cal-ev-detail-lbl {
+            font-size: 8px;
+            font-weight: 600;
+            color: var(--txt2);
+            margin-top: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
 
         .dash-hero-row {
@@ -3506,7 +3547,8 @@
             border: 1px solid var(--brd);
             border-radius: var(--rad20);
             padding: 16px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .18);
         }
 
         .dash-donut-inner {
@@ -3567,7 +3609,7 @@
             border-radius: var(--rad16);
             padding: 14px;
             cursor: pointer;
-            transition: border-color .15s;
+            transition: border-color .15s, transform .12s ease;
             position: relative;
             overflow: hidden;
             line-height: 2;
@@ -3575,6 +3617,23 @@
 
         .ds-item:active {
             border-color: var(--brd3);
+            transform: scale(.97);
+        }
+
+        .ds-item.ds-late {
+            background: linear-gradient(165deg, #ff4d6d0f, var(--bg1) 55%);
+        }
+
+        .ds-item.ds-warn {
+            background: linear-gradient(165deg, #ffb5470f, var(--bg1) 55%);
+        }
+
+        .ds-item.ds-ok {
+            background: linear-gradient(165deg, #3d7fff0f, var(--bg1) 55%);
+        }
+
+        .ds-item.ds-done {
+            background: linear-gradient(165deg, #00e8a20f, var(--bg1) 55%);
         }
 
         .ds-item::after {
@@ -4154,7 +4213,9 @@
         .info-summary-row,
         .info-toggle-row,
         .info-toggle-btn,
-        .ds-item {
+        .ds-item,
+        .dash-proxevt-row,
+        .dash-proxcli-card {
             transition: transform .12s cubic-bezier(.4, 0, .2, 1), filter .12s ease, background .15s ease, border-color .15s ease, opacity .15s ease;
         }
 
@@ -4188,7 +4249,9 @@
         .info-summary-row:active,
         .info-toggle-row:active,
         .info-toggle-btn:active,
-        .ds-item:active {
+        .ds-item:active,
+        .dash-proxevt-row:active,
+        .dash-proxcli-card:active {
             transform: scale(.94);
             filter: brightness(.94);
         }
@@ -6820,14 +6883,17 @@
                 const numParcelas = calc.numParcelas;
                 const valorParcela = calc.valorBase / numParcelas;
 
-                checkpoints.forEach(ck => {
+                // Só o evento mais próximo desse empréstimo — os checkpoints já vêm em
+                // ordem cronológica, então o primeiro que ainda não venceu e não está
+                // pago é o próximo
+                for (const ck of checkpoints) {
                     const isFinal = ck.numero === numParcelas;
                     const dataCk = ck.data + (23 * 60 * 60 * 1000);
                     const vencido = dataCk < TODAY;
                     const esperadoAcumulado = valorParcela * ck.numero;
                     const falta = Math.max(0, esperadoAcumulado - calc.totalPago);
                     const paga = falta <= 0;
-                    if (paga || vencido) return; // só os que ainda não venceram
+                    if (paga || vencido) continue; // só os que ainda não venceram
 
                     const diasAte = diffDays(TODAY - (12 * 60 * 60 * 1000), ck.data);
                     const label = numParcelas > 1
@@ -6835,7 +6901,8 @@
                         : 'Vencimento';
 
                     eventos.push({ loan, data: ck.data, diasAte, falta, label });
-                });
+                    break;
+                }
             });
 
             eventos.sort((a, b) => a.data - b.data);
@@ -6953,34 +7020,11 @@
             document.getElementById('proxevt-client-sheet-title').textContent =
                 `${client.nome} — ${tipo === 'atraso' ? 'Empréstimos Atrasados' : 'Empréstimos em Alerta'}`;
 
-            const corVal = tipo === 'atraso' ? 'var(--danger)' : 'var(--warn)';
-
-            document.getElementById('proxevt-client-sheet-body').innerHTML = grupo.loans.map(loan => {
-                const c = getLoanCalc(loan);
-                let valorLinha, labelLinha;
-                if (tipo === 'atraso') {
-                    valorLinha = c.dividaTotal;
-                    labelLinha = 'Dívida Atual';
-                } else {
-                    const valorParcela = c.valorBase / c.numParcelas;
-                    const ultimoNum = c.parcelasAtrasadasNumeros[c.parcelasAtrasadasNumeros.length - 1];
-                    valorLinha = Math.max(0, (valorParcela * ultimoNum) - c.totalPago);
-                    labelLinha = 'Falta Pagar';
-                }
-
-                return `
-                    <div class="proxevt-loan-row" onclick="closeSheet(document.getElementById('proxevt-client-sheet')); openEmpDetalhe('${loan.id}')">
-                        <div>
-                            <div class="proxevt-loan-id">${loan.id}</div>
-                            <div class="proxevt-loan-sub">${fmtMoney(loan.valor)} emprestado</div>
-                        </div>
-                        <div class="proxevt-loan-val">
-                            <div class="proxevt-loan-val-num" style="color:${corVal}">${fmtMoney(valorLinha)}</div>
-                            <div class="proxevt-loan-val-lbl">${labelLinha}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            // Reaproveita o card mini usado no resto do site — só troca o sheet que o
+            // clique fecha (o padrão fecha o 'notif-sheet')
+            document.getElementById('proxevt-client-sheet-body').innerHTML = grupo.loans.map(loan =>
+                loanCardMiniHTML(loan, true, false).replace(/notif-sheet/g, 'proxevt-client-sheet')
+            ).join('');
 
             openSheet('proxevt-client-sheet');
         }
@@ -7038,10 +7082,20 @@
             const client = getClient(loan.clientId);
             if (!client) return '';
 
+            // Dívida total entra sempre primeiro, seguida dos detalhes específicos do
+            // evento — em colunas verticais (valor em cima, rótulo pequeno embaixo),
+            // igual ao card mini. Cliente e ID do empréstimo já ficam no título
+            const dividaColHTML = `
+                <div class="cal-ev-col">
+                    <div class="cal-ev-detail-val">${fmtMoney(c.dividaTotal)}</div>
+                    <div class="cal-ev-detail-lbl">Dívida Total</div>
+                </div>
+            `;
+
             const detailsHTML = (details || []).map(dt => `
-                <div class="cal-ev-detail-row">
-                    <span>${dt.label}</span>
-                    <span style="${dt.color ? `color:${dt.color}` : ''}">${dt.value}</span>
+                <div class="cal-ev-col">
+                    <div class="cal-ev-detail-val" style="${dt.color ? `color:${dt.color}` : ''}">${dt.value}</div>
+                    <div class="cal-ev-detail-lbl">${dt.label}</div>
                 </div>
             `).join('');
 
@@ -7051,22 +7105,18 @@
 
             return `
                 <div class="lcm lcm-${c.status} cal-ev-card" onclick="calOpenLoanFromDay('${loan.id}')">
-                    <div class="cal-ev-top">
-                        <div class="av ${client.color}">${client.initials}</div>
-                        <div class="cal-ev-info">
-                            <div class="cal-ev-name">${client.nome}</div>
-                            <div class="lc-id">${loan.id}</div>
+                    <div class="cal-ev-title-row">
+                        <div class="cal-ev-title-left">
+                            <div class="av cal-ev-title-av ${client.color}">${client.initials}</div>
+                            <span class="cal-ev-title-name">${client.nome}</span>
                         </div>
-                        <div class="cal-ev-divida">
-                            <div class="cal-ev-divida-val">${fmtMoney(c.dividaTotal)}</div>
-                            <div class="cal-ev-divida-lbl">Dívida Total</div>
+                        <div class="cal-ev-title-center" style="color:${eventColor}">
+                            <span class="cal-ev-event-icon">${eventIcon}</span>
+                            <span>${eventLabel}</span>
                         </div>
+                        <div class="cal-ev-title-right">${loan.id}</div>
                     </div>
-                    <div class="cal-ev-event" style="color:${eventColor}">
-                        <span class="cal-ev-event-icon">${eventIcon}</span>
-                        <span class="cal-ev-event-label">${eventLabel}</span>
-                    </div>
-                    <div class="cal-ev-details">${detailsHTML}</div>
+                    <div class="cal-ev-cols">${dividaColHTML}${detailsHTML}</div>
                     <div class="lc-bar" style="width: 100%; height: 3px; margin-top: 8px; opacity: 0.45;">
                         <div class="lc-fill done" style="width:${progressPct}%"></div>
                     </div>
@@ -8085,10 +8135,10 @@
             <div class="lcm lcm-${c.status}" style="display: flex; flex-direction: column;" onclick="closeSheet(document.getElementById('notif-sheet')); openEmpDetalhe('${loan.id}')">
                 ${valoresON || (c.status === 'warn' && c.parcelaAnteriorAtrasada) || Number(loan.not) === 0 ? `
                 <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0; gap: 30px; margin-bottom: -20px">
-                    ${loan.entrada > 0 ? `
+                    ${valoresON && loan.entrada > 0 ? `
                     <span style="white-space: nowrap; font-weight: 600; font-size: 10px; color: var(--acc)">+${fmtMoney(loan.entrada)}</span>
                     ` : ``}
-                    ${loan.saida > 0 ? `
+                    ${valoresON && loan.saida > 0 ? `
                     <span style="white-space: nowrap; font-weight: 600; font-size: 10px; color: var(--danger)">-${fmtMoney(loan.saida)}</span>
                     ` : ``}
                     ${c.status === 'warn' && c.parcelaAnteriorAtrasada ? `
@@ -13699,14 +13749,42 @@
             return !!json && typeof json === 'object' && Array.isArray(json.loans) && Array.isArray(json.clients);
         }
 
+        // Faz o fetch da planilha em segundo plano (sem travar a tela de loading) pra
+        // conferir se o DB_Local usado na abertura do site ainda está atualizado. Se o
+        // "time" bater, não faz nada (nem avisa o usuário); se for diferente, salva o
+        // DB_Local novo, avisa em notif e recarrega o site com os dados recebidos
+        async function sincronizarDBEmSegundoPlano(timeAtual) {
+            try {
+                const json_data = await tentarFetchDB(25000);
+
+                if (!json_data || json_data.authorized === false) return; // ignora silenciosamente
+
+                if (json_data.time === timeAtual) {
+                    console.log("DB_Local já está atualizado (sincronização em segundo plano)");
+                    return;
+                }
+
+                console.log("DB_Local estava desatualizado — salvando dados novos e recarregando");
+                DB = json_data;
+                backup_local();
+                showNotif('Novos dados encontrados — atualizando…', 'info');
+                setTimeout(() => location.reload(), 1200);
+            } catch (err) {
+                console.warn('Falha na sincronização em segundo plano (mantendo DB_Local):', err);
+            }
+        }
+
         async function loadDB() {
             // Se já existe um DB_Local salvo e ele é um JSON válido pra estrutura do site,
             // usa ele direto e nem faz o fetch inicial — só busca no servidor se não
-            // existir nada salvo ainda ou se o que estiver salvo estiver corrompido/inválido
+            // existir nada salvo ainda ou se o que estiver salvo estiver corrompido/inválido.
+            // Mesmo usando o DB_Local, dispara um fetch em segundo plano (sem aguardar)
+            // pra conferir se ele ainda está atualizado
             const dbLocalExistente = pegarJsonDoLocalStorage("DB_Local");
             if (isDBValido(dbLocalExistente)) {
                 console.log("DB_Local válido encontrado — pulando fetch inicial");
                 DB = dbLocalExistente;
+                sincronizarDBEmSegundoPlano(dbLocalExistente.time);
                 return true; // sinaliza que usou o DB_Local direto (sem fetch)
             }
 
@@ -13799,13 +13877,6 @@
         }
 
 
-        // VARIAVEIS GLOBAIS
-        // Meu Script
-        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
-
-        // Script do Rafael
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzkicXkp2YFZubl5MqRQCFUh7d42YVs8TZbshypuR3yU92owy2whRHZVLmVDsUmhNjT/exec";
-
         // ===================================================================
         // VALIDADOR DE ACESSO — gera (ou recupera) um identificador único e fixo
         // pra este navegador/aparelho, salvo no localStorage. Esse ID é enviado
@@ -13890,6 +13961,13 @@
         iniciar_site();
         setupKeyboardAutoClose();
 
+
+        // VARIAVEIS GLOBAIS
+        // Meu Script
+        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
+
+        // Script do Rafael
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzkicXkp2YFZubl5MqRQCFUh7d42YVs8TZbshypuR3yU92owy2whRHZVLmVDsUmhNjT/exec";
 
     </script> <!-- SIDE NOTIFICATION -->
     <div id="side-notif">
