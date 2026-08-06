@@ -8818,7 +8818,7 @@
 
             try {
                 console.log("Adicionando novo cliente na planilha...");
-                const data_fetch = { data: cliente, funcao: 'add_cliente' };
+                const data_fetch = { data: cliente, funcao: 'add_cliente', id_usuario: ID_USUARIO };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -8924,7 +8924,7 @@
 
             try {
                 console.log("Editando o cliente na planilha...");
-                const data_fetch = { data: cliente, funcao: 'add_cliente' };
+                const data_fetch = { data: cliente, funcao: 'add_cliente', id_usuario: ID_USUARIO };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -9010,7 +9010,7 @@
 
             try {
                 console.log("DELETANDO cliente da planilha...");
-                const data_fetch = { data: dados_apagar, funcao: 'del_cliente' };
+                const data_fetch = { data: dados_apagar, funcao: 'del_cliente', id_usuario: ID_USUARIO };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -9700,7 +9700,7 @@
 
             try {
                 console.log("Adicionando empréstimo na planilha...");
-                const data_fetch = { data: loan, funcao: 'add_emprestimo' };
+                const data_fetch = { data: loan, funcao: 'add_emprestimo', id_usuario: ID_USUARIO };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -10071,7 +10071,7 @@
             }
 
             try {
-                const data_fetch = { data: new_loan, funcao: 'add_emprestimo' };
+                const data_fetch = { data: new_loan, funcao: 'add_emprestimo', id_usuario: ID_USUARIO };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -10168,7 +10168,7 @@
 
             try {
                 console.log("ALTERANDO SE PAGO...");
-                const data_fetch = { data: novo_pago_x, funcao: 'edit_pago' };
+                const data_fetch = { data: novo_pago_x, funcao: 'edit_pago', id_usuario: ID_USUARIO };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -10255,7 +10255,7 @@
 
             try {
                 console.log("ALTERANDO NOTIFICAÇÕES...");
-                const data_fetch = { data: novo_not_x, funcao: 'edit_not' };
+                const data_fetch = { data: novo_not_x, funcao: 'edit_not', id_usuario: ID_USUARIO };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -10345,7 +10345,7 @@
 
             try {
                 console.log("DELETANDO emprestimo da planilha...");
-                const data_fetch = { data: dados_apagar, funcao: 'del_emprestimo' };
+                const data_fetch = { data: dados_apagar, funcao: 'del_emprestimo', id_usuario: ID_USUARIO };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -11575,7 +11575,7 @@
 
             try {
                 console.log("Apagando pagamento...");
-                const data_fetch = { data: dados_apagar, funcao: 'del_pagamento' };
+                const data_fetch = { data: dados_apagar, funcao: 'del_pagamento', id_usuario: ID_USUARIO };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -12064,7 +12064,7 @@
 
             try {
                 console.log("Adicionando pagamento na planilha...");
-                const data_fetch = { data: pagamento, funcao: 'add_pagamento' };
+                const data_fetch = { data: pagamento, funcao: 'add_pagamento', id_usuario: ID_USUARIO };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -12705,7 +12705,7 @@
 
             try {
                 console.log("Atualizando padrões...");
-                const data_fetch = { data: dados_att, funcao: 'att_padroes' };
+                const data_fetch = { data: dados_att, funcao: 'att_padroes', id_usuario: ID_USUARIO };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -13004,7 +13004,7 @@
 
                 try {
                     console.log("Enviando anexo para planilha...");
-                    const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexo' };
+                    const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexo', id_usuario: ID_USUARIO };
                     const res = await fetch(URL_SCRIPT,
                         { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                     );
@@ -13072,7 +13072,7 @@
 
             try {
                 console.log("Apagando anexo...");
-                const data_fetch = { data: dadosParaEnvio, funcao: 'del_anexo' };
+                const data_fetch = { data: dadosParaEnvio, funcao: 'del_anexo', id_usuario: ID_USUARIO };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -13370,7 +13370,7 @@
 
                 try {
                     console.log("Enviando anexo para planilha...");
-                    const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexo' };
+                    const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexo', id_usuario: ID_USUARIO };
                     const res = await fetch(URL_SCRIPT,
                         { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                     );
