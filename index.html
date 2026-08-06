@@ -13739,6 +13739,7 @@
             } finally {
                 clearTimeout(timeoutId);
             }
+            
 
             if (!res.ok) { throw new Error("Erro ao realizar fetch inicial") };
             return await res.json();
@@ -13916,6 +13917,13 @@
 
         var DB = {};
 
+        // VARIAVEIS GLOBAIS
+        // Meu Script
+        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
+
+        // Script do Rafael 
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzkicXkp2YFZubl5MqRQCFUh7d42YVs8TZbshypuR3yU92owy2whRHZVLmVDsUmhNjT/exec";
+
 
         // Função para iniciar o site
         async function iniciar_site() {
@@ -13960,14 +13968,6 @@
 
         iniciar_site();
         setupKeyboardAutoClose();
-
-
-        // VARIAVEIS GLOBAIS
-        // Meu Script
-        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
-
-        // Script do Rafael
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzkicXkp2YFZubl5MqRQCFUh7d42YVs8TZbshypuR3yU92owy2whRHZVLmVDsUmhNjT/exec";
 
     </script> <!-- SIDE NOTIFICATION -->
     <div id="side-notif">
