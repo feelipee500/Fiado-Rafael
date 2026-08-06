@@ -23,6 +23,7 @@
             --acc: #00e8a2;
             --acc2: #3d7fff;
             --acc3: #f5a623;
+            --acc4: #22c55e;
             --danger: #ff4d6d;
             --warn: #ffb547;
             --txt0: #eef0f8;
@@ -2830,6 +2831,635 @@
             font-weight: 700;
         }
 
+        /* ===== CALENDÁRIO DO PAINEL ===== */
+        .dash-calendar-wrap {
+            margin-top: 16px;
+            border-top: 1px solid var(--brd);
+            padding-top: 14px;
+        }
+
+        .dash-calendar-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .dash-calendar-toggle-label {
+            font-family: var(--font-d);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: -.2px;
+        }
+
+        .dash-calendar-toggle-icon {
+            display: flex;
+            align-items: center;
+            color: var(--txt2);
+            transition: transform .2s ease;
+        }
+
+        .dash-calendar-toggle-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .dash-calendar-toggle-icon.open {
+            transform: rotate(180deg);
+        }
+
+        /* Exibição única do mês corrente — sem scroll, navega com os botões */
+        .dash-calendar {
+            overflow: visible;
+            margin-top: 14px;
+        }
+
+        /* ===== PRÓXIMOS EVENTOS ===== */
+        .dash-proxevt-wrap {
+            margin-top: 16px;
+            border-top: 1px solid var(--brd);
+            padding-top: 14px;
+        }
+
+        .dash-proxevt-title {
+            font-family: var(--font-d);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: -.2px;
+            margin-bottom: 10px;
+            color: var(--txt1);
+        }
+
+        .dash-proxevt-subtitle {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            color: var(--txt2);
+            margin: 12px 0 6px;
+        }
+
+        #dash-proxevt-hoje-wrap .dash-proxevt-subtitle {
+            margin-top: 0;
+        }
+
+        .dash-proxevt-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .dash-proxevt-empty {
+            font-size: 12px;
+            color: var(--txt2);
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .dash-proxevt-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            background: var(--bg2);
+            border: 1px solid var(--brd);
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .dash-proxevt-date {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            flex-shrink: 0;
+            line-height: 1.15;
+        }
+
+        .dash-proxevt-day {
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .dash-proxevt-mon {
+            font-size: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            opacity: .7;
+        }
+
+        .dash-proxevt-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .dash-proxevt-name {
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dash-proxevt-label {
+            font-size: 10px;
+            color: var(--txt2);
+            font-weight: 600;
+            margin-top: 1px;
+        }
+
+        .dash-proxevt-right {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .dash-proxevt-val {
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .dash-proxevt-dias {
+            font-size: 9px;
+            font-weight: 700;
+            white-space: nowrap;
+            margin-top: 1px;
+        }
+
+        /* Cards de cliente agrupado — Atrasado (vermelho) / Em Alerta (amarelo) */
+        .dash-proxcli-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 12px;
+            border: 1px solid;
+            cursor: pointer;
+        }
+
+        .dash-proxcli-card.is-late {
+            background: #ff4d6d14;
+            border-color: #ff4d6d40;
+        }
+
+        .dash-proxcli-card.is-warn {
+            background: #ffb54714;
+            border-color: #ffb54740;
+        }
+
+        .dash-proxcli-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .dash-proxcli-name {
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dash-proxcli-count {
+            font-size: 10px;
+            color: var(--txt2);
+            font-weight: 600;
+            margin-top: 1px;
+        }
+
+        .dash-proxcli-val {
+            font-size: 13px;
+            font-weight: 800;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .dash-proxcli-card.is-late .dash-proxcli-val {
+            color: var(--danger);
+        }
+
+        .dash-proxcli-card.is-warn .dash-proxcli-val {
+            color: var(--warn);
+        }
+
+        /* Lista de empréstimos dentro do popup de aviso do cliente */
+        .proxevt-loan-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: var(--bg1);
+            border: 1px solid var(--brd);
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .proxevt-loan-id {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .proxevt-loan-sub {
+            font-size: 10px;
+            color: var(--txt2);
+            font-weight: 600;
+            margin-top: 1px;
+        }
+
+        .proxevt-loan-val {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .proxevt-loan-val-num {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .proxevt-loan-val-lbl {
+            font-size: 9px;
+            color: var(--txt2);
+            font-weight: 600;
+        }
+
+        .cal-month {
+            margin-bottom: 4px;
+        }
+
+        /* Cabeçalho de navegação: seta anterior / mês+ano / seta seguinte */
+        .cal-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .cal-nav-btn {
+            width: 28px;
+            height: 28px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg2);
+            border: 1px solid var(--brd2);
+            border-radius: var(--rad8);
+            color: var(--txt0);
+            cursor: pointer;
+        }
+
+        .cal-nav-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Botão "Hoje": volta o calendário direto pro mês atual */
+        .cal-nav-today {
+            width: auto;
+            gap: 4px;
+            padding: 0 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--acc2);
+        }
+
+        .cal-nav-today span {
+            font-size: 12px;
+            line-height: 1;
+        }
+
+        .cal-nav-pin {
+            display: inline-flex;
+            color: #fff;
+        }
+
+        .cal-nav-pin svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .cal-nav-btn.is-disabled {
+            opacity: .35;
+            pointer-events: none;
+        }
+
+        .cal-nav-arrows {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .cal-nav-btn:active {
+            background: var(--bg3);
+        }
+
+        .cal-month-title {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--txt0);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            text-align: center;
+        }
+
+        .cal-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            margin-bottom: 2px;
+        }
+
+        .cal-weekdays span {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--txt2);
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+        }
+
+        .cal-day {
+            position: relative;
+            height: 42px;
+            overflow: hidden;
+            cursor: pointer;
+            background: var(--bg2);
+            border: 1px solid var(--brd2);
+            border-radius: 8px;
+        }
+
+        .cal-day.cal-day-empty {
+            background: transparent;
+            border-color: transparent;
+            cursor: default;
+        }
+
+        /* Marcador de dia em atraso: faixa vermelha na diagonal do canto superior
+           direito, atrás dos ícones de parcela/vencimento quando houver */
+        .cal-day-late-flag {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 11px 11px 0;
+            border-color: transparent #ff4d6d transparent transparent;
+            opacity: .55;
+            z-index: 0;
+        }
+
+        /* Marcador de dia de quitação: faixa verde na diagonal do canto inferior
+           direito, atrás do ícone de quitação */
+        .cal-day-quit-flag {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 0 11px 11px;
+            border-color: transparent transparent #22c55e transparent;
+            opacity: .7;
+            z-index: 0;
+        }
+
+        /* Número do dia sempre na mesma posição (topo, centralizado), independente
+           de a célula ter ícones de evento ou não */
+        .cal-day-num {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--txt0);
+        }
+
+        .cal-day.is-today .cal-day-num {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 17px;
+            height: 17px;
+            top: 3px;
+            border-radius: 50%;
+            box-shadow: 0 0 0 1.5px var(--acc2);
+        }
+
+        /* Ícones de canto: emissão no superior esquerdo, parcela/vencimento no
+           superior direito (acima da faixa de atraso, quando houver) */
+        .cal-day-corner {
+            position: absolute;
+            top: 3px;
+            z-index: 1;
+        }
+
+        .cal-day-corner-tl {
+            left: 3px;
+        }
+
+        .cal-day-corner-tr {
+            right: 3px;
+        }
+
+        .cal-day-corner svg {
+            width: 8px;
+            height: 8px;
+        }
+
+        /* Ícones de pagamento / quitação — continuam na posição normal, embaixo */
+        .cal-day-icons {
+            position: absolute;
+            left: 2px;
+            right: 2px;
+            bottom: 4px;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+
+        .cal-day-icons svg {
+            width: 8px;
+            height: 8px;
+        }
+
+        .cal-ic-emissao {
+            color: var(--acc2);
+        }
+
+        .cal-ic-venc {
+            color: var(--warn);
+        }
+
+        .cal-ic-pag {
+            color: var(--acc);
+        }
+
+        .cal-ic-quit {
+            color: var(--acc4);
+        }
+
+        /* Legenda abaixo do calendário */
+        .cal-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--brd);
+        }
+
+        .cal-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--txt1);
+        }
+
+        .cal-legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .cal-legend-item svg {
+            width: 9px;
+            height: 9px;
+            flex-shrink: 0;
+        }
+
+        /* SHEET DE DETALHE DO DIA */
+        .cds-section {
+            margin-bottom: 16px;
+        }
+
+        .cds-section:last-child {
+            margin-bottom: 4px;
+        }
+
+        .cds-section-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--txt1);
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            margin-bottom: 8px;
+        }
+
+        .cds-section-title svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        /* Card de evento do calendário — versão simplificada dos cards de empréstimo,
+           só com o essencial: cliente, empréstimo, dívida total e o evento do dia */
+        .cal-ev-card {
+            display: flex !important;
+            flex-direction: column;
+            align-items: stretch !important;
+        }
+
+        .cal-ev-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .cal-ev-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .cal-ev-name {
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cal-ev-divida {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .cal-ev-divida-val {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--txt0);
+            white-space: nowrap;
+        }
+
+        .cal-ev-divida-lbl {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--txt2);
+        }
+
+        .cal-ev-event {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-top: 8px;
+            border-top: 1px solid var(--brd);
+            font-size: 11px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .cal-ev-event-icon svg {
+            width: 11px;
+            height: 11px;
+            display: block;
+        }
+
+        .cal-ev-event-label {
+            flex: 1;
+        }
+
+        .cal-ev-details {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .cal-ev-detail-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--txt1);
+        }
+
+        .cal-ev-detail-row span:last-child {
+            font-weight: 800;
+            color: var(--txt0);
+            white-space: nowrap;
+        }
+
         .dash-hero-row {
             display: flex;
             gap: 0;
@@ -3639,29 +4269,46 @@
                         <div class="dash-hero-lbl"> Pendente Em Aberto</div>
                         <div class="dash-hero-val" id="ds-total-recv">R$ 0</div>
                         <div class="dash-hero-sub" id="ds-hero-sub">—</div>
-                        <div class="dash-hero-row">
-                            <div class="dhr-item">
-                                <div class="dhr-val" id="dhr-emprest">R$ 0</div>
-                                <div class="dhr-lbl">Emprestado</div>
+
+                        <!-- Próximos Eventos: sempre visível, calculado no renderDash -->
+                        <div class="dash-proxevt-wrap">
+                            <div id="dash-proxevt-hoje-wrap" style="display:none;">
+                                <div class="dash-proxevt-subtitle">Hoje</div>
+                                <div class="dash-proxevt-list" id="dash-proxevt-hoje-list"></div>
                             </div>
-                            <div class="dhr-item">
-                                <div class="dhr-val" id="dhr-total-emp">0</div>
-                                <div class="dhr-lbl">Qtd</div>
+
+                            <div id="dash-proxevt-atraso-wrap" style="display:none;">
+                                <div class="dash-proxevt-subtitle">Atrasados</div>
+                                <div class="dash-proxevt-list" id="dash-proxevt-atraso-list"></div>
                             </div>
-                            <div class="dhr-item">
-                                <div class="dhr-val" id="dhr-emprest-total">R$ 0</div>
-                                <div class="dhr-lbl">Total a Receber</div>
+
+                            <div id="dash-proxevt-alerta-wrap" style="display:none;">
+                                <div class="dash-proxevt-subtitle">Em Alerta</div>
+                                <div class="dash-proxevt-list" id="dash-proxevt-alerta-list"></div>
                             </div>
+
+                            <div id="dash-proxevt-futuro-wrap" style="display:none;">
+                                <div class="dash-proxevt-subtitle">Próximos Vencimentos</div>
+                                <div class="dash-proxevt-list" id="dash-proxevt-futuro-list"></div>
+                            </div>
+
+                            <div class="dash-proxevt-empty" id="dash-proxevt-empty" style="display:none;">Nenhum evento pendente</div>
                         </div>
-                        <div class="dash-hero-row">
-                            <div class="dhr-item">
-                                <div class="dhr-val c-g" id="dhr-pagos-total">R$ 0</div>
-                                <div class="dhr-lbl">Total Recebido</div>
+
+                        <!-- Calendário: visualiza os períodos dos empréstimos ao longo dos dias.
+                             Começa sempre fechado — os dados só são calculados/renderizados
+                             quando o box é aberto -->
+                        <div class="dash-calendar-wrap">
+                            <div class="dash-calendar-toggle" onclick="toggleDashCalendarBox()">
+                                <span class="dash-calendar-toggle-label">Calendário</span>
+                                <span class="dash-calendar-toggle-icon" id="dash-calendar-toggle-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9" />
+                                    </svg>
+                                </span>
                             </div>
-                            <div class="dhr-item">
-                                <div class="dhr-val c-g" id="dhr-lucro-relat">R$ 0</div>
-                                <div class="dhr-lbl">Lucro Relativo</div>
-                            </div>
+                            <div class="dash-calendar" id="dash-calendar" style="display:none;"></div>
                         </div>
                     </div>
 
@@ -5008,6 +5655,38 @@
         </div>
     </div>
 
+    <!-- Detalhe do dia do calendário (painel) -->
+    <div class="overlay" id="cal-day-sheet" data-backdrop="cal-day-sheet">
+        <div class="sheet" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title" id="cal-day-sheet-title">Dia</div>
+                <div class="sh-close" onclick="closeSheet(document.getElementById('cal-day-sheet'))"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></div>
+            </div>
+            <div class="sh-body" id="cal-day-sheet-body"></div>
+        </div>
+    </div>
+
+    <!-- Próximos Eventos: detalhe dos empréstimos de um cliente num aviso (atraso/alerta) -->
+    <div class="overlay" id="proxevt-client-sheet" data-backdrop="proxevt-client-sheet">
+        <div class="sheet" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title" id="proxevt-client-sheet-title">Cliente</div>
+                <div class="sh-close" onclick="closeSheet(document.getElementById('proxevt-client-sheet'))"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></div>
+            </div>
+            <div class="sh-body" id="proxevt-client-sheet-body"></div>
+        </div>
+    </div>
+
     <!-- Ordenar Clientes -->
     <div class="overlay" id="cli-sort-sheet" data-backdrop="cli-sort-sheet">
         <div class="sheet" onclick="event.stopPropagation()">
@@ -5739,12 +6418,17 @@
         let _currentLoanId = null;
         let _currentScreen = 'dash';
         let _prevScreen = null;
+        // Guarda o dia do popup do calendário mais recentemente aberto, e se a tela
+        // de detalhe do empréstimo atual foi aberta a partir dele — usado pra voltar
+        // direto pro painel com o mesmo popup, em vez de ir pra tela de empréstimos
+        let _calDaySheetOrigin = null;
+        let _openedEmpFromCalDay = false;
         let _newLoanClientId = null;
         let _newLoanData = null;
         let _empFilter = 'all';
 
         // ==================== FILTRO DE PERÍODO ====================
-        // mode: 'all' | 'month' | 'custom'
+        // mode: 'all' | 'months'
         let _periodFilter = { mode: 'all', months: [] };
         // Os até 2 meses "tocados" pra abrir/fechar o intervalo (não é a lista final —
         // a lista final, com todos os meses entre eles, fica em _periodMonthsBuffer)
@@ -5794,6 +6478,758 @@
                 });
             });
             return Array.from(map.values()).sort((a, b) => (b.year - a.year) || (b.month - a.month));
+        }
+
+        // ==================== CALENDÁRIO DO PAINEL ====================
+        // Mostra ícones nos dias de emissão, vencimento/parcela, pagamento e quitação
+        // de cada empréstimo, com um fundo avermelhado discreto marcando os dias em
+        // atraso. Meses contínuos, sem buracos, do primeiro mês com conteúdo até o
+        // último mês com algum vencimento em aberto.
+        const DIAS_SEMANA_ABREV = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+
+        const CAL_ICON_EMISSAO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+        const CAL_ICON_VENC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 15.5"/></svg>';
+        const CAL_ICON_PAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+        const CAL_ICON_QUITACAO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4-3.9-3.8 5.4-.8z"/></svg>';
+        const CAL_ICON_ATRASO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+
+        // Calcula juros/dia (constante por empréstimo) — mesma fórmula usada no getLoanCalc
+        function getJurosDiaValor(loan, valorBase) {
+            return loan.juros_tipo === 'fixo' ? loan.juros_val : valorBase * loan.juros_val / 100;
+        }
+
+        // Anda dia a dia (mesma lógica do getLoanCalc) calculando o saldo antes/depois
+        // de CADA pagamento do empréstimo — usado nos cards de pagamento do popup
+        function getPaymentBalancesMap(loan, calc) {
+            const emissao = loan.emissao;
+            const vencimento = calc.vencimento;
+            const jdv = getJurosDiaValor(loan, calc.valorBase);
+            const sortedPags = [...(loan.pagamentos || [])].sort((a, b) => a.data - b.data);
+            const pagByDate = {};
+            sortedPags.forEach(p => {
+                const ds = dateStr(p.data);
+                if (!pagByDate[ds]) pagByDate[ds] = [];
+                pagByDate[ds].push(p);
+            });
+
+            let saldoCorrente = calc.valorBase;
+            const map = new Map();
+            const endDate = loan.pago ? loan.pago : TODAY;
+            const totalDays = diffDays(emissao, endDate);
+
+            for (let d = 0; d <= totalDays; d++) {
+                const dia = addDays(emissao, d);
+                const ds = dateStr(dia);
+                if (dia > vencimento && saldoCorrente > 0) saldoCorrente += jdv;
+                if (pagByDate[ds]) {
+                    for (const p of pagByDate[ds]) {
+                        const antes = saldoCorrente;
+                        saldoCorrente = Math.max(0, saldoCorrente - p.valor);
+                        map.set(p, { antes, depois: saldoCorrente });
+                    }
+                }
+            }
+            return map;
+        }
+
+        // Anda dia a dia até um dia específico (não necessariamente hoje) pra descobrir
+        // qual era o "número do dia de atraso" e a dívida atualizada naquele momento —
+        // usado no popup ao detalhar um dia de atraso específico
+        function computeAtrasoInfo(loan, calc, targetDay) {
+            const emissao = loan.emissao;
+            const vencimento = calc.vencimento;
+            const jdv = getJurosDiaValor(loan, calc.valorBase);
+            const sortedPags = [...(loan.pagamentos || [])].sort((a, b) => a.data - b.data);
+            const pagByDate = {};
+            sortedPags.forEach(p => {
+                const ds = dateStr(p.data);
+                if (!pagByDate[ds]) pagByDate[ds] = [];
+                pagByDate[ds].push(p);
+            });
+
+            let saldoCorrente = calc.valorBase;
+            let diasAtraso = 0;
+            const totalDays = diffDays(emissao, targetDay);
+
+            for (let d = 0; d <= totalDays; d++) {
+                const dia = addDays(emissao, d);
+                const ds = dateStr(dia);
+                if (dia > vencimento && saldoCorrente > 0) {
+                    diasAtraso++;
+                    saldoCorrente += jdv;
+                }
+                if (pagByDate[ds]) {
+                    for (const p of pagByDate[ds]) {
+                        if (saldoCorrente <= 0) break;
+                        saldoCorrente = Math.max(0, saldoCorrente - p.valor);
+                    }
+                }
+            }
+
+            return { diasAtraso, jurosDia: jdv, dividaAtualizada: Math.max(0, saldoCorrente), vencimento };
+        }
+
+        // Monta, uma única vez, os dados de calendário de cada empréstimo
+        function getCalendarLoanData() {
+            return (DB.loans || []).map(loan => {
+                const calc = getLoanCalc(loan);
+                const emissao = loan.emissao;
+
+                // Vencimento final + cada checkpoint de parcela (mantém o objeto completo,
+                // não só a data, pra poder identificar o número da parcela no popup).
+                // Se o empréstimo já foi quitado (manual ou por pagamento completo), o
+                // período dele no calendário termina na data da quitação — parcelas e
+                // vencimentos posteriores a essa data não fazem mais sentido e não aparecem.
+                const checkpoints = getParcelaDates(emissao, loan.prazo, calc.numParcelas)
+                    .filter(ck => !calc.isPago || ck.data <= calc.pago);
+                const paymentBalances = getPaymentBalancesMap(loan, calc);
+
+                return { loan, calc, emissao, checkpoints, paymentBalances };
+            });
+        }
+
+        // Determina o primeiro e o último mês que o calendário precisa cobrir, de forma
+        // contínua e sem buracos: do primeiro mês com conteúdo até o último mês que tem
+        // algum vencimento (empréstimos em aberto podem vencer no futuro). Empréstimos já
+        // quitados não estendem o intervalo além da data de quitação.
+        function getCalendarMonthRange(loanData) {
+            if (!loanData.length) return null;
+
+            let minTime = null, maxTime = null;
+            const consider = (t) => {
+                if (t == null) return;
+                if (minTime === null || t < minTime) minTime = t;
+                if (maxTime === null || t > maxTime) maxTime = t;
+            };
+
+            loanData.forEach(ld => {
+                consider(ld.emissao);
+                if (ld.calc.isPago) {
+                    consider(ld.calc.pago);
+                } else {
+                    consider(ld.calc.vencimento);
+                }
+                (ld.loan.pagamentos || []).forEach(p => consider(p.data));
+            });
+
+            if (minTime === null) return null;
+
+            // Garante que o mês atual sempre apareça, mesmo sem eventos futuros
+            if (maxTime === null || TODAY > maxTime) maxTime = TODAY;
+            if (minTime > TODAY) minTime = TODAY;
+
+            const start = new Date(minTime), end = new Date(maxTime);
+            return {
+                start: { year: start.getFullYear(), month: start.getMonth() },
+                end: { year: end.getFullYear(), month: end.getMonth() }
+            };
+        }
+
+        // Gera a lista de meses contínua (sem pular nenhum) entre início e fim, em ordem
+        // crescente (mais antigo primeiro)
+        function buildContinuousMonths(range) {
+            if (!range) return [];
+            const months = [];
+            let cur = { ...range.start };
+            let guard = 0;
+            while ((cur.year < range.end.year || (cur.year === range.end.year && cur.month <= range.end.month)) && guard < 600) {
+                months.push({ ...cur });
+                cur = addMonths(cur.year, cur.month, 1);
+                guard++;
+            }
+            return months;
+        }
+
+        // Verifica se um empréstimo em aberto está (ou esteve, antes de ser quitado)
+        // atrasado. Empréstimos já quitados não exibem mais dias de atraso no calendário —
+        // o período deles termina na data da quitação.
+        function getAtrasoRange(calc) {
+            if (calc.isPago) return null;
+            const wasLate = TODAY > calc.vencimento;
+            if (!wasLate) return null;
+            return { start: calc.vencimento, end: TODAY };
+        }
+
+        // Agrega os eventos de um dia específico (usado tanto pra desenhar as células
+        // quanto pro popup de detalhe ao tocar num dia)
+        function getDayInfo(dayStart, dayEnd, loanData) {
+            const info = { emissions: [], dues: [], payments: [], quitacoes: [], isLateDay: false };
+            loanData.forEach(ld => {
+                const calc = ld.calc;
+                if (ld.emissao >= dayStart && ld.emissao <= dayEnd) info.emissions.push(ld.loan);
+                ld.checkpoints.forEach(ck => { if (ck.data >= dayStart && ck.data <= dayEnd) info.dues.push(ld.loan); });
+
+                // Se esse é o dia da quitação automática (por pagamento completo, não
+                // manual), os pagamentos desse dia não aparecem como evento separado —
+                // eles ficam representados só pelo evento de quitação
+                const isAutoQuitDay = calc.isPago && calc.saldoRestante <= 0 && calc.pago >= dayStart && calc.pago <= dayEnd;
+                if (!isAutoQuitDay) {
+                    (ld.loan.pagamentos || []).forEach(p => {
+                        if (p.data >= dayStart && p.data <= dayEnd) info.payments.push({ loan: ld.loan, pagamento: p });
+                    });
+                }
+                if (calc.isPago && calc.pago >= dayStart && calc.pago <= dayEnd) info.quitacoes.push(ld.loan);
+
+                const atraso = getAtrasoRange(calc);
+                if (atraso && dayStart > atraso.start && dayStart <= atraso.end) info.isLateDay = true;
+            });
+            return info;
+        }
+
+        // Monta o HTML de um mês inteiro do calendário
+        function renderCalMonth(year, month, loanData) {
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const startWeekday = new Date(year, month, 1).getDay();
+            const t0 = todayYM();
+            const todayDate = new Date(TODAY).getDate();
+
+            const dayInfos = [];
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dayStart = new Date(year, month, d, 0, 0, 0, 0).getTime();
+                const dayEnd = new Date(year, month, d, 23, 59, 59, 999).getTime();
+                dayInfos[d] = getDayInfo(dayStart, dayEnd, loanData);
+            }
+
+            let cellsHTML = '';
+            for (let i = 0; i < startWeekday; i++) {
+                cellsHTML += '<div class="cal-day cal-day-empty"></div>';
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const info = dayInfos[d];
+                const isToday = (year === t0.year && month === t0.month && d === todayDate);
+
+                const emissaoIconHTML = info.emissions.length
+                    ? `<span class="cal-day-corner cal-day-corner-tl cal-ic-emissao">${CAL_ICON_EMISSAO}</span>` : '';
+                const vencIconHTML = info.dues.length
+                    ? `<span class="cal-day-corner cal-day-corner-tr cal-ic-venc">${CAL_ICON_VENC}</span>` : '';
+
+                let bottomIconsHTML = '';
+                if (info.payments.length) bottomIconsHTML += `<span class="cal-ic-pag">${CAL_ICON_PAG}</span>`;
+                if (info.quitacoes.length) bottomIconsHTML += `<span class="cal-ic-quit">${CAL_ICON_QUITACAO}</span>`;
+
+                const isQuitDay = info.quitacoes.length > 0;
+                const lateFlagHTML = info.isLateDay ? '<span class="cal-day-late-flag"></span>' : '';
+                const quitFlagHTML = isQuitDay ? '<span class="cal-day-quit-flag"></span>' : '';
+
+                cellsHTML += `<div class="cal-day ${isToday ? 'is-today' : ''}" onclick="openCalDaySheet(${year}, ${month}, ${d})">
+                    ${lateFlagHTML}
+                    ${quitFlagHTML}
+                    ${emissaoIconHTML}
+                    ${vencIconHTML}
+                    <span class="cal-day-num">${d}</span>
+                    <div class="cal-day-icons">${bottomIconsHTML}</div>
+                </div>`;
+            }
+
+            return `
+                <div class="cal-month">
+                    <div class="cal-weekdays">${DIAS_SEMANA_ABREV.map(w => `<span>${w}</span>`).join('')}</div>
+                    <div class="cal-grid">${cellsHTML}</div>
+                </div>
+            `;
+        }
+
+        // Mês atualmente exibido no calendário do painel (navegação mensal)
+        let calCurrentYM = null;
+
+        const CAL_NAV_ICON_PREV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+        const CAL_NAV_ICON_NEXT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+        const CAL_NAV_ICON_PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>';
+
+        // Compara dois pontos {year, month}: <0 se a é anterior a b, 0 se igual, >0 se posterior
+        function compareYM(a, b) {
+            if (a.year !== b.year) return a.year - b.year;
+            return a.month - b.month;
+        }
+
+        // Troca o mês exibido (offset: -1 mês anterior, +1 próximo mês) respeitando o
+        // intervalo de meses que o calendário cobre
+        function calChangeMonth(offset) {
+            if (!calCurrentYM) return;
+            const next = addMonths(calCurrentYM.year, calCurrentYM.month, offset);
+            calCurrentYM = next;
+            renderDashCalendar();
+        }
+
+        // Volta o calendário direto pro mês atual
+        function calGoToday() {
+            calCurrentYM = todayYM();
+            renderDashCalendar();
+        }
+
+        // Se o box do calendário do painel está aberto — começa sempre fechado, e os
+        // dados do calendário (getCalendarLoanData + grid do mês) só são calculados e
+        // renderizados quando ele é aberto, evitando esse custo em toda renderDash()
+        let _dashCalendarOpen = false;
+
+        function toggleDashCalendarBox() {
+            _dashCalendarOpen = !_dashCalendarOpen;
+            const box = document.getElementById('dash-calendar');
+            const icon = document.getElementById('dash-calendar-toggle-icon');
+            if (!box) return;
+            if (_dashCalendarOpen) {
+                box.style.display = '';
+                if (icon) icon.classList.add('open');
+                renderDashCalendar();
+            } else {
+                box.style.display = 'none';
+                if (icon) icon.classList.remove('open');
+            }
+        }
+
+        // Agrupa por cliente os empréstimos "atrasados" (status late — prazo final já
+        // vencido) e os "em alerta" (com alguma parcela vencida sem estar 100% paga, mas
+        // o empréstimo em si ainda não chegou no prazo final)
+        function getAvisosClientes(loanData) {
+            const atraso = new Map();  // clientId -> { loans: [], valor: 0 }
+            const alerta = new Map();
+
+            loanData.forEach(ld => {
+                const { loan, calc } = ld;
+                if (calc.isPago) return;
+
+                if (calc.status === 'late') {
+                    if (!atraso.has(loan.clientId)) atraso.set(loan.clientId, { loans: [], valor: 0 });
+                    const g = atraso.get(loan.clientId);
+                    g.loans.push(loan);
+                    g.valor += calc.dividaTotal;
+                } else if (calc.parcelaAnteriorAtrasada) {
+                    // A última parcela atrasada já acumula tudo que está em aberto até ali
+                    const valorParcela = calc.valorBase / calc.numParcelas;
+                    const ultimoNum = calc.parcelasAtrasadasNumeros[calc.parcelasAtrasadasNumeros.length - 1];
+                    const faltaAcumulada = Math.max(0, (valorParcela * ultimoNum) - calc.totalPago);
+                    if (!alerta.has(loan.clientId)) alerta.set(loan.clientId, { loans: [], valor: 0 });
+                    const g = alerta.get(loan.clientId);
+                    g.loans.push(loan);
+                    g.valor += faltaAcumulada;
+                }
+            });
+
+            return { atraso, alerta };
+        }
+
+        // Varre os checkpoints (parcela/vencimento) de todos os empréstimos em aberto e
+        // devolve os eventos que ainda vão vencer (exclui os já vencidos — esses entram
+        // nos cards de aviso por cliente), em ordem cronológica
+        function getEventosVencimentoFuturos(loanData) {
+            const eventos = [];
+            loanData.forEach(ld => {
+                const { loan, calc, checkpoints } = ld;
+                if (calc.isPago) return;
+                const numParcelas = calc.numParcelas;
+                const valorParcela = calc.valorBase / numParcelas;
+
+                checkpoints.forEach(ck => {
+                    const isFinal = ck.numero === numParcelas;
+                    const dataCk = ck.data + (23 * 60 * 60 * 1000);
+                    const vencido = dataCk < TODAY;
+                    const esperadoAcumulado = valorParcela * ck.numero;
+                    const falta = Math.max(0, esperadoAcumulado - calc.totalPago);
+                    const paga = falta <= 0;
+                    if (paga || vencido) return; // só os que ainda não venceram
+
+                    const diasAte = diffDays(TODAY - (12 * 60 * 60 * 1000), ck.data);
+                    const label = numParcelas > 1
+                        ? (isFinal ? 'Parcela Final' : `${ck.numero}° Parcela`)
+                        : 'Vencimento';
+
+                    eventos.push({ loan, data: ck.data, diasAte, falta, label });
+                });
+            });
+
+            eventos.sort((a, b) => a.data - b.data);
+            return eventos;
+        }
+
+        // Linha de um evento futuro de vencimento (usada tanto na seção "Hoje" quanto em
+        // "Próximos Vencimentos") — amarelo quando faltam de 0 a 2 dias, azul quando falta
+        // mais que isso
+        function proxEvtRowHTML(ev) {
+            const client = getClient(ev.loan.clientId);
+            if (!client) return '';
+            const cor = ev.diasAte <= 2 ? 'var(--warn)' : 'var(--acc2)';
+            const diasTxt = ev.diasAte === 0 ? 'Hoje' : ev.diasAte === 1 ? 'Amanhã' : `em ${ev.diasAte} dias`;
+            const dt = new Date(ev.data);
+
+            return `
+                <div class="dash-proxevt-row" onclick="openCalDaySheet(${dt.getFullYear()}, ${dt.getMonth()}, ${dt.getDate()})">
+                    <div class="dash-proxevt-date" style="color:${cor}">
+                        <span class="dash-proxevt-day">${dt.getDate()}</span>
+                        <span class="dash-proxevt-mon">${MESES_PT_ABREV[dt.getMonth()]}</span>
+                    </div>
+                    <div class="dash-proxevt-info">
+                        <div class="dash-proxevt-name">${client.nome}</div>
+                        <div class="dash-proxevt-label">${ev.label}</div>
+                    </div>
+                    <div class="dash-proxevt-right">
+                        <div class="dash-proxevt-val" style="color:${cor}">${fmtMoney(ev.falta)}</div>
+                        <div class="dash-proxevt-dias" style="color:${cor}">${diasTxt}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Card de cliente agrupado (Atrasado / Em Alerta) — clicar abre o popup com os
+        // empréstimos daquele aviso
+        function proxCliCardHTML(clientId, g, tipo) {
+            const client = getClient(clientId);
+            if (!client) return '';
+            const count = g.loans.length;
+
+            return `
+                <div class="dash-proxcli-card ${tipo === 'atraso' ? 'is-late' : 'is-warn'}" onclick="openProxEvtClientPopup('${clientId}', '${tipo}')">
+                    <div class="av ${client.color}">${client.initials}</div>
+                    <div class="dash-proxcli-info">
+                        <div class="dash-proxcli-name">${client.nome}</div>
+                        <div class="dash-proxcli-count">${count} empréstimo${count !== 1 ? 's' : ''}</div>
+                    </div>
+                    <div class="dash-proxcli-val">${fmtMoney(g.valor)}</div>
+                </div>
+            `;
+        }
+
+        // Preenche o box "Próximos Eventos" — sempre visível e calculado no renderDash,
+        // ao contrário do calendário (que só calcula quando aberto)
+        function renderProximosEventos() {
+            const hojeWrap = document.getElementById('dash-proxevt-hoje-wrap');
+            const atrasoWrap = document.getElementById('dash-proxevt-atraso-wrap');
+            const alertaWrap = document.getElementById('dash-proxevt-alerta-wrap');
+            const futuroWrap = document.getElementById('dash-proxevt-futuro-wrap');
+            const emptyEl = document.getElementById('dash-proxevt-empty');
+            if (!hojeWrap || !atrasoWrap || !alertaWrap || !futuroWrap || !emptyEl) return;
+
+            const loanData = getCalendarLoanData();
+            const { atraso, alerta } = getAvisosClientes(loanData);
+            const eventosFuturos = getEventosVencimentoFuturos(loanData);
+            const hoje = eventosFuturos.filter(e => e.diasAte === 0);
+            const futuros = eventosFuturos.filter(e => e.diasAte > 0).slice(0, 6);
+
+            if (hoje.length) {
+                hojeWrap.style.display = '';
+                document.getElementById('dash-proxevt-hoje-list').innerHTML = hoje.map(proxEvtRowHTML).join('');
+            } else {
+                hojeWrap.style.display = 'none';
+            }
+
+            if (atraso.size) {
+                atrasoWrap.style.display = '';
+                document.getElementById('dash-proxevt-atraso-list').innerHTML =
+                    [...atraso.entries()].map(([cid, g]) => proxCliCardHTML(cid, g, 'atraso')).join('');
+            } else {
+                atrasoWrap.style.display = 'none';
+            }
+
+            if (alerta.size) {
+                alertaWrap.style.display = '';
+                document.getElementById('dash-proxevt-alerta-list').innerHTML =
+                    [...alerta.entries()].map(([cid, g]) => proxCliCardHTML(cid, g, 'alerta')).join('');
+            } else {
+                alertaWrap.style.display = 'none';
+            }
+
+            if (futuros.length) {
+                futuroWrap.style.display = '';
+                document.getElementById('dash-proxevt-futuro-list').innerHTML = futuros.map(proxEvtRowHTML).join('');
+            } else {
+                futuroWrap.style.display = 'none';
+            }
+
+            const nadaPendente = !hoje.length && !atraso.size && !alerta.size && !futuros.length;
+            emptyEl.style.display = nadaPendente ? '' : 'none';
+        }
+
+        // Popup com os empréstimos de um cliente específico dentro de um aviso
+        // (atraso/alerta) — aberto ao clicar num card de cliente do "Próximos Eventos"
+        function openProxEvtClientPopup(clientId, tipo) {
+            const client = getClient(clientId);
+            if (!client) return;
+
+            const loanData = getCalendarLoanData();
+            const { atraso, alerta } = getAvisosClientes(loanData);
+            const grupo = (tipo === 'atraso' ? atraso : alerta).get(clientId);
+            if (!grupo) return;
+
+            document.getElementById('proxevt-client-sheet-title').textContent =
+                `${client.nome} — ${tipo === 'atraso' ? 'Empréstimos Atrasados' : 'Empréstimos em Alerta'}`;
+
+            const corVal = tipo === 'atraso' ? 'var(--danger)' : 'var(--warn)';
+
+            document.getElementById('proxevt-client-sheet-body').innerHTML = grupo.loans.map(loan => {
+                const c = getLoanCalc(loan);
+                let valorLinha, labelLinha;
+                if (tipo === 'atraso') {
+                    valorLinha = c.dividaTotal;
+                    labelLinha = 'Dívida Atual';
+                } else {
+                    const valorParcela = c.valorBase / c.numParcelas;
+                    const ultimoNum = c.parcelasAtrasadasNumeros[c.parcelasAtrasadasNumeros.length - 1];
+                    valorLinha = Math.max(0, (valorParcela * ultimoNum) - c.totalPago);
+                    labelLinha = 'Falta Pagar';
+                }
+
+                return `
+                    <div class="proxevt-loan-row" onclick="closeSheet(document.getElementById('proxevt-client-sheet')); openEmpDetalhe('${loan.id}')">
+                        <div>
+                            <div class="proxevt-loan-id">${loan.id}</div>
+                            <div class="proxevt-loan-sub">${fmtMoney(loan.valor)} emprestado</div>
+                        </div>
+                        <div class="proxevt-loan-val">
+                            <div class="proxevt-loan-val-num" style="color:${corVal}">${fmtMoney(valorLinha)}</div>
+                            <div class="proxevt-loan-val-lbl">${labelLinha}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            openSheet('proxevt-client-sheet');
+        }
+
+        // Desenha apenas o mês atualmente selecionado (calCurrentYM), com botões para
+        // alternar entre os meses que o calendário cobre
+        function renderDashCalendar() {
+            const el = document.getElementById('dash-calendar');
+            if (!el) return;
+
+            const loanData = getCalendarLoanData();
+            const range = getCalendarMonthRange(loanData);
+            if (!range) {
+                calCurrentYM = null;
+                el.innerHTML = '<div class="empty"><p>Nenhum empréstimo cadastrado ainda</p></div>';
+                return;
+            }
+
+            // Primeira renderização (ou dados zerados): começa no mês atual
+            if (!calCurrentYM) calCurrentYM = todayYM();
+
+            // Mantém o mês exibido dentro do intervalo coberto pelos empréstimos
+            if (compareYM(calCurrentYM, range.start) < 0) calCurrentYM = { ...range.start };
+            if (compareYM(calCurrentYM, range.end) > 0) calCurrentYM = { ...range.end };
+
+            const isAtStart = compareYM(calCurrentYM, range.start) <= 0;
+            const isAtEnd = compareYM(calCurrentYM, range.end) >= 0;
+            const isCurrentMonth = compareYM(calCurrentYM, todayYM()) === 0;
+
+            const navHTML = `
+                <div class="cal-nav">
+                    <div class="cal-nav-arrows">
+                        <span class="cal-nav-btn ${isAtStart ? 'is-disabled' : ''}" onclick="calChangeMonth(-1)">${CAL_NAV_ICON_PREV}</span>
+                        <span class="cal-nav-btn ${isAtEnd ? 'is-disabled' : ''}" onclick="calChangeMonth(1)">${CAL_NAV_ICON_NEXT}</span>
+                    </div>
+                    <div class="cal-month-title">${MESES_PT[calCurrentYM.month]} ${calCurrentYM.year}</div>
+                    <span class="cal-nav-btn cal-nav-today ${isCurrentMonth ? 'is-disabled' : ''}" onclick="calGoToday()">Hoje <span class="cal-nav-pin">${CAL_NAV_ICON_PIN}</span></span>
+                </div>`;
+
+            el.innerHTML = navHTML +
+                renderCalMonth(calCurrentYM.year, calCurrentYM.month, loanData) +
+                `<div class="cal-legend">
+                    <div class="cal-legend-item"><span class="cal-legend-dot" style="background:#ff4d6d40"></span>Dia em Atraso</div>
+                    <div class="cal-legend-item">${CAL_ICON_EMISSAO.replace('currentColor', 'var(--acc2)')}Emissão</div>
+                    <div class="cal-legend-item">${CAL_ICON_VENC.replace('currentColor', 'var(--warn)')}Vencimento/Parcela</div>
+                    <div class="cal-legend-item">${CAL_ICON_PAG.replace('currentColor', 'var(--acc)')}Pagamento</div>
+                    <div class="cal-legend-item"><span class="cal-legend-dot" style="background:#22c55e40"></span>${CAL_ICON_QUITACAO.replace('currentColor', 'var(--acc4)')}Quitação</div>
+                </div>`;
+        }
+
+        // Card simplificado usado só no popup do calendário: cliente, empréstimo,
+        // dívida total do empréstimo e as informações do evento daquele dia
+        function calEventCardHTML(loan, eventIcon, eventColor, eventLabel, details) {
+            const c = getLoanCalc(loan);
+            const client = getClient(loan.clientId);
+            if (!client) return '';
+
+            const detailsHTML = (details || []).map(dt => `
+                <div class="cal-ev-detail-row">
+                    <span>${dt.label}</span>
+                    <span style="${dt.color ? `color:${dt.color}` : ''}">${dt.value}</span>
+                </div>
+            `).join('');
+
+            // Barra de progresso do pagamento em relação à dívida total — igual à dos
+            // outros cards de empréstimo (lista de empréstimos, tela de detalhe etc.)
+            const progressPct = c.totalPago ? Math.max(2, Math.min(100, Math.round((c.totalPago / c.dividaTotal) * 100))) : 0;
+
+            return `
+                <div class="lcm lcm-${c.status} cal-ev-card" onclick="calOpenLoanFromDay('${loan.id}')">
+                    <div class="cal-ev-top">
+                        <div class="av ${client.color}">${client.initials}</div>
+                        <div class="cal-ev-info">
+                            <div class="cal-ev-name">${client.nome}</div>
+                            <div class="lc-id">${loan.id}</div>
+                        </div>
+                        <div class="cal-ev-divida">
+                            <div class="cal-ev-divida-val">${fmtMoney(c.dividaTotal)}</div>
+                            <div class="cal-ev-divida-lbl">Dívida Total</div>
+                        </div>
+                    </div>
+                    <div class="cal-ev-event" style="color:${eventColor}">
+                        <span class="cal-ev-event-icon">${eventIcon}</span>
+                        <span class="cal-ev-event-label">${eventLabel}</span>
+                    </div>
+                    <div class="cal-ev-details">${detailsHTML}</div>
+                    <div class="lc-bar" style="width: 100%; height: 3px; margin-top: 8px; opacity: 0.45;">
+                        <div class="lc-fill done" style="width:${progressPct}%"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Abre o popup de detalhe de um dia específico do calendário, listando o que
+        // aconteceu (ou vai acontecer) naquele dia: empréstimos emitidos, vencimentos/
+        // parcelas, pagamentos recebidos (com saldo antes/depois), quitações e dias de
+        // atraso (com quantos dias, juros do dia e dívida atualizada naquele momento).
+        // Tocar num card fecha o popup e leva direto pro empréstimo.
+        function openCalDaySheet(year, month, day) {
+            _calDaySheetOrigin = { year, month, day };
+            const dayStart = new Date(year, month, day, 0, 0, 0, 0).getTime();
+            const dayEnd = new Date(year, month, day, 23, 59, 59, 999).getTime();
+            const loanData = getCalendarLoanData();
+
+            const d = new Date(dayStart).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('cal-day-sheet-title').textContent = d.charAt(0).toUpperCase() + d.slice(1);
+
+            const emissaoCards = [], vencCards = [], pagCards = [], quitCards = [], atrasoCards = [];
+
+            loanData.forEach(ld => {
+                const { loan, calc } = ld;
+
+                if (ld.emissao >= dayStart && ld.emissao <= dayEnd) {
+                    emissaoCards.push(calEventCardHTML(loan, CAL_ICON_EMISSAO, 'var(--acc2)', 'Empréstimo Emitido', [
+                        { label: 'Valor Emprestado', value: fmtMoney(loan.valor) }
+                    ]));
+                }
+
+                const valorParcela = calc.valorBase / calc.numParcelas;
+                let carryFromPrev = false;
+                ld.checkpoints.forEach(ck => {
+                    const isFinal = ck.numero === calc.numParcelas;
+                    // "Vencimento" só faz sentido pra empréstimo de parcela única — com
+                    // mais de uma parcela, mostra sempre "N° Parcela" (a final vira
+                    // "N° Parcela Final")
+                    const label = calc.numParcelas > 1
+                        ? (isFinal ? `Parcela Final` : `${ck.numero}° Parcela`)
+                        : 'Vencimento';
+
+                    // Pagamento esperado é sempre o valor individual da parcela. A atribuição
+                    // usa o TOTAL pago no empréstimo até agora (não filtrado por data — um
+                    // pagamento feito depois do vencimento ainda quita a parcela). O "falta
+                    // pagar" só passa a acumular o saldo de uma parcela anterior a partir do
+                    // momento em que ELA venceu em aberto — as parcelas mais à frente seguem
+                    // mostrando só o valor individual até que a parcela logo antes delas
+                    // também vença sem estar paga.
+                    const dataCk = ck.data + (23 * 60 * 60 * 1000);
+                    const vencido = dataCk < TODAY;
+                    const diasAte = diffDays(TODAY - (12 * 60 * 60 * 1000), ck.data);
+                    const esperadoAcumulado = valorParcela * ck.numero;
+                    const falta = Math.max(0, esperadoAcumulado - calc.totalPago);
+                    const paga = falta <= 0;
+                    const atrasada = vencido && !paga;
+                    const showFalta = vencido || carryFromPrev;
+                    const acumulada = showFalta && falta > valorParcela + 0.005;
+                    const semPagamento = atrasada && calc.totalPago <= 0.005;
+                    carryFromPrev = atrasada;
+
+                    if (ck.data < dayStart || ck.data > dayEnd) return;
+
+                    // Valor em destaque é o "Falta Pagar"; o valor individual da parcela
+                    // aparece discreto, junto do título do evento
+                    const prazoTxt = diasAte == 0 ? 'Hoje' : diasAte == 1 ? 'Amanhã' : `em ${diasAte} dias`;
+
+                    const details = [];
+                    if (paga) {
+                        details.push({ label: 'Situação', value: 'Parcela Paga ✓', color: 'var(--acc)' });
+                    } else if (atrasada) {
+                        details.push({ label: 'Falta Pagar', value: (acumulada ? '* ' : '') + fmtMoney(falta), color: 'var(--danger)' });
+                        if (semPagamento) details.push({ label: 'Aviso', value: 'Nenhum Pagamento', color: 'var(--danger)' });
+                    } else {
+                        details.push({ label: 'Falta Pagar', value: (acumulada ? '* ' : '') + fmtMoney(falta), color: 'var(--warn)' });
+                        details.push({ label: 'Prazo', value: prazoTxt, color: 'var(--acc2)' });
+                    }
+
+                    // Cor do card é sempre a padrão de parcela/vencimento (amarelo), mesmo
+                    // atrasada — o aviso de atraso é só uma marcação inline junto ao label
+                    const valorTitleNote = calc.numParcelas > 1 ? ` <span style="color:var(--txt2); font-weight:400; font-size:11px">- ${calc.numParcelas}x ${fmtMoney(valorParcela)}</span>` : '';
+                    const atrasadaBadge = atrasada ? ' <span style="color:var(--danger); font-size:10px; font-weight:700">· Atrasada</span>' : '';
+                    vencCards.push(calEventCardHTML(loan, CAL_ICON_VENC, 'var(--warn)', label + valorTitleNote + atrasadaBadge, details));
+                });
+
+                // Se esse é o dia da quitação automática (por pagamento completo, não
+                // manual), os pagamentos desse dia não viram card separado — o valor
+                // pago aparece dentro do próprio card de quitação, mais abaixo
+                const isAutoQuitDay = calc.isPago && calc.saldoRestante <= 0 && calc.pago >= dayStart && calc.pago <= dayEnd;
+
+                if (!isAutoQuitDay) {
+                    (loan.pagamentos || []).forEach(p => {
+                        if (p.data >= dayStart && p.data <= dayEnd) {
+                            const bal = ld.paymentBalances.get(p) || { antes: calc.valorBase, depois: calc.saldoRestante };
+                            const details = [
+                                { label: 'Valor Pago', value: fmtMoney(p.valor), color: 'var(--acc)' },
+                                { label: 'Saldo Antes do Pagamento', value: fmtMoney(bal.antes) }
+                            ];
+                            if (bal.depois > 0) {
+                                details.push({ label: 'Saldo Após o Pagamento', value: fmtMoney(bal.depois) });
+                            } else {
+                                details.push({ label: 'Saldo Após o Pagamento', value: 'Quitado ✓', color: 'var(--acc)' });
+                            }
+                            pagCards.push(calEventCardHTML(loan, CAL_ICON_PAG, 'var(--acc)', 'Pagamento Recebido', details));
+                        }
+                    });
+                }
+
+                if (calc.isPago && calc.pago >= dayStart && calc.pago <= dayEnd) {
+                    const isManual = calc.saldoRestante > 0;
+                    if (isManual) {
+                        quitCards.push(calEventCardHTML(loan, CAL_ICON_QUITACAO, 'var(--acc4)', 'Quitação Manual', [
+                            { label: 'Dívida Ignorada', value: fmtMoney(calc.saldoRestante), color: 'var(--danger)' }
+                        ]));
+                    } else {
+                        // Quitação por pagamento completo: mostra também o valor pago
+                        // nesse dia, já que o card de "Pagamento Recebido" foi omitido
+                        const dayPayments = (loan.pagamentos || []).filter(p => p.data >= dayStart && p.data <= dayEnd);
+                        const totalPagoHoje = dayPayments.reduce((s, p) => s + p.valor, 0);
+                        const quitDetails = [];
+                        if (totalPagoHoje > 0) {
+                            quitDetails.push({ label: 'Valor Pago', value: fmtMoney(totalPagoHoje), color: 'var(--acc)' });
+                        }
+                        quitDetails.push({ label: 'Lucro Total', value: fmtMoney(calc.totalPago - loan.valor), color: 'var(--acc)' });
+                        quitCards.push(calEventCardHTML(loan, CAL_ICON_QUITACAO, 'var(--acc4)', 'Quitação', quitDetails));
+                    }
+                }
+
+                const atraso = getAtrasoRange(calc);
+                if (atraso && dayStart > atraso.start && dayStart <= atraso.end) {
+                    const info = computeAtrasoInfo(loan, calc, dayStart);
+                    atrasoCards.push(calEventCardHTML(loan, CAL_ICON_ATRASO, 'var(--danger)', `Dia de Atraso Nº ${info.diasAtraso}`, [
+                        { label: 'Vencia em', value: fmtDate(info.vencimento) },
+                        { label: 'Juros do Dia', value: fmtMoney(info.jurosDia), color: 'var(--danger)' },
+                        { label: 'Dívida Atualizada', value: fmtMoney(info.dividaAtualizada), color: 'var(--danger)' }
+                    ]));
+                }
+            });
+
+            const section = (title, icon, cards) => {
+                if (!cards.length) return '';
+                return `
+                    <div class="cds-section">
+                        <div class="cds-section-title">${icon}${title}</div>
+                        ${cards.join('')}
+                    </div>
+                `;
+            };
+
+            let html = '';
+            html += section('Empréstimos Emitidos', `<span class="cal-ic-emissao">${CAL_ICON_EMISSAO}</span>`, emissaoCards);
+            html += section('Vencimentos e Parcelas', `<span class="cal-ic-venc">${CAL_ICON_VENC}</span>`, vencCards);
+            html += section('Pagamentos Recebidos', `<span class="cal-ic-pag">${CAL_ICON_PAG}</span>`, pagCards);
+            html += section('Empréstimos Quitados', `<span class="cal-ic-quit">${CAL_ICON_QUITACAO}</span>`, quitCards);
+            html += section('Dias em Atraso', `<span style="color:var(--danger)">${CAL_ICON_ATRASO}</span>`, atrasoCards);
+
+            if (!html) {
+                html = '<div class="empty"><p>Nenhum evento neste dia.</p></div>';
+            }
+
+            document.getElementById('cal-day-sheet-body').innerHTML = html;
+            openSheet('cal-day-sheet');
         }
 
         function loanInPeriod(loan) {
@@ -6185,59 +7621,52 @@
             }
 
 
-            // Parcela / Vencimento markers — inserted at each parcela checkpoint, ending with the final vencimento
+            // Parcela / Vencimento markers — inserted at each parcela checkpoint, ending com a
+            // parcela final. "Vencimento" só é usado quando o empréstimo é de parcela única;
+            // com mais de uma parcela, todos os checkpoints (inclusive o último) são "parcela".
+            //
+            // O pagamento esperado de cada parcela é sempre o valor individual dela. A
+            // atribuição de pagamentos usa o TOTAL pago no empréstimo até agora (independente
+            // da data em que os pagamentos foram feitos — um pagamento feito depois do
+            // vencimento ainda quita a parcela). O "falta pagar" só passa a acumular o saldo
+            // de uma parcela anterior a partir do momento em que ELA venceu sem estar 100%
+            // paga — a parcela seguinte a essa é que passa a exibir o valor acumulado; as
+            // parcelas mais à frente continuam mostrando só o valor individual até que a
+            // parcela imediatamente anterior a elas também vença em aberto.
             {
                 const numParcelas = Math.max(1, parseInt(loan.parcelas) || 1);
                 const checkpoints = getParcelaDates(emissao, loan.prazo, numParcelas);
                 const valorParcela = c.valorBase / numParcelas;
+                const totalPagoAtual = c.totalPago;
+                let carryFromPrev = false;
 
                 checkpoints.forEach(ck => {
                     const isFinal = ck.numero === numParcelas;
                     const dataCk = ck.data + (23 * 60 * 60 * 1000);
-                    // Pagamentos considerados até esta data (usados tanto para a parcela quanto para o vencimento final)
-                    const pagsAteData = sortedPags.filter(p => p.data <= dataCk);
-                    const totalPagoAteData = pagsAteData.reduce((s, p) => s + p.valor, 0);
-                    const esperadoAcumulado = valorParcela * ck.numero;
-                    const algumPagAteData = pagsAteData.length > 0;
                     const vencido = dataCk < TODAY;
                     const diasAte = diffDays(TODAY - (12 * 60 * 60 * 1000), ck.data);
 
-                    if (isFinal) {
-                        // Mantém a semântica original do evento de vencimento (baseado na dívida total)
-                        const saldoNoVenc = Math.max(0, c.valorBase - totalPagoAteData);
-                        const quitouAntesVenc = totalPagoAteData >= c.valorBase;
-                        events.push({
-                            date: dataCk, tipo: 'vencimento',
-                            numero: ck.numero, totalParcelas: numParcelas,
-                            label: 'Vencimento',
-                            quitouAntes: quitouAntesVenc,
-                            algumPag: algumPagAteData,
-                            totalPagoAteVenc: totalPagoAteData,
-                            saldoNoVenc,
-                            vencido, diasAte,
-                            saldoAntes: saldoNoVenc, saldoDepois: saldoNoVenc,
-                            valor: saldoNoVenc,
-                            color: quitouAntesVenc ? 'td-g' : 'td-a'
-                        });
-                    } else {
-                        // Checkpoint de parcela intermediária — compara o pago até aqui com o esperado até aqui
-                        const saldoParcela = Math.max(0, esperadoAcumulado - totalPagoAteData);
-                        const quitouParcela = totalPagoAteData >= esperadoAcumulado;
-                        events.push({
-                            date: dataCk, tipo: 'parcela',
-                            numero: ck.numero, totalParcelas: numParcelas,
-                            label: `${ck.numero}° parcela`,
-                            quitouAntes: quitouParcela,
-                            algumPag: algumPagAteData,
-                            totalPagoAteVenc: totalPagoAteData,
-                            esperadoAcumulado, valorParcela,
-                            saldoNoVenc: saldoParcela,
-                            vencido, diasAte,
-                            saldoAntes: saldoParcela, saldoDepois: saldoParcela,
-                            valor: saldoParcela,
-                            color: quitouParcela ? 'td-g' : 'td-a'
-                        });
-                    }
+                    const esperadoAcumulado = valorParcela * ck.numero;
+                    const falta = Math.max(0, esperadoAcumulado - totalPagoAtual);
+                    const paga = falta <= 0;
+                    const atrasada = vencido && !paga;
+                    const showFalta = vencido || carryFromPrev;
+                    const acumulada = showFalta && falta > valorParcela + 0.005;
+                    const semPagamento = atrasada && totalPagoAtual <= 0.005;
+                    carryFromPrev = atrasada;
+
+                    events.push({
+                        date: dataCk, tipo: numParcelas > 1 ? 'parcela' : 'vencimento',
+                        numero: ck.numero, totalParcelas: numParcelas, isFinal,
+                        label: numParcelas > 1
+                            ? (isFinal ? `Parcela Final` : `${ck.numero}° Parcela`)
+                            : 'Vencimento',
+                        valorParcela, totalPagoAtual, falta, paga, atrasada, showFalta, acumulada, semPagamento,
+                        vencido, diasAte,
+                        saldoAntes: falta, saldoDepois: falta,
+                        valor: falta,
+                        color: 'td-a'
+                    });
                 });
             }
 
@@ -6429,12 +7858,10 @@
             document.getElementById('ds-total-recv').textContent = fmtMoney(restante);
             document.getElementById('ds-hero-sub').textContent = `${total - cntDone} em aberto · ${cntDone} quitado${cntDone !== 1 ? 's' : ''}`;
 
-            document.getElementById('dhr-emprest').textContent = fmtMoney(totalEmp);
-            document.getElementById('dhr-total-emp').textContent = total;
-            document.getElementById('dhr-emprest-total').textContent = fmtMoney(totaldivida);
-
-            document.getElementById('dhr-pagos-total').textContent = fmtMoney(totalpagos);
-            document.getElementById('dhr-lucro-relat').textContent = fmtMoney(lucrorelativo);
+            renderProximosEventos();
+            // O calendário só é calculado/renderizado quando o box está aberto — evita
+            // esse cálculo pesado sempre que a dash é re-renderizada
+            if (_dashCalendarOpen) renderDashCalendar();
 
 
             // Status cards
@@ -7391,7 +8818,7 @@
 
             try {
                 console.log("Adicionando novo cliente na planilha...");
-                const data_fetch = { data: cliente, funcao: 'add_cliente', id_usuario: ID_USUARIO };
+                const data_fetch = { data: cliente, funcao: 'add_cliente' };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -7497,7 +8924,7 @@
 
             try {
                 console.log("Editando o cliente na planilha...");
-                const data_fetch = { data: cliente, funcao: 'add_cliente', id_usuario: ID_USUARIO };
+                const data_fetch = { data: cliente, funcao: 'add_cliente' };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -7583,7 +9010,7 @@
 
             try {
                 console.log("DELETANDO cliente da planilha...");
-                const data_fetch = { data: dados_apagar, funcao: 'del_cliente', id_usuario: ID_USUARIO };
+                const data_fetch = { data: dados_apagar, funcao: 'del_cliente' };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -8273,7 +9700,7 @@
 
             try {
                 console.log("Adicionando empréstimo na planilha...");
-                const data_fetch = { data: loan, funcao: 'add_emprestimo', id_usuario: ID_USUARIO };
+                const data_fetch = { data: loan, funcao: 'add_emprestimo' };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -8644,7 +10071,7 @@
             }
 
             try {
-                const data_fetch = { data: new_loan, funcao: 'add_emprestimo', id_usuario: ID_USUARIO };
+                const data_fetch = { data: new_loan, funcao: 'add_emprestimo' };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -8741,7 +10168,7 @@
 
             try {
                 console.log("ALTERANDO SE PAGO...");
-                const data_fetch = { data: novo_pago_x, funcao: 'edit_pago', id_usuario: ID_USUARIO };
+                const data_fetch = { data: novo_pago_x, funcao: 'edit_pago' };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -8828,7 +10255,7 @@
 
             try {
                 console.log("ALTERANDO NOTIFICAÇÕES...");
-                const data_fetch = { data: novo_not_x, funcao: 'edit_not', id_usuario: ID_USUARIO };
+                const data_fetch = { data: novo_not_x, funcao: 'edit_not' };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -8918,7 +10345,7 @@
 
             try {
                 console.log("DELETANDO emprestimo da planilha...");
-                const data_fetch = { data: dados_apagar, funcao: 'del_emprestimo', id_usuario: ID_USUARIO };
+                const data_fetch = { data: dados_apagar, funcao: 'del_emprestimo' };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -9292,8 +10719,16 @@
 
         // ==================== EMP DETALHE ====================
         _saldoRestante = 0;
-        function openEmpDetalhe(lid) {
+        // Abre o detalhe de um empréstimo a partir de um card do popup de dia do
+        // calendário — marca a origem pra "voltar" reabrir o painel com o mesmo popup
+        function calOpenLoanFromDay(lid) {
+            closeSheet(document.getElementById('cal-day-sheet'));
+            openEmpDetalhe(lid, true);
+        }
+
+        function openEmpDetalhe(lid, fromCalDay) {
             pushHistory('emp-detalhe', lid);
+            _openedEmpFromCalDay = !!fromCalDay;
             _currentLoanId = lid;
             const l = getLoan(lid);
             if (!l) return;
@@ -9451,7 +10886,12 @@
 
             // Back
             document.getElementById('ed-back-btn').onclick = () => {
-                if (_prevScreen === 'cliente-detalhe') openClienteDetalhe(l.clientId);
+                if (_openedEmpFromCalDay && _calDaySheetOrigin) {
+                    const o = _calDaySheetOrigin;
+                    _openedEmpFromCalDay = false;
+                    navTo('dash');
+                    openCalDaySheet(o.year, o.month, o.day);
+                } else if (_prevScreen === 'cliente-detalhe') openClienteDetalhe(l.clientId);
                 else navTo('emprestimos');
             };
 
@@ -9930,72 +11370,36 @@
                 // Override rows with badge included
                 if (anexoBadge) rows.push(`<div style="margin-top:-10px; display:flex; align-items:center; justify-content: center;">${anexoBadge}</div>`);
 
-            } else if (e.tipo === 'vencimento') {
+            } else if (e.tipo === 'vencimento' || e.tipo === 'parcela') {
+                // "Vencimento" só aparece pra empréstimo de parcela única; com mais de uma
+                // parcela, o label já vem pronto de buildTimeline ("Parcela X/Y" / "Parcela
+                // Final Y/Y"). Card sempre no tom padrão de parcela/vencimento (amarelo),
+                // mesmo atrasada — o aviso de atraso é só uma marcação inline junto ao
+                // título, não uma linha extra. O valor em destaque é o "Falta pagar"; o valor
+                // individual da parcela aparece discreto, junto do título.
                 dotClass = 'td-a';
                 cardClass = 'tl-card-venc';
-                title = (e.totalParcelas && e.totalParcelas > 1)
-                    ? `${e.numero}° parcela - Vencimento final`
-                    : 'Vencimento do prazo';
+                const valorTitleNote = e.totalParcelas > 1 ? ` <span style="color:var(--txt2); font-weight:400; font-size:11px">- ${e.totalParcelas}x ${fmtMoney(e.valorParcela)}</span>` : '';
+                const atrasadaBadge = e.atrasada ? ' <span style="color:var(--danger); font-size:10px; font-weight:700; vertical-align:1px">· Atrasada</span>' : '';
+                title = e.label + valorTitleNote + atrasadaBadge;
                 const prazoTxt = e.diasAte == 0 ? 'Hoje' : e.diasAte == 1 ? 'Amanhã' : `em ${e.diasAte} dias`;
-                if (e.quitouAntes) {
-                    rows = [
-                        row('Situação', '✓ Quitado antes do vencimento', true, 'var(--acc)'),
-                    ];
-                } else if (!e.vencido) {
-                    // Vencimento ainda não chegou
-                    rows = e.algumPag ? [
-                        row('Valor esperado', fmtMoney(e.saldoNoVenc + e.totalPagoAteVenc), false, 'var(--txt1)'),
-                        row('Pago até aqui', fmtMoney(e.totalPagoAteVenc), false, 'var(--acc)'),
-                        row('Prazo', prazoTxt, true, 'var(--acc2)'),
-                    ] : [
-                        row('Valor esperado', fmtMoney(e.saldoNoVenc), false, 'var(--txt1)'),
-                        row('Prazo', prazoTxt, true, 'var(--acc2)'),
-                    ];
-                } else if (!e.algumPag) {
-                    rows = [
-                        row('Pagamentos no prazo', 'Nenhum', false, 'var(--danger)'),
-                        row('Valor em aberto', fmtMoney(e.saldoNoVenc), true, 'var(--txt0)'),
-                        row('⚠ Juros de atraso', 'a partir deste dia', false, 'var(--warn)'),
-                    ];
-                } else {
-                    rows = [
-                        row('Pago até o vencimento', fmtMoney(e.totalPagoAteVenc), false, 'var(--acc)'),
-                        row('Saldo restante', fmtMoney(e.saldoNoVenc), true, 'var(--txt0)'),
-                        row('⚠ Juros de atraso', 'a partir deste dia', false, 'var(--warn)'),
-                    ];
-                }
 
-            } else if (e.tipo === 'parcela') {
-                dotClass = 'td-a';
-                cardClass = 'tl-card-venc';
-                title = `${e.numero}° parcela`;
-                const prazoTxtP = e.diasAte == 0 ? 'Hoje' : e.diasAte == 1 ? 'Amanhã' : `em ${e.diasAte} dias`;
-                if (e.quitouAntes) {
+                if (e.paga) {
                     rows = [
-                        row('Pagamento esperado', fmtMoney(e.esperadoAcumulado), false, 'var(--txt1)'),
-                        row('Situação', '✓ Pagamentos no prazo', true, 'var(--acc)'),
+                        row('Situação', '✓ Parcela paga', true, 'var(--acc)'),
                     ];
-                } else if (!e.vencido) {
-                    // Prazo desta parcela ainda não chegou
-                    rows = e.algumPag ? [
-                        row('Pagamento esperado', fmtMoney(e.esperadoAcumulado), false, 'var(--txt1)'),
-                        row('Pago até aqui', fmtMoney(e.totalPagoAteVenc), false, 'var(--acc)'),
-                        row('Prazo', prazoTxtP, true, 'var(--acc2)'),
-                    ] : [
-                        row('Pagamento esperado', fmtMoney(e.esperadoAcumulado), false, 'var(--txt1)'),
-                        row('Prazo', prazoTxtP, true, 'var(--acc2)'),
-                    ];
-                } else if (!e.algumPag) {
+                } else if (e.atrasada) {
                     rows = [
-                        row('Pagamento esperado', fmtMoney(e.esperadoAcumulado), false, 'var(--txt1)'),
-                        row('Pagamentos no prazo', 'Nenhum', false, 'var(--danger)'),
-                        row('Valor em aberto desta parcela', fmtMoney(e.saldoNoVenc), true, 'var(--txt0)'),
+                        row('Falta pagar', (e.acumulada ? '* ' : '') + fmtMoney(e.falta), true, 'var(--danger)'),
                     ];
+                    if (e.semPagamento) {
+                        rows.push(row('Aviso', 'Nenhum Pagamento', false, 'var(--danger)'));
+                    }
                 } else {
+                    // Ainda não venceu (pode já estar acumulando de uma parcela anterior)
                     rows = [
-                        row('Pagamento esperado', fmtMoney(e.esperadoAcumulado), false, 'var(--txt1)'),
-                        row('Pago até aqui', fmtMoney(e.totalPagoAteVenc), false, 'var(--acc)'),
-                        row('Valor em aberto desta parcela', fmtMoney(e.saldoNoVenc), true, 'var(--txt0)'),
+                        row('Falta pagar', (e.acumulada ? '* ' : '') + fmtMoney(e.falta), true, 'var(--warn)'),
+                        row('Prazo', prazoTxt, false, 'var(--acc2)'),
                     ];
                 }
 
@@ -10171,7 +11575,7 @@
 
             try {
                 console.log("Apagando pagamento...");
-                const data_fetch = { data: dados_apagar, funcao: 'del_pagamento', id_usuario: ID_USUARIO };
+                const data_fetch = { data: dados_apagar, funcao: 'del_pagamento' };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -10660,7 +12064,7 @@
 
             try {
                 console.log("Adicionando pagamento na planilha...");
-                const data_fetch = { data: pagamento, funcao: 'add_pagamento', id_usuario: ID_USUARIO };
+                const data_fetch = { data: pagamento, funcao: 'add_pagamento' };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -11301,7 +12705,7 @@
 
             try {
                 console.log("Atualizando padrões...");
-                const data_fetch = { data: dados_att, funcao: 'att_padroes', id_usuario: ID_USUARIO };
+                const data_fetch = { data: dados_att, funcao: 'att_padroes' };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -11482,7 +12886,18 @@
                 history.pushState({ scr: 'novo' }, '', '');
                 return;
             }
-            // 5. Navigate back in our stack
+            // 5. Emp-detalhe aberto a partir de um card do popup do calendário —
+            // volta direto pro painel com o mesmo popup reaberto, em vez de
+            // seguir a pilha normal (que levaria pra tela de empréstimos)
+            if (_currentScreen === 'emp-detalhe' && _openedEmpFromCalDay) {
+                _navStack.pop();
+                const o = _calDaySheetOrigin;
+                _openedEmpFromCalDay = false;
+                _goTo('dash', null, false);
+                if (o) openCalDaySheet(o.year, o.month, o.day);
+                return;
+            }
+            // 6. Navigate back in our stack
             _navStack.pop();
             const prev = _navStack[_navStack.length - 1];
             if (prev) {
@@ -11589,7 +13004,7 @@
 
                 try {
                     console.log("Enviando anexo para planilha...");
-                    const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexo', id_usuario: ID_USUARIO };
+                    const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexo' };
                     const res = await fetch(URL_SCRIPT,
                         { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                     );
@@ -11657,7 +13072,7 @@
 
             try {
                 console.log("Apagando anexo...");
-                const data_fetch = { data: dadosParaEnvio, funcao: 'del_anexo', id_usuario: ID_USUARIO };
+                const data_fetch = { data: dadosParaEnvio, funcao: 'del_anexo' };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -11955,7 +13370,7 @@
 
                 try {
                     console.log("Enviando anexo para planilha...");
-                    const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexo', id_usuario: ID_USUARIO };
+                    const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexo' };
                     const res = await fetch(URL_SCRIPT,
                         { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                     );
@@ -12279,7 +13694,22 @@
             return await res.json();
         }
 
+        // Verifica se um objeto tem a estrutura mínima esperada pelo site (loans/clients)
+        function isDBValido(json) {
+            return !!json && typeof json === 'object' && Array.isArray(json.loans) && Array.isArray(json.clients);
+        }
+
         async function loadDB() {
+            // Se já existe um DB_Local salvo e ele é um JSON válido pra estrutura do site,
+            // usa ele direto e nem faz o fetch inicial — só busca no servidor se não
+            // existir nada salvo ainda ou se o que estiver salvo estiver corrompido/inválido
+            const dbLocalExistente = pegarJsonDoLocalStorage("DB_Local");
+            if (isDBValido(dbLocalExistente)) {
+                console.log("DB_Local válido encontrado — pulando fetch inicial");
+                DB = dbLocalExistente;
+                return true; // sinaliza que usou o DB_Local direto (sem fetch)
+            }
+
             console.log("Realizando Fetch inicial...");
             try {
                 // 1ª tentativa: timeout curto. Se o Apps Script estiver "dormindo" (cold start),
@@ -12345,6 +13775,7 @@
             }
             if (!Array.isArray(DB.loans)) DB.loans = [];
             if (!Array.isArray(DB.clients)) DB.clients = [];
+            return false; // fez fetch (não usou o DB_Local direto)
         }
 
         // Funçção para salvar o DB no localstorage
@@ -12418,7 +13849,12 @@
         // Função para iniciar o site
         async function iniciar_site() {
             showLoading(['Iniciando…', 'Carregando dados…', 'Preparando o painel…', 'Calculando saldos…']);
-            await loadDB();
+            const usouDBLocalValido = await loadDB();
+            // Quando os dados vieram direto do DB_Local (sem fetch), segura a tela de
+            // loading por mais um pouco antes de remover, pra não sumir rápido demais
+            if (usouDBLocalValido) {
+                await new Promise(resolve => setTimeout(resolve, 600));
+            }
             hideLoading();
 
             // Acesso recusado pelo script: encerra o carregamento, mostra o aviso
