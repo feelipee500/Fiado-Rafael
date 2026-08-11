@@ -5630,7 +5630,7 @@
         <div class="sheet" onclick="event.stopPropagation()">
             <div class="sh-handle"></div>
             <div class="sh-hdr">
-                <div class="sh-title">Adicionar Anexo do Cliente</div>
+                <div class="sh-title">Adicionar Anexos do Cliente</div>
                 <div class="sh-close" onclick="closeSheet(document.getElementById('client-attach-sheet'))"><svg
                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
                         <line x1="18" y1="6" x2="6" y2="18" />
@@ -5638,10 +5638,10 @@
                     </svg></div>
             </div>
             <div class="sh-body">
-                <input type="file" id="client-attach-file-input" accept=".pdf,.jpg,.jpeg,.png,.webp"
+                <input type="file" id="client-attach-file-input" accept=".pdf,.jpg,.jpeg,.png,.webp" multiple
                     style="display:none" onchange="onClientAttachFileSelected(this)">
 
-                <div id="client-attach-preview"></div>
+                <div id="client-attach-list"></div>
 
                 <div id="client-attach-picker" class="file-picker-btn"
                     onclick="document.getElementById('client-attach-file-input').click()">
@@ -5650,19 +5650,11 @@
                         <polyline points="17 8 12 3 7 8" />
                         <line x1="12" y1="3" x2="12" y2="15" />
                     </svg>
-                    Selecionar arquivo / imagem
+                    <span id="client-attach-picker-label">Selecionar arquivos / imagens</span>
                 </div>
 
-                <div class="fg mt12">
-                    <div class="fl">Nome do Anexo</div>
-                    <select class="fi fs" id="client-attach-name-select" onchange="onClientAttachNameSelectChange()">
-                    </select>
-                    <input class="fi mt8" id="client-attach-name-input" type="text" style="display:none"
-                        placeholder="Digite o nome do anexo" oninput="updateClientAttachSaveState()">
-                </div>
-
-                <button class="btn-p mt12" id="client-attach-save-btn" disabled onclick="add_anexo_cliente()">Salvar
-                    Anexo</button>
+                <button class="btn-p mt12" id="client-attach-save-btn" disabled
+                    onclick="add_anexo_cliente()">Salvar Anexo</button>
             </div>
         </div>
     </div>
@@ -6454,6 +6446,65 @@
 
         // Recebe um valor numerico e transforma em reais monetário (R$ X.XXX,XX)
         function fmtMoney(v) { return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+        // Converte texto digitado (que pode vir com vírgula decimal, ex: "306,67", ou no
+        // formato BR completo "1.234,56") num número JS válido, SEM truncar os centavos —
+        // usar no lugar de parseNumBR() puro em qualquer input de valor/percentual, pra
+        // nunca mandar pro script um número cortado (ex: "306,67" virando 306). Também
+        // aceita números/strings já no formato correto (com ponto) normalmente.
+        function parseNumBR(v) {
+            if (v === null || v === undefined) return NaN;
+            if (typeof v === 'number') return v;
+            let s = String(v).trim();
+            if (s === '') return NaN;
+            if (s.includes(',') && s.includes('.')) {
+                // Os dois presentes: formato BR completo (1.234,56) — ponto é milhar, vírgula é decimal
+                s = s.replace(/\./g, '').replace(',', '.');
+            } else if (s.includes(',')) {
+                // Só vírgula: é o separador decimal (ex: "306,67")
+                s = s.replace(',', '.');
+            }
+            return parseFloat(s);
+        }
+
+        // Garante que os campos numéricos vindos do script sejam números JS de verdade
+        // (não texto, e não com vírgula decimal) — proteção do lado de quem RECEBE os
+        // dados, caso a planilha algum dia devolva algo formatado como texto.
+        function _normalizarNumerosDB(db) {
+            if (!db || typeof db !== 'object') return db;
+
+            const numCampos = (obj, campos) => {
+                if (!obj) return;
+                campos.forEach(c => {
+                    if (obj[c] !== undefined && obj[c] !== null && obj[c] !== '' && typeof obj[c] !== 'number') {
+                        const n = parseNumBR(obj[c]);
+                        if (!isNaN(n)) obj[c] = n;
+                    }
+                });
+            };
+
+            (db.loans || []).forEach(loan => {
+                numCampos(loan, ['valor', 'valor_receber', 'prazo', 'juros_val', 'emissao', 'pago', 'qtd_pags', 'parcelas', 'not', 'lin']);
+                (loan.pagamentos || []).forEach(p => numCampos(p, ['valor', 'data', 'totalPagoAntes', 'geradoEm', 'lin']));
+            });
+
+            if (db.defaults) {
+                numCampos(db.defaults, ['juros_val', 'juros_fixo_val', 'juros_perc_val']);
+                if (db.defaults.prazos && typeof db.defaults.prazos === 'object') {
+                    Object.keys(db.defaults.prazos).forEach(k => {
+                        const n = parseNumBR(db.defaults.prazos[k]);
+                        if (!isNaN(n)) db.defaults.prazos[k] = n;
+                    });
+                }
+            }
+
+            if (typeof db.time !== 'number') {
+                const n = parseNumBR(db.time);
+                if (!isNaN(n)) db.time = n;
+            }
+
+            return db;
+        }
 
         // FUNÇÃO PARA COLETAR AS TAXAS DE LUCRO (DINÂMICA - BASEADA NO PRAZO ANTERIOR)
         const getProfitRate = (prazo) => {
@@ -8845,8 +8896,6 @@
                 return;
             }
 
-            showLoading(['CRIANDO NOVO CLIENTE...', 'VERIFICANDO DADOS...', 'ENVIANDO PARA PLANILHA...', 'SINCRONIZANDO...', 'ATUALIZANDO LISTA...', 'TERMINANDO...']);
-
             const initials = nome.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase();
             const colors = ['av-g', 'av-b', 'av-a', 'av-r', 'av-p'];
             const color = colors[DB.clients.length % colors.length];
@@ -8863,39 +8912,12 @@
 
             const id = novo_id;
 
-
-            const cliente = { ids_total_c, id, nome, tel, email, desc, initials, color, qtd_emps, time: DB.time };
-
-            try {
-                console.log("Adicionando novo cliente na planilha...");
-                const data_fetch = { data: cliente, funcao: 'add_cliente', id_usuario: ID_USUARIO };
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch - add cliente") };
-
-                const novoDB = await res.json();
-
-                if (novoDB.error) {
-                    throw new Error(novoDB.error);
-                }
-
-                console.log("Novo Cliente adicionado com sucesso");
-                DB = novoDB;
-            }
-            catch (err) {
-                console.log("Erro ao adicionar o novo Cliente");
-                console.log(err);
-
-                showToast("Erro ao adicionar o novo Cliente", 'err');
-                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
-                setTimeout(() => {
-                    return window.location.reload(true);
-                }, 5000);
-            }
-
-            // Salvar backup local
+            showLoadingFor(1000, ['Salvando cliente…']);
+            // Atualização otimista: aplica local e já reflete na tela, sem esperar o script.
+            // A planilha monta "lin", "lins_emps", "lins_pags" e "anexos" automaticamente
+            // (arrays vazios pra um cliente novo, já que ele ainda não tem nada vinculado).
+            DB.clients.push({ id, nome, tel, email, desc, initials, color, qtd_emps, lins_emps: [], lins_pags: [], anexos: [] });
+            DB.ids_total_c = ids_total_c;
             backup_local();
 
             document.getElementById('nc-nome').value = ''; document.getElementById('nc-tel').value = ''; document.getElementById('nc-email').value = ''; document.getElementById('nc-desc').value = '';
@@ -8903,9 +8925,12 @@
             _novoSelectedClientId = id;
             renderNovoClientList();
 
-            hideLoading();
             setTimeout(() => goToStep2(), 100);
             showToast('Cliente salvo!', 'ok');
+
+            // Sincroniza com a planilha em segundo plano
+            refreshCurrentScreen();
+            syncBackground('cliente_novo', { ids_total_c, id, nome, tel, email, desc, initials, color, qtd_emps });
         }
 
         function openEditCliente() {
@@ -8957,8 +8982,6 @@
             const c = getClient(_currentClientId);
             if (!c) return;
 
-            showLoading(['EDITANDO CLIENTE...', 'VERIFICANDO DADOS...', 'ENVIANDO PARA PLANILHA...', 'SINCRONIZANDO...', 'ATUALIZANDO LISTA...', 'TERMINANDO...']);
-
             const id = _currentClientId;
             const nome = nome_edit;
             const tel = tel_edit;
@@ -8972,45 +8995,24 @@
 
             const cliente = { ids_total_c, id, nome, tel, email, desc, initials, color, qtd_emps, lin, time: DB.time };
 
-            try {
-                console.log("Editando o cliente na planilha...");
-                const data_fetch = { data: cliente, funcao: 'add_cliente', id_usuario: ID_USUARIO };
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch - add cliente") };
-
-                const novoDB = await res.json();
-
-                if (novoDB.error) {
-                    throw new Error(novoDB.error);
-                }
-
-                console.log("Cliente editado com sucesso");
-                DB = novoDB;
-            }
-            catch (err) {
-                console.log("Erro ao editar o Cliente");
-                console.log(err);
-
-                showToast("Erro ao editar o Cliente", 'err');
-                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
-                setTimeout(() => {
-                    return window.location.reload(true);
-                }, 5000);
-            }
-
-            // Salvar backup local
+            showLoadingFor(1000, ['Salvando alterações…']);
+            // Atualização otimista: substitui o cliente localmente e já atualiza a tela.
+            // "ids_total_c" e "time" são globais do DB, não campos do cliente na planilha —
+            // não entram no objeto mesclado.
+            const idx = DB.clients.findIndex(cl => cl.id === id);
+            if (idx !== -1) DB.clients[idx] = { ...DB.clients[idx], id, nome, tel, email, desc, initials, color, qtd_emps, lin };
             backup_local();
 
             closeSheet(document.getElementById('edit-client-confirm-sheet'));
             closeSheet(document.getElementById('edit-client-sheet'));
-            hideLoading();
 
             showToast('Cliente atualizado! ✓', 'ok');
             // Re-render the detail screen with updated data
             setTimeout(() => openClienteDetalhe(_currentClientId), 300);
+
+            // Sincroniza com a planilha em segundo plano (o "lin" é resolvido fresco na hora do envio)
+            refreshCurrentScreen();
+            syncBackground('cliente_editar', { ids_total_c, id, nome, tel, email, desc, initials, color, qtd_emps });
         }
 
 
@@ -9047,47 +9049,26 @@
             if (typed !== id_verif) { showToast('ID incorreto, tente novamente', 'err'); return; }
 
 
-            showLoading(['DELETANDO CLIENTE...', 'APAGANDO DADOS...', 'REMOVENDO EMPRESTIMOS...', 'ATUALIZANDO PLANILHA...', 'REMOVENDO ANEXOS...', 'SINCRONIZANDO...', 'ATUALIZANDO LISTA...', 'TERMINANDO...']);
-
             const c = getClient(_currentClientId);
             const id = c.id;
-            const lin = c.lin;
-            const lins_emps = c.lins_emps;
-            const lins_pags = c.lins_pags;
             const completo_x = completo ? true : false;
 
-            const dados_apagar = { id, lin, lins_emps, lins_pags, completo_x, time: DB.time };
-
-            try {
-                console.log("DELETANDO cliente da planilha...");
-                const data_fetch = { data: dados_apagar, funcao: 'del_cliente', id_usuario: ID_USUARIO };
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch - del cliente") };
-
-                const novoDB = await res.json();
-
-                if (novoDB.error) {
-                    throw new Error(novoDB.error);
+            showLoadingFor(1000, ['Apagando cliente…']);
+            // Atualização otimista: o script sempre apaga os empréstimos/pagamentos/anexos do
+            // cliente (mesmo quando "completo" é falso); só a linha do próprio cliente é mantida
+            // ou não dependendo de completo_x. "qtd_emps"/"ids_total_c" são contadores de ID e
+            // nunca são zerados pelo script, então não mexemos neles aqui.
+            DB.loans = DB.loans.filter(l => l.clientId !== id);
+            if (completo_x) {
+                DB.clients = DB.clients.filter(cl => cl.id !== id);
+            } else {
+                const cliRestante = DB.clients.find(cl => cl.id === id);
+                if (cliRestante) {
+                    cliRestante.lins_emps = [];
+                    cliRestante.lins_pags = [];
+                    cliRestante.anexos = [];
                 }
-
-                console.log("Cliente deletado com sucesso");
-                DB = novoDB;
             }
-            catch (err) {
-                console.log("Erro ao deletar Cliente");
-                console.log(err);
-
-                showToast("Erro ao deletar Cliente", 'err');
-                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
-                setTimeout(() => {
-                    return window.location.reload(true);
-                }, 5000);
-            }
-
-            // Salvar backup local
             backup_local();
 
             renderClientes();
@@ -9097,9 +9078,13 @@
             closeSheet(document.getElementById('edit-client-sheet'));
 
             goToStep2();
-            hideLoading();
 
             showToast('Cliente deletado!', 'ok');
+
+            // Sincroniza com a planilha em segundo plano (lin/lins_emps/lins_pags resolvidos
+            // frescos, direto do DB_srv, na hora do envio)
+            refreshCurrentScreen();
+            syncBackground('cliente_apagar', { id, completo_x });
         }
 
 
@@ -9321,7 +9306,7 @@
                 }
             }
 
-            const valor = parseFloat(inputValor.value);
+            const valor = parseNumBR(inputValor.value);
             if (valor < 0) {
                 inputValor.style.borderColor = "var(--err, #ff4d4d)";
                 inputValor.value = "";
@@ -9393,7 +9378,7 @@
                 pr = pr * 100;
             } else {
                 // Modo Manual: Captura valor digitado e força a trava (não aceita menor que o valor emprestado)
-                let vReceberDigito = parseFloat(inputReceber.value) || 0;
+                let vReceberDigito = parseNumBR(inputReceber.value) || 0;
 
                 if (vReceberDigito > 0 && vReceberDigito < valor) {
                     inputReceber.style.borderColor = "var(--err, #ff4d4d)";
@@ -9407,7 +9392,7 @@
                 pr = valorBase > valor ? (valorBase - valor) / valor * 100 : 0;
             }
 
-            const jurosVal = parseFloat(inputJurosVal.value);
+            const jurosVal = parseNumBR(inputJurosVal.value);
             if (jurosVal < 0) {
                 inputJurosVal.style.borderColor = "var(--err, #ff4d4d)";
                 inputJurosVal.value = "";
@@ -9443,12 +9428,12 @@
             const inputData = document.getElementById('ne-data');
             const inputDataVenc = document.getElementById('ne-data-venc');
             const inputJurosVal = document.getElementById('ne-juros-val');
-            const valor = parseFloat(inputValor.value) || 0;
+            const valor = parseNumBR(inputValor.value) || 0;
             const dataEmissao = parseDate(inputData.value);
             const jurosTipo = document.getElementById('ne-juros-tipo').value;
-            const jurosVal = parseFloat(inputJurosVal.value) || 0;
+            const jurosVal = parseNumBR(inputJurosVal.value) || 0;
 
-            const valorEmprestado = parseFloat(inputValor.value) || 0;
+            const valorEmprestado = parseNumBR(inputValor.value) || 0;
 
 
             let prazoRaw = 0;
@@ -9461,7 +9446,7 @@
                 prazoRaw = parseInt(inputPrazo.value) || 0;
 
                 // Validação extra e impeditiva para o valor a receber no modo manual
-                const valorReceber = parseFloat(inputReceber.value) || 0;
+                const valorReceber = parseNumBR(inputReceber.value) || 0;
                 if (!valorReceber || valorReceber < valor) {
                     inputReceber.style.borderColor = "var(--err, #ff4d4d)";
                     showToast('O valor a receber não esta válido', 'err');
@@ -9491,7 +9476,7 @@
             }
 
             const pr = getProfitRate(prazoRaw);
-            const valor_receber = modo === 'manual' ? parseFloat(document.getElementById('ne-receber-manual').value) : valor * (1 + pr);
+            const valor_receber = modo === 'manual' ? parseNumBR(document.getElementById('ne-receber-manual').value) : valor * (1 + pr);
             const c = getClient(_novoSelectedClientId);
 
             const parcelas = Math.max(1, parseInt(document.getElementById('ne-parcelas').value) || 1);
@@ -9664,9 +9649,9 @@
 
         // Nova função intermediária para o modo manual
         function validarECalcularManual() {
-            const valorEmprestado = parseFloat(document.getElementById('ne-valor').value) || 0;
+            const valorEmprestado = parseNumBR(document.getElementById('ne-valor').value) || 0;
             const inputReceber = document.getElementById('ne-receber-manual');
-            let valorReceber = parseFloat(inputReceber.value) || 0;
+            let valorReceber = parseNumBR(inputReceber.value) || 0;
 
             // Se o usuário digitou um valor menor do que o emprestado, avisa ou força o valor mínimo
             if (valorReceber > 0 && valorReceber < valorEmprestado) {
@@ -9716,7 +9701,6 @@
 
         async function add_emprestimo() {
             console.log("Gerando novo emprestimo...");
-            showLoading(['Adicionando Novo Emprestimo...', 'Atualizando Dados...', 'Aguarde...', 'Gerando Comprovante...', 'Finalizando...']);
 
             closeSheet(document.getElementById('novo-emp-confirm-sheet'));
             const d = _newLoanData;
@@ -9746,49 +9730,28 @@
 
             const qtd_emps = d.qtd_emps + 1;
 
-            const loan = { id, clientId, valor, valor_receber, prazo, parcelas, juros_tipo, juros_val, emissao, pago, qtd_pags, lin_cliente, novo_qtd_emps, time: DB.time };
-
-            try {
-                console.log("Adicionando empréstimo na planilha...");
-                const data_fetch = { data: loan, funcao: 'add_emprestimo', id_usuario: ID_USUARIO };
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch - add emprestimo") };
-
-                const novoDB = await res.json();
-
-                if (!novoDB.time || novoDB.time <= DB.time) {
-                    console.log('novoDB');
-                    console.log(novoDB);
-                    throw new Error(novoDB.error);
-                }
-
-                console.log("Emprestimo adicionado com sucesso");
-                DB = novoDB;
-            }
-            catch (err) {
-                console.log("Erro ao adicionar novo emprestimo");
-                console.log(err);
-
-                showToast("Erro ao adicionar novo emprestimo", 'err');
-                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
-                setTimeout(() => {
-                    return window.location.reload(true);
-                }, 5000);
-            }
-
-
-            // Salvar backup local
+            showLoadingFor(1000, ['Criando empréstimo…']);
+            // Atualização otimista: adiciona o empréstimo e atualiza a contagem do cliente na hora.
+            // A planilha sempre grava "not"=1 (notificações ativas) pra empréstimo novo, e monta
+            // "pagamentos", "anexo_envio" e "lins_pags" vazios automaticamente (nada vinculado ainda).
+            if (!Array.isArray(DB.loans)) DB.loans = [];
+            DB.loans.push({
+                id, clientId, valor, valor_receber, prazo, parcelas, juros_tipo, juros_val, emissao,
+                pago, qtd_pags, not: 1, pagamentos: [], anexo_envio: [], lins_pags: []
+            });
+            const cli = getClient(clientId);
+            if (cli) cli.qtd_emps = qtd_emps;
             backup_local();
 
             _currentLoanId = id;
-            hideLoading();
 
             const newloan = getLoan(id);
             renderComprovante(newloan);
             navTo('comprovante');
+
+            // Sincroniza com a planilha em segundo plano ("lin_cliente" é resolvido fresco na hora do envio)
+            refreshCurrentScreen();
+            syncBackground('emprestimo_novo', { id, clientId, valor, valor_receber, prazo, parcelas, juros_tipo, juros_val, emissao, pago, qtd_pags, novo_qtd_emps });
         }
 
 
@@ -9837,7 +9800,7 @@
             const statusBox = document.getElementById('ee-status-box');
             const tlWrap = document.getElementById('ee-timeline-wrap');
 
-            const novoValor = parseFloat(inputValor.value);
+            const novoValor = parseNumBR(inputValor.value);
             const novaData = parseDate(inputData.value);
             const novoTipo = inputJurosTipo.value;
 
@@ -9907,7 +9870,7 @@
             let valorBase = 0;
 
             // Modo Manual: Captura valor digitado e força a trava (não aceita menor que o valor emprestado)
-            let vReceberDigito = parseFloat(inputReceber.value) || 0;
+            let vReceberDigito = parseNumBR(inputReceber.value) || 0;
 
             if (vReceberDigito > 0 && vReceberDigito < novoValor) {
                 inputReceber.style.borderColor = "var(--err, #ff4d4d)";
@@ -9921,7 +9884,7 @@
             pr = valorBase > novoValor ? (valorBase - novoValor) / novoValor * 100 : 0;
             const novoBase = valorBase;
 
-            const novoJuros = parseFloat(inputJurosVal.value);
+            const novoJuros = parseNumBR(inputJurosVal.value);
             if (novoJuros < 0) {
                 inputJurosVal.style.borderColor = "var(--err, #ff4d4d)";
                 inputJurosVal.value = "";
@@ -9980,9 +9943,9 @@
         }
 
         function validarECalcularManual_edit() {
-            const valorEmprestado = parseFloat(document.getElementById('ee-valor-edit').value) || 0;
+            const valorEmprestado = parseNumBR(document.getElementById('ee-valor-edit').value) || 0;
             const inputReceber = document.getElementById('ee-receber-manual-edit');
-            let valorReceber = parseFloat(inputReceber.value) || 0;
+            let valorReceber = parseNumBR(inputReceber.value) || 0;
 
             // Se o usuário digitou um valor menor do que o emprestado, avisa ou força o valor mínimo
             if (valorReceber > 0 && valorReceber < valorEmprestado) {
@@ -10053,13 +10016,13 @@
         let _pendingEditEmp_pago = null;
         let _pendingEditEmp = null;
         function preConfirmarEditEmp() {
-            const novoValor = parseFloat(document.getElementById('ee-valor-edit').value) || 0;
-            const novoValorReceber = parseFloat(document.getElementById('ee-receber-manual-edit').value) || 0;
+            const novoValor = parseNumBR(document.getElementById('ee-valor-edit').value) || 0;
+            const novoValorReceber = parseNumBR(document.getElementById('ee-receber-manual-edit').value) || 0;
             const novaData = parseDate(document.getElementById('ee-data-edit').value);
             const novoPrazo = parseInt(document.getElementById('ee-prazo-manual-edit').value) || 0;
             const novoParcelas = Math.max(1, parseInt(document.getElementById('ee-parcelas-edit').value) || 1);
             const novoTipo = document.getElementById('ee-juros-tipo-edit').value;
-            const novoJuros = parseFloat(document.getElementById('ee-juros-val-edit').value) || 0;
+            const novoJuros = parseNumBR(document.getElementById('ee-juros-val-edit').value) || 0;
             if (!novoValor || !novoValorReceber || !novaData || !novoPrazo || !novoJuros) { showToast('Preencha todos os campos', 'err'); return; }
             if (novaData > TODAY) { showToast('Data não pode ser no futuro', 'err'); return; }
             if (novoParcelas > novoPrazo) { showToast('O número de parcelas não pode ser maior que o prazo em dias', 'err'); return; }
@@ -10093,7 +10056,6 @@
             if (typed !== _currentLoanId) { showToast('ID incorreto, tente novamente', 'err'); return; }
 
             console.log("Editando Emprestimo...");
-            showLoading(['Editando Emprestimo...', 'Atualizando Dados...', 'Apagando Pagamentos...', 'Apagando Anexos...', 'Salvando Novos Dados...', 'Finalizando...']);
 
             closeSheet(document.getElementById('edit-emp-confirm-sheet'));
             closeSheet(document.getElementById('edit-emp-sheet'));
@@ -10111,55 +10073,28 @@
 
             const id = loan.id;
             const clientId = loan.clientId;
-            const lin = loan.lin;
-            const lins_pags = loan.lins_pags;
 
-            const new_loan = { id, clientId, valor, valor_receber, prazo, parcelas, juros_tipo, juros_val, emissao, pago, qtd_pags, lin, time: DB.time };
-
-            if (lins_pags.length > 0) {
-                new_loan.lins_pags = lins_pags;
-            }
-
-            try {
-                const data_fetch = { data: new_loan, funcao: 'add_emprestimo', id_usuario: ID_USUARIO };
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch - add emprestimo") };
-
-                const novoDB = await res.json();
-
-                if (!novoDB.time || novoDB.time <= DB.time) {
-                    console.log('novoDB');
-                    console.log(novoDB);
-                    throw new Error(novoDB.error);
-                }
-
-                console.log("Emprestimo editado com sucesso");
-                DB = novoDB;
-            }
-            catch (err) {
-                console.log("Erro ao editar emprestimo");
-                console.log(err);
-
-                showToast("Erro ao editar emprestimo", 'err');
-                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
-                setTimeout(() => {
-                    return window.location.reload(true);
-                }, 5000);
-            }
-
-            // Salvar backup local
-            backup_local();
-
+            showLoadingFor(1000, ['Salvando alterações…']);
+            // Atualização otimista: aplica as mudanças e zera pagamentos/status na hora.
+            // O script sempre grava "not"=1 ao editar (reativa notificações, mesmo se
+            // estavam desligadas) e sempre apaga os anexos do empréstimo (localizar_anexos).
             Object.assign(loan, _pendingEditEmp);
+            loan.pago = 0;
+            loan.qtd_pags = 0;
+            loan.not = 1;
+            loan.pagamentos = [];
+            loan.anexo_envio = [];
+            loan.lins_pags = [];
+            backup_local();
 
             _pendingEditEmp = null;
             _pendingEditEmp_pago = null;
             showToast('Empréstimo atualizado! ✓', 'ok');
             updateNotifBadge();
-            setTimeout(() => openEmpDetalhe(_currentLoanId), 300);
+
+            // Sincroniza com a planilha em segundo plano ("lin"/"lins_pags" resolvidos frescos)
+            refreshCurrentScreen();
+            syncBackground('emprestimo_editar', { id, clientId, valor, valor_receber, prazo, parcelas, juros_tipo, juros_val, emissao, pago, qtd_pags });
         }
 
         // ---- Marcar / desmarcar como pago ----
@@ -10208,54 +10143,22 @@
             const loan = getLoan(_currentLoanId);
             if (!loan) return;
 
-            showLoading(['ALTERANDO PAGO...', 'IGNORANDO PAGAMENTOS...', 'SALVANDO NA PLANILHA...', 'FINALIZANDO...']);
-
             const id = loan.id;
-            const lin = loan.lin;
             const novo_pago = novoEstado;
 
-            const novo_pago_x = { id, lin, novo_pago, time: DB.time };
-
-            try {
-                console.log("ALTERANDO SE PAGO...");
-                const data_fetch = { data: novo_pago_x, funcao: 'edit_pago', id_usuario: ID_USUARIO };
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch - edit pago") };
-
-                const novoDB = await res.json();
-
-                if (novoDB.error) {
-                    throw new Error(novoDB.error);
-                }
-
-                console.log("PAGO ALTERADO com sucesso");
-                DB = novoDB;
-            }
-            catch (err) {
-                console.log("Erro ao ALTERAR PAGO");
-                console.log(err);
-
-                showToast("Erro ao ALTERAR PAGO", 'err');
-                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
-                setTimeout(() => {
-                    return window.location.reload(true);
-                }, 5000);
-            }
-
-            // Salvar backup local
+            showLoadingFor(1000, [novoEstado ? 'Marcando como pago…' : 'Removendo quitação…']);
+            // Atualização otimista
+            loan.pago = novo_pago;
             backup_local();
-
 
             closeSheet(document.getElementById('mark-paid-confirm-sheet'));
             updateNotifBadge();
-            openEmpDetalhe(_currentLoanId)
-
-            hideLoading();
+            openEmpDetalhe(_currentLoanId, false, true)
 
             showToast(novoEstado ? 'Marcado como pago! ✓' : 'Quitação removida', 'ok');
+
+            refreshCurrentScreen();
+            syncBackground('emprestimo_pago', { id, novo_pago });
         }
 
 
@@ -10295,52 +10198,21 @@
             const loan = getLoan(_currentLoanId);
             if (!loan) return;
 
-            showLoading(['ALTERANDO NOTIFICAÇÕES...', 'SALVANDO NA PLANILHA...', 'FINALIZANDO...']);
-
             const id = loan.id;
-            const lin = loan.lin;
             const novo_not = novoEstado;
 
-            const novo_not_x = { id, lin, novo_not, time: DB.time };
-
-            try {
-                console.log("ALTERANDO NOTIFICAÇÕES...");
-                const data_fetch = { data: novo_not_x, funcao: 'edit_not', id_usuario: ID_USUARIO };
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch - edit not") };
-
-                const novoDB = await res.json();
-
-                if (novoDB.error) {
-                    throw new Error(novoDB.error);
-                }
-
-                console.log("NOTIFICAÇÕES ALTERADAS com sucesso");
-                DB = novoDB;
-            }
-            catch (err) {
-                console.log("Erro ao ALTERAR NOTIFICAÇÕES");
-                console.log(err);
-
-                showToast("Erro ao ALTERAR NOTIFICAÇÕES", 'err');
-                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
-                setTimeout(() => {
-                    return window.location.reload(true);
-                }, 5000);
-            }
-
-            // Salvar backup local
+            showLoadingFor(1000, [novoEstado ? 'Ativando notificação…' : 'Desativando notificação…']);
+            // Atualização otimista
+            loan.not = novo_not;
             backup_local();
 
             closeSheet(document.getElementById('toggle-notif-confirm-sheet'));
-            openEmpDetalhe(_currentLoanId);
-
-            hideLoading();
+            openEmpDetalhe(_currentLoanId, false, true);
 
             showToast(novoEstado ? 'Notificações ativadas! ✓' : 'Notificações desativadas', 'ok');
+
+            refreshCurrentScreen();
+            syncBackground('emprestimo_notif', { id, novo_not });
         }
 
 
@@ -10379,50 +10251,12 @@
             const typed = document.getElementById('delete-confirm-input')?.value?.trim();
             if (typed !== expectedId) { showToast('ID incorreto, tente novamente', 'err'); return; }
 
-            showLoading(['DELETANDO EMPRESTIMO...', 'APAGANDO DADOS...', 'REMOVENDO PAGAMENTOS...', 'ATUALIZANDO PLANILHA...', 'REMOVENDO ANEXOS...', 'SINCRONIZANDO...', 'TERMINANDO...']);
-
             const loan = getLoan(expectedId);
             const id = loan.id;
-            const lin = loan.lin;
-            const lins_pags = loan.lins_pags;
 
-            const dados_apagar = { id, lin, time: DB.time };
-
-            if (lins_pags.length > 0) {
-                dados_apagar.lins_pags = lins_pags;
-            }
-
-
-            try {
-                console.log("DELETANDO emprestimo da planilha...");
-                const data_fetch = { data: dados_apagar, funcao: 'del_emprestimo', id_usuario: ID_USUARIO };
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch - del emprestimo") };
-
-                const novoDB = await res.json();
-
-                if (novoDB.error) {
-                    throw new Error(novoDB.error);
-                }
-
-                console.log("Emprestimo deletado com sucesso");
-                DB = novoDB;
-            }
-            catch (err) {
-                console.log("Erro ao deletar Emprestimo");
-                console.log(err);
-
-                showToast("Erro ao deletar Emprestimo", 'err');
-                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
-                setTimeout(() => {
-                    return window.location.reload(true);
-                }, 5000);
-            }
-
-            // Salvar backup local
+            showLoadingFor(1000, ['Apagando empréstimo…']);
+            // Atualização otimista: remove localmente na hora
+            DB.loans = DB.loans.filter(l => l.id !== id);
             backup_local();
 
             updateNotifBadge();
@@ -10430,9 +10264,11 @@
 
             navTo('dash');
 
-            hideLoading();
-
             showToast('Empréstimo excluído', 'ok');
+
+            // Sincroniza com a planilha em segundo plano ("lin"/"lins_pags" resolvidos frescos)
+            refreshCurrentScreen();
+            syncBackground('emprestimo_apagar', { id });
         }
 
         // ==================== CLIENTES ====================
@@ -10638,8 +10474,8 @@
             });
         }
 
-        function openClienteDetalhe(cid) {
-            pushHistory('cliente-detalhe', cid);
+        function openClienteDetalhe(cid, semNav) {
+            if (!semNav) pushHistory('cliente-detalhe', cid);
             _currentClientId = cid;
             const c = getClient(cid);
             if (!c) return;
@@ -10755,7 +10591,7 @@
                 `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>${_periodFilter.mode !== 'all' ? 'Nenhum empréstimo neste período' :
                     'Nenhum empréstimo ainda'}</p></div>`;
 
-            navTo('cliente-detalhe');
+            if (!semNav) navTo('cliente-detalhe');
         }
 
         function backFromClienteDetalhe() {
@@ -10776,8 +10612,8 @@
             openEmpDetalhe(lid, true);
         }
 
-        function openEmpDetalhe(lid, fromCalDay) {
-            pushHistory('emp-detalhe', lid);
+        function openEmpDetalhe(lid, fromCalDay, semNav) {
+            if (!semNav) pushHistory('emp-detalhe', lid);
             _openedEmpFromCalDay = !!fromCalDay;
             _currentLoanId = lid;
             const l = getLoan(lid);
@@ -10934,7 +10770,8 @@
             document.getElementById('ed-pag-data').max = dateStr(TODAY);
             document.getElementById('ed-pag-retro-wrap').style.display = 'none';
 
-            // Back
+            // Back — volta pra tela de onde o usuário realmente veio (_prevScreen),
+            // não sempre pra 'emprestimos'.
             document.getElementById('ed-back-btn').onclick = () => {
                 if (_openedEmpFromCalDay && _calDaySheetOrigin) {
                     const o = _calDaySheetOrigin;
@@ -10942,12 +10779,19 @@
                     navTo('dash');
                     openCalDaySheet(o.year, o.month, o.day);
                 } else if (_prevScreen === 'cliente-detalhe') openClienteDetalhe(l.clientId);
-                else navTo('emprestimos');
+                else navTo(_prevScreen || 'emprestimos');
             };
 
             // Timeline
             renderTimeline(l);
-            navTo('emp-detalhe');
+            // "semNav" significa que já estamos NESTA tela e só queremos atualizar o
+            // conteúdo (ex: depois de uma ação otimista) — nesse caso NÃO chama navTo,
+            // que dispara showLoadingFor(300) (uma tela de carregamento cobrindo tudo)
+            // desnecessariamente. Isso é o que fazia a atualização parecer "atrasada":
+            // o conteúdo já estava certo, mas ficava escondido atrás do loading por um
+            // instante e, em ações encadeadas (ex: abrir o comprovante em seguida),
+            // esse efeito se acumulava.
+            if (!semNav) navTo('emp-detalhe');
         }
 
         // Espera a rolagem suave de um elemento realmente terminar, em vez de usar um
@@ -11609,60 +11453,26 @@
             const typed = document.getElementById('del-pag-id-input')?.value?.trim();
             if (typed !== id_x) { showToast('ID incorreto, tente novamente', 'err'); return; }
 
-            showLoading(['APAGANDO PAGAMENTO...', 'ATUALIZANDO DADOS...', 'APAGANDO ANEXOS...', 'COLETANDO NOVOS VALORES...', 'TERMINANDO...']);
-
-
-            const pags_removidos = loan.pagamentos.filter(p => p.data >= pag.data);
-            let lins_pags = [pag.lin];
-            if (pags_removidos.length > 0) {
-                lins_pags = pags_removidos.map(pago => pago.lin);
-            }
-
             const id = pid;
             const data_busca = pag.data;
 
-            const dados_apagar = { id, lins_pags, data_busca, time: DB.time };
-
-            try {
-                console.log("Apagando pagamento...");
-                const data_fetch = { data: dados_apagar, funcao: 'del_pagamento', id_usuario: ID_USUARIO };
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch - del pagamento") };
-
-                const novoDB = await res.json();
-
-                if (novoDB.error) {
-                    throw new Error(novoDB.error);
-                }
-
-                console.log("Pagamento apagado com sucesso");
-                DB = novoDB;
-            }
-            catch (err) {
-                console.log("Erro ao apagar o pagamento");
-                console.log(err);
-
-                showToast("Erro ao apagar o pagamento", 'err');
-                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
-                setTimeout(() => {
-                    return window.location.reload(true);
-                }, 5000);
-            }
-
-            // Salvar backup local
+            showLoadingFor(1000, ['Apagando pagamento…']);
+            // Atualização otimista: remove o pagamento (e os posteriores) na hora.
+            // A planilha remonta "lins_pags" do empréstimo com base nas linhas que sobraram
+            // (o que sobra localmente aqui é só pra tela; o envio real resolve o "lin"
+            // certo direto do DB_srv, na hora do envio).
+            loan.pagamentos = loan.pagamentos.filter(p => p.data < pag.data);
+            loan.lins_pags = loan.pagamentos.map(p => p.lin);
             backup_local();
 
             closeSheet(document.getElementById('delete-pag-confirm-sheet'));
-            openEmpDetalhe(lid)
-            hideLoading();
 
             showToast('Pagamento apagado', 'ok');
             updateNotifBadge();
-            openEmpDetalhe(lid);
+
+            // Sincroniza com a planilha em segundo plano ("lins_pags" resolvido fresco, do DB_srv)
+            refreshCurrentScreen();
+            syncBackground('pagamento_apagar', { id, loanId: lid, dataRef: data_busca, linFallback: pag.lin });
         }
 
         // Abrir janela de edição de pagamentos
@@ -11675,13 +11485,13 @@
             function buildEditBody() {
                 const editValor = document.getElementById('epag-valor')?.value ?? pag.valor;
                 const dtPag = document.getElementById('epag-data')?.value ? parseDate(document.getElementById('epag-data')?.value) : pag.data;
-                const vValor = parseFloat(editValor) || 0;
+                const vValor = parseNumBR(editValor) || 0;
                 const isRetro = dtPag < TODAY - 12 * 60 * 60 * 1000;
 
                 return `
                 <div class="sc-lbl">Dados do pagamento</div>
                 <div class="fg"><div class="fl">Valor pago (R$)</div>
-                    <input class="fi" id="epag-valor" type="text" inputmode="numeric" step="1" value="${pag.valor}" oninput="this.value=this.value.replace(/[^0-9\s]/g, ''); refreshEditPag('${lid}','${pid}')">
+                    <input class="fi" id="epag-valor" type="text" inputmode="numeric" step="1" value="${pag.valor}" oninput="this.value=this.value.replace(/[^0-9.,]/g, ''); refreshEditPag('${lid}','${pid}')">
                 </div>
                 <div class="fg"><div class="fl">Data do pagamento</div>
                     <input class="fi" id="epag-data" type="date" value="${dateStr(pag.data)}" min="${dateStr(loan.emissao)}" max="${dateStr(TODAY)}" onchange="refreshEditPag('${lid}','${pid}')">
@@ -11756,7 +11566,7 @@
             const loan = getLoan(lid);
             const pag = loan.pagamentos.find(p => p.id === pid);
             if (!pag) return;
-            const vValor = parseFloat(document.getElementById('epag-valor')?.value) || 0;
+            const vValor = parseNumBR(document.getElementById('epag-valor')?.value) || 0;
             _valor_edit = vValor;
             const vData = document.getElementById('epag-data')?.value ? parseDate(document.getElementById('epag-data')?.value) : '';
             if (!vData) return;
@@ -11843,7 +11653,7 @@
             const loanSim = structuredClone(loan);
             const pag = loanSim.pagamentos.find(p => p.id === pid);
             if (!pag) return;
-            const novoValor = parseFloat(document.getElementById('epag-valor').value) || 0;
+            const novoValor = parseNumBR(document.getElementById('epag-valor').value) || 0;
             let novaData = parseDate(document.getElementById('epag-data').value);
             if (!novoValor || !novaData) { showToast('Preencha valor e data', 'err'); return; }
 
@@ -11928,7 +11738,7 @@
             let loan_retro = structuredClone(loan);
 
             let data = parseDate(document.getElementById('ed-pag-data').value);
-            const valor = parseFloat(document.getElementById('ed-pag-valor').value) || 0;
+            const valor = parseNumBR(document.getElementById('ed-pag-valor').value) || 0;
             const wrap = document.getElementById('ed-pag-retro-wrap');
             const wrap_retro = document.getElementById('ed-pag-retro-wrap-retro');
 
@@ -11974,7 +11784,7 @@
 
         function doRegistrarPagamento() {
             let valor, data;
-            valor = parseFloat(document.getElementById('ed-pag-valor').value) || 0;
+            valor = parseNumBR(document.getElementById('ed-pag-valor').value) || 0;
             data = parseDate(document.getElementById('ed-pag-data').value);
 
 
@@ -12050,7 +11860,7 @@
 
             bodyHTML += `
                 <div class="confirm-btns">
-                <button class="cbtn-n" onclick="closeSheet(document.getElementById('pag-confirm-sheet'))">Cancelar</button><button class="cbtn-y" onclick="add_pagamento('${_currentLoanId}',${valor},'${data}')">Confirmar ✓</button></div>`;
+                <button class="cbtn-n" onclick="closeSheet(document.getElementById('pag-confirm-sheet'))">Cancelar</button><button class="cbtn-y" onclick="add_pagamento('${_currentLoanId}',${valor},${data})">Confirmar ✓</button></div>`;
 
             document.getElementById('pag-confirm-body').innerHTML = bodyHTML;
             openSheet('pag-confirm-sheet');
@@ -12058,7 +11868,6 @@
 
 
         async function add_pagamento(lid, valor, data, pid_old) {
-            showLoading(['REALIZANDO PAGAMENTO...', 'SALVANDO DADOS...', 'COLETANDO NOVOS VALORES...', 'TERMINANDO...']);
             closeSheet(document.getElementById('pag-confirm-sheet'));
             closeSheet(document.getElementById('retro-final-sheet'));
             const loan = getLoan(lid);
@@ -12069,23 +11878,17 @@
             const isRetro = dtPag < TODAY - 12 * 60 * 60 * 1000;
             const qtd_pags = loan.qtd_pags;
 
-            // Se retroativo: apaga todos os pagamentos com data APÓS a data deste pagamento
-            let removidos_lins = [];
-            let removidos = [];
+            // Se retroativo: os pagamentos com data APÓS a data deste pagamento serão apagados
+            // (a lista real de linhas a apagar é resolvida fresca, do DB_srv, na hora do envio)
             let novo_qtd_pags = 0;
             if (pid_old) {
-                removidos = loan.pagamentos.filter(p => p.data > dtPag || p.data > pag.data || p.id === pid_old);
                 loan_retro.pagamentos = loan.pagamentos.filter(p => p.data < dtPag && p.data < pag.data);
                 novo_qtd_pags = qtd_pags;
 
             } else {
-                removidos = loan.pagamentos.filter(p => p.data > dtPag || p.id === pid_old);
                 loan_retro.pagamentos = loan.pagamentos.filter(p => p.data < dtPag);
                 novo_qtd_pags = qtd_pags + 1;
             }
-
-            removidos_lins = removidos.map(p => p.lin);
-
 
 
             const calc = getLoanCalc(loan_retro);
@@ -12103,55 +11906,27 @@
             }
 
             const pid = pid_old ? pid_old : novo_id;
-            const lin_loan = loan.lin;
 
-            const pagamento = { id: pid, data, valor, status, anexo_pag: [], totalPagoAntes, geradoEm, removidos_lins, time: DB.time };
+            const pagamento = { id: pid, data, valor, status, anexo_pag: [], totalPagoAntes, geradoEm };
 
-            if (!pid_old) {
-                pagamento.lin_loan = lin_loan;
-                pagamento.novo_qtd_pags = novo_qtd_pags;
-            }
-
-            try {
-                console.log("Adicionando pagamento na planilha...");
-                const data_fetch = { data: pagamento, funcao: 'add_pagamento', id_usuario: ID_USUARIO };
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch - add pagamento") };
-
-                const novoDB = await res.json();
-
-                if (novoDB.error) {
-                    throw new Error(novoDB.error);
-                }
-
-                console.log("Pagamento adicionado com sucesso");
-                DB = novoDB;
-            }
-            catch (err) {
-                console.log("Erro ao adicionar o pagamento");
-                console.log(err);
-
-                showToast("Erro ao adicionar o pagamento", 'err');
-                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
-                setTimeout(() => {
-                    return window.location.reload(true);
-                }, 5000);
-            }
-
-            // Salvar backup local
+            showLoadingFor(1000, ['Registrando pagamento…']);
+            // Atualização otimista: aplica o novo pagamento (com retroativos filtrados) e atualiza a tela na hora
+            loan.pagamentos = [...loan_retro.pagamentos, pagamento];
+            loan.qtd_pags = novo_qtd_pags;
             backup_local();
 
-            openEmpDetalhe(lid);
+            openEmpDetalhe(lid, false, true);
             updateNotifBadge();
 
-            hideLoading();
             abrirComprovantePagamento(lid, pid);
             showToast('Pagamento registrado! ✓', 'ok');
 
+            // Sincroniza com a planilha em segundo plano ("lin_loan"/"removidos_lins" resolvidos frescos)
+            refreshCurrentScreen();
+            syncBackground('pagamento_novo', {
+                id: pid, loanId: lid, dtPag: data, valor, status, totalPagoAntes, geradoEm,
+                pid_old, pagDataOriginal: pag ? pag.data : undefined, novo_qtd_pags
+            });
         }
 
 
@@ -12287,9 +12062,9 @@
                         'JUROS DE ATRASO'}</div>
                 </div>
                 <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:10px">
-                    <div style="text-align:center; font-size:10px; font-weight:300; margin-bottom:12px">${fmtMoney(valorBase)}</div>
+                    <div style="text-align:center; font-size:11px; font-weight:700; color:var(--txt0); font-family:var(--font-d); letter-spacing:-.2px; margin-bottom:12px">${fmtMoney(valorBase)}</div>
                     <div style="text-align:center; font-size:11px; font-weight:700; letter-spacing:-.2px; font-family:var(--font-d)">${fmtMoney(dividaTotal)}${retro ? '*' : ''}</div>
-                    <div style="text-align:center; font-size:10px; font-weight:500; margin-bottom:12px">${diasAtrasoPag > 0 ? fmtMoney(jurosAcumNoDia) : juros_dia}${retro ? '*' : ''}</div>
+                    <div style="text-align:center; font-size:11px; font-weight:700; color:var(--txt0); font-family:var(--font-d); letter-spacing:-.2px; margin-bottom:12px">${diasAtrasoPag > 0 ? fmtMoney(jurosAcumNoDia) : juros_dia}${retro ? '*' : ''}</div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:50px; max-width:250px; min-width:50px; margin:0 auto">
@@ -12301,20 +12076,20 @@
                                 ''}</span></div>
                 </div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:50px; max-width:250px; min-width:50px; margin:0 auto">
-                    <div style="text-align:center; font-size:10px; font-weight:100">${fmtDate(loan.emissao)}</div>
+                    <div style="text-align:center; font-size:10px; font-weight:600; color:var(--txt0)">${fmtDate(loan.emissao)}</div>
                         <div style="display:grid; grid-template-columns:60px auto; gap:10px; max-width:220px; min-width:100px; margin:0 auto">
                             <div style="text-align:start; font-size:10px; color:var(--txt2); white-space: nowrap">EM ABERTO</div>
-                            <div style="text-align:start; font-size:10px; font-weight:100; white-space: nowrap">${dias_corridos}${retro ? '*' : ''}</div>
+                            <div style="text-align:start; font-size:10px; font-weight:600; color:var(--txt0); white-space: nowrap">${dias_corridos}${retro ? '*' : ''}</div>
                         </div>
                 </div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:50px; max-width:250px; min-width:50px; margin:0 auto; padding-bottom:30px; ">
-                    <div style="text-align:center; font-size:10px; font-weight:100">${fmtDate(vencimento)}</div>
+                    <div style="text-align:center; font-size:10px; font-weight:600; color:var(--txt0)">${fmtDate(vencimento)}</div>
                         <div style="display:grid; grid-template-columns:60px auto; gap:10px; max-width:220px; min-width:100px; margin:0 auto">
                             <div style="text-align:start; font-size:10px; color:var(--txt2); white-space: nowrap ">${diasAtrasoPag > 0 ? 'DE ATRASO' :
                     diasAtrasoPag == 0 && !retro ? 'VENCE' :
                         diasAtrasoPag < 0 && retro ? 'VENCIA EM' :
                             'VENCE EM'}</div>
-                            <div style="text-align:start; font-size:10px; font-weight:100; white-space: nowrap">${diasAtrasoPag > 0 ? diasAtrasoPag + (diasAtrasoPag == 1 ? ' DIA' : ' DIAS') :
+                            <div style="text-align:start; font-size:10px; font-weight:600; color:var(--txt0); white-space: nowrap">${diasAtrasoPag > 0 ? diasAtrasoPag + (diasAtrasoPag == 1 ? ' DIA' : ' DIAS') :
                     diasAtrasoPag == 0 ? 'HOJE' :
                         Math.abs(diasAtrasoPag) + ((Math.abs(diasAtrasoPag) == 1 ? ' DIA' : ' DIAS'))}${retro ? '*' :
                             ''}</div>
@@ -12447,6 +12222,42 @@
             } else {
                 fab.className = 'no-notif';
             }
+        }
+
+        // Re-renderiza a tela que está visível AGORA, usando o DB atual — sem navegar,
+        // sem fechar sheets, sem mexer no histórico. Chamada depois de qualquer ação que
+        // altera dados (otimista) e também depois que uma sincronização em segundo plano
+        // termina, pra garantir que o que está na tela nunca fique desatualizado esperando
+        // uma navegação ou um F5 pra "puxar" o dado novo.
+        function refreshCurrentScreen() {
+            try {
+                switch (_currentScreen) {
+                    case 'dash':
+                        renderDash();
+                        break;
+                    case 'emprestimos':
+                        renderEmprestimos(_empFilter);
+                        break;
+                    case 'clientes':
+                        renderClientes();
+                        break;
+                    case 'novo':
+                        renderNovo();
+                        break;
+                    case 'cliente-detalhe':
+                        if (_currentClientId && getClient(_currentClientId)) openClienteDetalhe(_currentClientId, true);
+                        break;
+                    case 'emp-detalhe':
+                        if (_currentLoanId && getLoan(_currentLoanId)) openEmpDetalhe(_currentLoanId, false, true);
+                        break;
+                    case 'comprovante':
+                        if (_currentLoanId && getLoan(_currentLoanId)) renderComprovante(getLoan(_currentLoanId));
+                        break;
+                }
+            } catch (err) {
+                console.warn('Falha ao atualizar a tela atual (refreshCurrentScreen):', err);
+            }
+            updateNotifBadge();
         }
 
         // ==================== SHEETS / OVERLAYS ====================
@@ -12671,7 +12482,7 @@
                 const pctEl = document.getElementById(`def-prazo-${key}`);
                 if (!diasEl || !pctEl) continue;
                 const dias = parseInt(diasEl.value);
-                const pct = parseFloat(pctEl.value);
+                const pct = parseNumBR(pctEl.value);
                 if (isNaN(dias) || dias < 1) return { error: `Prazo inválido: "${diasEl.value}"` };
                 if (isNaN(pct) || pct < 0) return { error: `Taxa inválida para ${dias} dias` };
                 if (result[dias] !== undefined) return { error: `Prazo ${dias} dias duplicado` };
@@ -12686,8 +12497,8 @@
             if (collected.error) { showToast(collected.error, 'err'); return; }
             const novosPrazos = collected.prazos;
             const novoTipo = document.getElementById('def-juros-tipo').value;
-            const novoFixoVal = parseFloat(document.getElementById('def-juros-fixo-val').value) || 0;
-            const novoPercVal = parseFloat(document.getElementById('def-juros-perc-val').value) || 0;
+            const novoFixoVal = parseNumBR(document.getElementById('def-juros-fixo-val').value) || 0;
+            const novoPercVal = parseNumBR(document.getElementById('def-juros-perc-val').value) || 0;
             const novoVal = novoTipo === 'fixo' ? novoFixoVal : novoPercVal;
             const novocalculo = document.getElementById('def-calculo-tipo').value;
 
@@ -12748,51 +12559,27 @@
         let _pendingDefaults = null;
 
         async function att_padroes() {
-            showLoading(['ATUALIZANDO PADRÕES...', 'CALCULANDO VALORES...', 'SALVANDO...', 'PADRONIZANDO...', 'TERMINANDO...']);
             if (!_pendingDefaults) return;
 
             const dados_att = _pendingDefaults;
+            const { prazos, juros_tipo, juros_val, juros_fixo_val, juros_perc_val, calculo_tipo } = dados_att;
 
-            try {
-                console.log("Atualizando padrões...");
-                const data_fetch = { data: dados_att, funcao: 'att_padroes', id_usuario: ID_USUARIO };
-                const res = await fetch(URL_SCRIPT,
-                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                );
-
-                if (!res.ok) { throw new Error("Erro ao realizar fetch - att padroes") };
-
-                const novoDB = await res.json();
-
-                if (novoDB.error) {
-                    throw new Error(novoDB.error);
-                }
-
-                console.log("Padrões atualizados com sucesso");
-                DB = novoDB;
-            }
-            catch (err) {
-                console.log("Erro ao atualizar padrões");
-                console.log(err);
-
-                showToast("Erro ao atualizar padrões", 'err');
-                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
-                setTimeout(() => {
-                    return window.location.reload(true);
-                }, 5000);
-            }
-
-            // Salvar backup local
+            showLoadingFor(1000, ['Salvando padrões…']);
+            // Atualização otimista: aplica os novos padrões na hora
+            // ("time" não faz parte do objeto "defaults" da planilha, só vai no payload de sincronização)
+            DB.defaults = { ...(DB.defaults || {}), prazos, juros_tipo, juros_val, juros_fixo_val, juros_perc_val, calculo_tipo };
             backup_local();
 
             _rebuildPrazoSelect();
             closeSheet(document.getElementById('defaults-confirm-sheet'));
             closeSheet(document.getElementById('defaults-sheet'));
-            hideLoading();
 
             _pendingDefaults = null;
 
             showToast('Padrões atualizados! ✓', 'ok');
+
+            refreshCurrentScreen();
+            syncBackground('padroes_atualizar', { prazos, juros_tipo, juros_val, juros_fixo_val, juros_perc_val, calculo_tipo });
         }
 
 
@@ -12947,6 +12734,19 @@
                 if (o) openCalDaySheet(o.year, o.month, o.day);
                 return;
             }
+            // 5b. Emp-detalhe aberto normalmente — volta pra tela real de origem
+            // (_prevScreen), não pra pilha genérica (item 6), que quase sempre tem
+            // 'emprestimos' logo abaixo de 'emp-detalhe' e mandava pra lá mesmo
+            // quando o usuário veio de outro lugar (ex: o dash).
+            if (_currentScreen === 'emp-detalhe') {
+                _navStack.pop();
+                if (_prevScreen === 'cliente-detalhe' && _currentClientId) {
+                    openClienteDetalhe(_currentClientId);
+                } else {
+                    _goTo(_prevScreen || 'emprestimos', null, false);
+                }
+                return;
+            }
             // 6. Navigate back in our stack
             _navStack.pop();
             const prev = _navStack[_navStack.length - 1];
@@ -13061,14 +12861,12 @@
 
                     if (!res.ok) { throw new Error("Erro ao realizar fetch - add anexo") };
 
-                    const novoDB = await res.json();
-
-                    if (novoDB.error) {
-                        throw new Error(novoDB.error);
-                    }
+                    const novoDBBruto = await res.json();
+                    _validarRespostaScript(novoDBBruto);
 
                     console.log("Anexo adicionado com sucesso");
-                    DB = novoDB;
+                    DB = _normalizarNumerosDB(novoDBBruto);
+                    _atualizarDBSrv(DB);
                     console.log(DB);
 
                     const loan = getLoan(_currentLoanId);
@@ -13095,11 +12893,16 @@
 
                     hideLoading();
 
-                    showToast('Erro ao salvar anexo!', 'err');
-                    showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
-                    setTimeout(() => {
-                        return window.location.reload(true);
-                    }, 5000);
+                    if (err && err.naoAutorizado) {
+                        showToast('Acesso não autorizado pela planilha', 'err');
+                        showNotif('Acesso não autorizado — o anexo não foi salvo', 'err', 15000);
+                    } else {
+                        showToast('Erro ao salvar anexo!', 'err');
+                        showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                        setTimeout(() => {
+                            return window.location.reload(true);
+                        }, 5000);
+                    }
                 }
             };
 
@@ -13129,14 +12932,12 @@
 
                 if (!res.ok) { throw new Error("Erro ao realizar fetch - del anexo") };
 
-                const novoDB = await res.json();
-
-                if (novoDB.error) {
-                    throw new Error(novoDB.error);
-                }
+                const novoDBBruto = await res.json();
+                _validarRespostaScript(novoDBBruto);
 
                 console.log("Anexo apagado com sucesso");
-                DB = novoDB;
+                DB = _normalizarNumerosDB(novoDBBruto);
+                _atualizarDBSrv(DB);
                 console.log(DB);
 
                 closeSheet(document.getElementById('remove-attach'), false);
@@ -13169,18 +12970,24 @@
                 console.log(err);
                 hideLoading();
 
-                showToast("Erro ao apagar o Anexo", 'err');
-                showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
-                setTimeout(() => {
-                    return window.location.reload(true);
-                }, 5000);
+                if (err && err.naoAutorizado) {
+                    showToast('Acesso não autorizado pela planilha', 'err');
+                    showNotif('Acesso não autorizado — o anexo não foi apagado', 'err', 15000);
+                } else {
+                    showToast("Erro ao apagar o Anexo", 'err');
+                    showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                    setTimeout(() => {
+                        return window.location.reload(true);
+                    }, 5000);
+                }
             }
 
         }
 
         // ==================== ANEXOS DO CLIENTE (parte visual) ====================
         // DB.clients[...].anexos = [{ file: "nome_do_anexo", id: "id_no_drive" }, ...]
-        let _clientAttachFile = null;
+        let _clientAttachFiles = []; // [{ uid, file }] — arquivos escolhidos nesta leva, ainda não enviados
+        let _clientAttachUidSeq = 0;
         let _clienteAnexosExpanded = false;
 
         // Lista de nomes pré-definidos para os anexos do cliente
@@ -13268,200 +13075,297 @@
 
         // Abre o sheet de adicionar anexo, já resetado
         function openClienteAnexoSheet() {
-            _clientAttachFile = null;
+            _clientAttachFiles = [];
             document.getElementById('client-attach-file-input').value = '';
-            document.getElementById('client-attach-name-input').value = '';
-            document.getElementById('client-attach-name-input').style.display = 'none';
-            document.getElementById('client-attach-preview').innerHTML = '';
+            document.getElementById('client-attach-list').innerHTML = '';
             document.getElementById('client-attach-picker').style.display = '';
-            populateClientAttachNameSelect();
+            document.getElementById('client-attach-picker-label').textContent = 'Selecionar arquivos / imagens';
             updateClientAttachSaveState();
             openSheet('client-attach-sheet');
         }
 
-        // Preenche o select de nomes pré-definidos, ocultando os já usados pelo cliente
-        function populateClientAttachNameSelect() {
-            const select = document.getElementById('client-attach-name-select');
-            if (!select) return;
-
+        // Nomes pré-definidos ainda disponíveis para um item da lista: exclui os já usados
+        // pelo cliente na planilha e os já escolhidos por outros anexos desta mesma leva
+        function getClientAttachAvailableNames(uidAtual) {
             const client = getClient(_currentClientId);
-            const usados = new Set(((client && client.anexos) || []).map(a => a.file));
+            const usadosCliente = new Set(((client && client.anexos) || []).map(a => a.file));
 
-            const disponiveis = CLIENT_ATTACH_PREDEFINED_NAMES.filter(n => !usados.has(n));
+            const usadosNestaLeva = new Set(
+                _clientAttachFiles
+                    .filter(f => f.uid !== uidAtual)
+                    .map(f => getClientAttachEntryName(f.uid))
+                    .filter(Boolean)
+            );
 
-            select.innerHTML = disponiveis.map(n => `<option value="${n}">${n}</option>`).join('')
-                + `<option value="__outro__">Outro...</option>`;
-
-            select.value = disponiveis.length ? disponiveis[0] : '__outro__';
-            onClientAttachNameSelectChange();
+            return CLIENT_ATTACH_PREDEFINED_NAMES.filter(n => !usadosCliente.has(n) && !usadosNestaLeva.has(n));
         }
 
-        // Alterna a exibição do input de texto customizado quando "Outro..." é escolhido
-        function onClientAttachNameSelectChange() {
-            const select = document.getElementById('client-attach-name-select');
-            const input = document.getElementById('client-attach-name-input');
-            if (!select || !input) return;
-
-            if (select.value === '__outro__') {
-                input.style.display = '';
-            } else {
-                input.style.display = 'none';
-                input.value = '';
-            }
-            updateClientAttachSaveState();
-        }
-
-        // Preview do arquivo escolhido (apenas visual, ainda não envia para lugar nenhum)
-        function onClientAttachFileSelected(input) {
-            const file = input.files?.[0];
-            if (!file) return;
-
-            const maxSize = 10 * 1024 * 1024; // 10MB
-            if (file.size > maxSize) {
-                showToast('Arquivo maior que 10MB');
-                input.value = '';
-                return;
-            }
-
-            _clientAttachFile = file;
-            const box = document.getElementById('client-attach-preview');
-            document.getElementById('client-attach-picker').style.display = 'none';
-
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    box.innerHTML = `
-                    <div class="card_comp_pag" style="padding:10px; cursor:pointer" onclick="openAttachPreview('image','${e.target.result}')">
-                        <img src="${e.target.result}" style=" width:100%; max-height:220px; object-fit:contain; border-radius:8px">
-                        <div style="margin-top:8px; font-size:12px; text-align:center">${file.name}</div>
-                    </div>
-                    <div style="margin-top:8px; font-size:12px; color:var(--danger); cursor:pointer; text-align:center" onclick="removeClienteAttachPreview()">Remover</div>
-                    `;
-                };
-                reader.readAsDataURL(file);
-            } else {
-                const pdfUrl = URL.createObjectURL(file);
-
-                box.innerHTML = `
-                <div class="card_comp_pag" style="padding:12px; display:flex; align-items:center; gap:10px; cursor:pointer" onclick="openAttachPreview('pdf','${pdfUrl}')">
-                    <div style="font-size:32px">📄</div>
-                    <div>
-                        <div style="font-size:12px; font-weight:600">${file.name}</div>
-                        <div style="font-size:11px; color:var(--txt2)">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
-                    </div>
-                </div>
-                <div style="margin-top:8px; font-size:12px; color:var(--danger); cursor:pointer; text-align:center" onclick="removeClienteAttachPreview()">Remover</div>
-                `;
-            }
-
-            // Pré-preenche o nome do anexo com o nome do arquivo, se estiver no modo "Outro..." e o usuário ainda não tiver digitado nada
-            const nameInput = document.getElementById('client-attach-name-input');
-            const nameSelect = document.getElementById('client-attach-name-select');
-            if (nameInput && nameSelect && nameSelect.value === '__outro__' && !nameInput.value.trim()) {
-                nameInput.value = file.name.replace(/\.[^/.]+$/, '');
-            }
-
-            updateClientAttachSaveState();
-        }
-
-        // Remove o preview e volta para o botão de seleção
-        function removeClienteAttachPreview() {
-            _clientAttachFile = null;
-            document.getElementById('client-attach-file-input').value = '';
-            document.getElementById('client-attach-preview').innerHTML = '';
-            document.getElementById('client-attach-picker').style.display = '';
-            updateClientAttachSaveState();
-        }
-
-        // Retorna o nome do anexo escolhido: valor do select, ou texto digitado quando "Outro..." está selecionado
-        function getClientAttachSelectedName() {
-            const select = document.getElementById('client-attach-name-select');
+        // Lê o nome escolhido/digitado para um item específico da lista (select ou "Outro...")
+        function getClientAttachEntryName(uid) {
+            const select = document.getElementById(`client-attach-name-select-${uid}`);
             if (!select) return '';
             if (select.value === '__outro__') {
-                return document.getElementById('client-attach-name-input')?.value.trim() || '';
+                return document.getElementById(`client-attach-name-input-${uid}`)?.value.trim() || '';
             }
             return select.value;
         }
 
-        // Botão de salvar só fica habilitado com arquivo escolhido + nome preenchido
-        function updateClientAttachSaveState() {
-            const nameVal = getClientAttachSelectedName();
-            const btn = document.getElementById('client-attach-save-btn');
-            if (btn) btn.disabled = !(_clientAttachFile && nameVal);
+        // Alterna a exibição do input de texto customizado quando "Outro..." é escolhido, para um item específico
+        function onClientAttachNameSelectChange(uid) {
+            const select = document.getElementById(`client-attach-name-select-${uid}`);
+            const input = document.getElementById(`client-attach-name-input-${uid}`);
+            if (!select || !input) return;
+
+            if (select.value === '__outro__') {
+                input.style.display = '';
+                const entry = _clientAttachFiles.find(f => f.uid === uid);
+                if (entry && !input.value.trim()) {
+                    input.value = entry.file.name.replace(/\.[^/.]+$/, '');
+                }
+            } else {
+                input.style.display = 'none';
+                input.value = '';
+            }
+
+            clearClientAttachError(uid);
+            updateClientAttachSaveState();
         }
 
-        // TODO: implementar o envio de _clientAttachFile para o Drive/planilha,
-        // salvar { file: nome, id: <id_do_drive> } em DB.clients[...].anexos
-        // e então chamar renderClienteAnexos(getClient(_currentClientId)) + closeSheet(...)
-        async function add_anexo_cliente() {
-            if (!_clientAttachFile || !_currentClientId) return;
+        // Chamado ao digitar no input de nome customizado ("Outro...") — só limpa o erro visual
+        function onClientAttachNameInputChange(uid) {
+            clearClientAttachError(uid);
+            updateClientAttachSaveState();
+        }
 
-            showLoading(['CONVERTENDO ANEXO...', 'ENVIANDO PARA O DRIVE...', 'SALVANDO NA PASTA...', 'SINCRONIZANDO...', 'TERMINANDO...']);
+        // Recebe os arquivos escolhidos (um ou vários) e adiciona na lista de pendentes
+        function onClientAttachFileSelected(input) {
+            const files = Array.from(input.files || []);
+            if (!files.length) return;
 
-            const nome = _currentClientId;
-            const tipo = _clientAttachFile.type;
-            const data_ref = 0;
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            let algumMuitoGrande = false;
 
-            const file_name = getClientAttachSelectedName();
-
-            const reader = new FileReader();
-            reader.onload = async function () {
-                const base64 = reader.result.split(',')[1];
-
-                const dadosParaEnvio = {
-                    nome,
-                    tipo,
-                    base64: base64,
-                    data_ref,
-                    file: file_name,
-                    time: DB.time
-                };
-
-
-                try {
-                    console.log("Enviando anexo para planilha...");
-                    const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexo', id_usuario: ID_USUARIO };
-                    const res = await fetch(URL_SCRIPT,
-                        { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
-                    );
-
-                    if (!res.ok) { throw new Error("Erro ao realizar fetch - add anexo") };
-
-                    const novoDB = await res.json();
-
-                    if (novoDB.error) {
-                        throw new Error(novoDB.error);
-                    }
-
-                    console.log("Anexo adicionado com sucesso");
-                    DB = novoDB;
-                    console.log(DB);
-
-                    _clientAttachFile = null;
-
-                    const c = getClient(_currentClientId);
-                    // Atualizar Anexos do cliente
-                    renderClienteAnexos(c);
-                    closeSheet(document.getElementById('client-attach-sheet'))
-
-                    hideLoading();
-                    showToast('Anexo Salvo');
+            files.forEach(file => {
+                if (file.size > maxSize) {
+                    algumMuitoGrande = true;
+                    return;
                 }
-                catch (err) {
-                    console.log("Erro ao adicionar o Anexo");
-                    console.log(err);
+                _clientAttachFiles.push({ uid: ++_clientAttachUidSeq, file });
+            });
 
-                    hideLoading();
+            input.value = '';
 
-                    showToast('Erro ao salvar anexo!', 'err');
+            if (algumMuitoGrande) showToast('Um ou mais arquivos maiores que 10MB foram ignorados');
+
+            renderClientAttachList();
+            document.getElementById('client-attach-picker-label').textContent = 'Adicionar mais arquivos';
+        }
+
+        // Renderiza a lista de arquivos escolhidos, cada um com seu próprio preview + seletor de nome
+        function renderClientAttachList() {
+            const box = document.getElementById('client-attach-list');
+            if (!box) return;
+
+            box.innerHTML = _clientAttachFiles.map(entry => renderClientAttachItem(entry)).join('');
+
+            // Carrega os previews de imagem de forma assíncrona (PDF fica só com o ícone)
+            _clientAttachFiles.forEach(entry => {
+                if (entry.file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const img = document.getElementById(`client-attach-img-${entry.uid}`);
+                        if (img) img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(entry.file);
+                }
+            });
+
+            updateClientAttachSaveState();
+        }
+
+        // Monta o card de um item da lista: preview, nome do arquivo, seletor de nome do anexo e remover
+        function renderClientAttachItem(entry) {
+            const { uid, file } = entry;
+            const isImg = file.type.startsWith('image/');
+
+            // PDF já pode ter uma URL de visualização pronta na hora; imagem só fica pronta quando o FileReader terminar
+            if (!isImg && !entry._pdfUrl) entry._pdfUrl = URL.createObjectURL(file);
+
+            const preview = isImg
+                ? `<img id="client-attach-img-${uid}" style="width:48px; height:48px; object-fit:cover; border-radius:8px; flex-shrink:0; cursor:pointer" onclick="visualizarClientAttachPending(${uid})">`
+                : `<div style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; cursor:pointer" onclick="visualizarClientAttachPending(${uid})">📄</div>`;
+
+            const disponiveis = getClientAttachAvailableNames(uid);
+            const options = `<option value="">Escolher Nome...</option>`
+                + disponiveis.map(n => `<option value="${n}">${n}</option>`).join('')
+                + `<option value="__outro__">Outro...</option>`;
+
+            return `
+            <div class="card_comp_pag mt8" style="padding:10px">
+                <div style="display:flex; gap:10px; align-items:flex-start">
+                    ${preview}
+                    <div style="flex:1; min-width:0">
+                        <div style="font-size:12px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${file.name}</div>
+                        <div style="font-size:11px; color:var(--txt2)">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                    </div>
+                    <div style="font-size:12px; color:var(--danger); cursor:pointer; flex-shrink:0" onclick="removeClienteAttachPreview(${uid})">Remover</div>
+                </div>
+                <div class="fg mt8">
+                    <div class="fl">Nome do Anexo</div>
+                    <select class="fi fs" id="client-attach-name-select-${uid}" onchange="onClientAttachNameSelectChange(${uid})">
+                        ${options}
+                    </select>
+                    <input class="fi mt8" id="client-attach-name-input-${uid}" type="text" style="display:none"
+                        placeholder="Digite o nome do anexo" oninput="onClientAttachNameInputChange(${uid})">
+                </div>
+            </div>`;
+        }
+
+        // Abre o preview (imagem ou PDF) de um anexo ainda não enviado
+        function visualizarClientAttachPending(uid) {
+            const entry = _clientAttachFiles.find(f => f.uid === uid);
+            if (!entry) return;
+
+            if (entry.file.type.startsWith('image/')) {
+                const img = document.getElementById(`client-attach-img-${uid}`);
+                if (img && img.src) openAttachPreview('image', img.src);
+            } else if (entry._pdfUrl) {
+                openAttachPreview('pdf', entry._pdfUrl);
+            }
+        }
+
+        // Remove um arquivo específico da lista de pendentes
+        function removeClienteAttachPreview(uid) {
+            _clientAttachFiles = _clientAttachFiles.filter(f => f.uid !== uid);
+            renderClientAttachList();
+            if (!_clientAttachFiles.length) {
+                document.getElementById('client-attach-picker-label').textContent = 'Selecionar arquivos / imagens';
+            }
+        }
+
+        // Botão de salvar só precisa de pelo menos 1 arquivo escolhido — a validação dos nomes
+        // (preenchidos e sem repetição) acontece na hora de salvar, em validarNomesClientAttach()
+        function updateClientAttachSaveState() {
+            const btn = document.getElementById('client-attach-save-btn');
+            if (btn) btn.disabled = !_clientAttachFiles.length;
+        }
+
+        // Marca em vermelho o seletor/input de nome de um anexo com problema
+        function setClientAttachError(uid) {
+            const select = document.getElementById(`client-attach-name-select-${uid}`);
+            const input = document.getElementById(`client-attach-name-input-${uid}`);
+            if (select) select.style.borderColor = 'var(--danger)';
+            if (input && input.style.display !== 'none') input.style.borderColor = 'var(--danger)';
+        }
+
+        // Remove o destaque vermelho do seletor/input de nome de um anexo
+        function clearClientAttachError(uid) {
+            const select = document.getElementById(`client-attach-name-select-${uid}`);
+            const input = document.getElementById(`client-attach-name-input-${uid}`);
+            if (select) select.style.borderColor = '';
+            if (input) input.style.borderColor = '';
+        }
+
+        // Valida, na hora de salvar, se todos os anexos têm nome escolhido e se não há nomes repetidos.
+        // Destaca em vermelho os campos com problema e avisa o usuário.
+        function validarNomesClientAttach() {
+            _clientAttachFiles.forEach(f => clearClientAttachError(f.uid));
+
+            const semNome = _clientAttachFiles.filter(f => !getClientAttachEntryName(f.uid));
+            if (semNome.length) {
+                semNome.forEach(f => setClientAttachError(f.uid));
+                showToast('Escolha um nome para todos os anexos');
+                return false;
+            }
+
+            const contagem = new Map();
+            _clientAttachFiles.forEach(f => {
+                const nome = getClientAttachEntryName(f.uid);
+                contagem.set(nome, (contagem.get(nome) || 0) + 1);
+            });
+
+            const duplicados = _clientAttachFiles.filter(f => contagem.get(getClientAttachEntryName(f.uid)) > 1);
+            if (duplicados.length) {
+                duplicados.forEach(f => setClientAttachError(f.uid));
+                showToast('Existem anexos com o mesmo nome, escolha nomes diferentes');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Converte um File em base64 (sem o prefixo data:...;base64,)
+        function _clientAttachFileParaBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Envia todos os anexos escolhidos de uma vez só para a planilha (o script salva cada um individualmente)
+        async function add_anexo_cliente() {
+            if (!_clientAttachFiles.length || !_currentClientId) return;
+            if (!validarNomesClientAttach()) return;
+
+            const varios = _clientAttachFiles.length > 1;
+            showLoading([varios ? 'CONVERTENDO ANEXOS...' : 'CONVERTENDO ANEXO...', 'ENVIANDO PARA O DRIVE...', 'SALVANDO NA PASTA...', 'SINCRONIZANDO...', 'TERMINANDO...']);
+
+            try {
+                const anexos = await Promise.all(_clientAttachFiles.map(async entry => ({
+                    nome: _currentClientId,
+                    tipo: entry.file.type,
+                    base64: await _clientAttachFileParaBase64(entry.file),
+                    data_ref: 0,
+                    file: getClientAttachEntryName(entry.uid)
+                })));
+
+                const dadosParaEnvio = { anexos, time: DB.time };
+
+                console.log("Enviando anexos para planilha...");
+                const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexos_cliente', id_usuario: ID_USUARIO };
+                const res = await fetch(URL_SCRIPT,
+                    { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
+                );
+
+                if (!res.ok) { throw new Error("Erro ao realizar fetch - add anexos") };
+
+                const novoDBBruto = await res.json();
+                _validarRespostaScript(novoDBBruto);
+
+                console.log("Anexo(s) adicionado(s) com sucesso");
+                DB = _normalizarNumerosDB(novoDBBruto);
+                _atualizarDBSrv(DB);
+                console.log(DB);
+
+                _clientAttachFiles = [];
+
+                const c = getClient(_currentClientId);
+                // Atualizar Anexos do cliente
+                renderClienteAnexos(c);
+                closeSheet(document.getElementById('client-attach-sheet'))
+
+                hideLoading();
+                showToast(varios ? 'Anexos Salvos' : 'Anexo Salvo');
+            }
+            catch (err) {
+                console.log("Erro ao adicionar o(s) Anexo(s)");
+                console.log(err);
+
+                hideLoading();
+
+                if (err && err.naoAutorizado) {
+                    showToast('Acesso não autorizado pela planilha', 'err');
+                    showNotif('Acesso não autorizado — o(s) anexo(s) não foi(ram) salvo(s)', 'err', 15000);
+                } else {
+                    showToast('Erro ao salvar anexo(s)!', 'err');
                     showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
                     setTimeout(() => {
                         return window.location.reload(true);
                     }, 5000);
                 }
-            };
-
-            reader.readAsDataURL(_clientAttachFile);
+            }
         }
 
 
@@ -13739,15 +13643,49 @@
             } finally {
                 clearTimeout(timeoutId);
             }
-            
+
 
             if (!res.ok) { throw new Error("Erro ao realizar fetch inicial") };
-            return await res.json();
+
+            // Lê o corpo a partir de um clone da resposta — evita o erro "body stream
+            // already read" que pode acontecer se algo mais (ex: a aba Network do
+            // DevTools do navegador inspecionando a resposta) já tiver começado a ler o
+            // corpo original antes do nosso código chegar aqui.
+            return await res.clone().json();
         }
 
         // Verifica se um objeto tem a estrutura mínima esperada pelo site (loans/clients)
         function isDBValido(json) {
             return !!json && typeof json === 'object' && Array.isArray(json.loans) && Array.isArray(json.clients);
+        }
+
+        // Confere o formato da resposta do script de forma consistente em TODOS os
+        // fetches do site, cobrindo os formatos possíveis que o doPost pode devolver:
+        //  - { authorized: false }           → navegador não autorizado
+        //  - { error: "mensagem" }           → qualquer erro tratado pelo script (dados
+        //                                       insuficientes, timestamp incorreto, função
+        //                                       inexistente, falha do Drive/Planilha, etc.)
+        //  - JSON válido mas sem "loans"/"clients" → célula da planilha corrompida/vazia
+        //    ou com um conteúdo que não é o DB esperado
+        //  - JSON do DB certinho                    → segue normalmente
+        // Lança um erro com uma marcação (.naoAutorizado) pro caso de não-autorizado,
+        // que os chamadores tratam de forma diferente (não adianta tentar de novo).
+        function _validarRespostaScript(resp) {
+            if (!resp || typeof resp !== 'object') {
+                throw new Error('Resposta vazia ou inválida do script');
+            }
+            if (resp.authorized === false) {
+                const err = new Error('Acesso não autorizado pelo script para este navegador');
+                err.naoAutorizado = true;
+                throw err;
+            }
+            if (resp.error) {
+                throw new Error(resp.error);
+            }
+            if (!isDBValido(resp)) {
+                throw new Error('Resposta da planilha em formato inesperado (faltam dados)');
+            }
+            return resp;
         }
 
         // Faz o fetch da planilha em segundo plano (sem travar a tela de loading) pra
@@ -13760,13 +13698,22 @@
 
                 if (!json_data || json_data.authorized === false) return; // ignora silenciosamente
 
+                // Erro do script ou formato inesperado: NÃO usa essa resposta pra substituir
+                // o DB_Local que já está funcionando — apenas ignora essa checagem em
+                // segundo plano (o usuário já está usando dados válidos, não tem porquê
+                // interromper por causa de uma checagem de fundo que falhou).
+                if (json_data.error || !isDBValido(json_data)) {
+                    console.warn('Sincronização em segundo plano: resposta inválida do script, ignorando.', json_data.error || json_data);
+                    return;
+                }
+
                 if (json_data.time === timeAtual) {
                     console.log("DB_Local já está atualizado (sincronização em segundo plano)");
                     return;
                 }
 
                 console.log("DB_Local estava desatualizado — salvando dados novos e recarregando");
-                DB = json_data;
+                DB = _normalizarNumerosDB(json_data);
                 backup_local();
                 showNotif('Novos dados encontrados — atualizando…', 'info');
                 setTimeout(() => location.reload(), 1200);
@@ -13780,13 +13727,26 @@
             // usa ele direto e nem faz o fetch inicial — só busca no servidor se não
             // existir nada salvo ainda ou se o que estiver salvo estiver corrompido/inválido.
             // Mesmo usando o DB_Local, dispara um fetch em segundo plano (sem aguardar)
-            // pra conferir se ele ainda está atualizado
+            // pra conferir se ele ainda está atualizado.
+            //
+            // EXCEÇÃO IMPORTANTE: se sobrou alguma ação pendente de uma sessão anterior
+            // (ex: o fetch foi enviado com keepalive mas a resposta nunca chegou porque a
+            // aba fechou no meio do caminho), o "time" do cache local pode já estar
+            // desatualizado em relação à planilha — nesse caso NÃO dá pra confiar no cache
+            // pra montar o reenvio, senão o servidor rejeita (time errado) pra sempre e
+            // gera um loop de recarregamento. Por isso, havendo pendência, força buscar o
+            // estado real da planilha antes de reenviar qualquer coisa.
             const dbLocalExistente = pegarJsonDoLocalStorage("DB_Local");
-            if (isDBValido(dbLocalExistente)) {
+            const temPendencias = _lerPendentes().length > 0;
+            if (isDBValido(dbLocalExistente) && !temPendencias) {
                 console.log("DB_Local válido encontrado — pulando fetch inicial");
-                DB = dbLocalExistente;
+                DB = _normalizarNumerosDB(dbLocalExistente);
+                _atualizarDBSrv(DB);
                 sincronizarDBEmSegundoPlano(dbLocalExistente.time);
                 return true; // sinaliza que usou o DB_Local direto (sem fetch)
+            }
+            if (isDBValido(dbLocalExistente) && temPendencias) {
+                console.log("Há ações pendentes de uma sessão anterior — buscando o 'time' real da planilha antes de reenviar (não confiar no cache local)");
             }
 
             console.log("Realizando Fetch inicial...");
@@ -13818,8 +13778,17 @@
                     return;
                 }
 
+                // Se o script respondeu com um erro tratado (ex: célula da planilha
+                // corrompida/vazia), NÃO trata como se fosse "planilha vazia" — isso
+                // esconderia um problema real do usuário. Cai pro mesmo fallback de erro
+                // (usa o DB_Local salvo, se tiver, e avisa).
+                if (json_data && (json_data.error || !isDBValido(json_data))) {
+                    throw new Error(json_data.error || 'Resposta da planilha em formato inesperado');
+                }
+
                 if (json_data) {
-                    DB = json_data;
+                    DB = _normalizarNumerosDB(json_data);
+                    _atualizarDBSrv(DB);
                     console.log(DB);
                     showNotif('Dados coletados da planilha', 'ok');
                 }
@@ -13837,7 +13806,8 @@
                 console.log("Fetch inicial - Erro");
                 console.log("Usando DB local");
 
-                DB = pegarJsonDoLocalStorage("DB_Local");
+                DB = _normalizarNumerosDB(pegarJsonDoLocalStorage("DB_Local"));
+                _atualizarDBSrv(DB);
 
                 showNotif(err.name === 'AbortError' ? 'Conexão lenta — dados salvos' : 'Erro ao sincronizar', 'err');
             }
@@ -13917,12 +13887,568 @@
 
         var DB = {};
 
-        // VARIAVEIS GLOBAIS
-        // Meu Script
-        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
+        // ===================== SINCRONIZAÇÃO EM SEGUNDO PLANO (UI OTIMISTA) =====================
+        // Ideia: as ações (add_cliente, del_cliente, etc.) já atualizam a variável DB e a tela
+        // NA HORA, sem esperar o Apps Script responder. O fetch acontece "por trás" através
+        // desta fila, e só quando a resposta chega é que DB é substituído pelo estado oficial
+        // vindo da planilha. Se der erro, avisamos e recarregamos pra garantir consistência.
+        //
+        // IMPORTANTE sobre "lin"/"lins_*": são números de LINHA na planilha, escolhidos e
+        // mantidos pela própria planilha — mudam toda vez que qualquer linha é inserida ou
+        // apagada na aba. Por isso eles NUNCA são calculados/adivinhados aqui: existe um
+        // espelho separado do DB (DB_srv) que só é atualizado quando o servidor confirma uma
+        // ação (nunca pela atualização otimista da tela), e cada envio da fila busca o "lin"
+        // mais atual em DB_srv bem na hora de montar o payload — não no momento do clique.
+        // Isso garante que, se a ação anterior da fila já apagou/moveu linhas na planilha, a
+        // próxima ação da fila aponta pra linha certa, e não pra uma linha "fantasma".
+        //
+        // Proteção contra o usuário fechar o site antes do fetch terminar:
+        //  1) fetch com keepalive:true — o navegador tenta concluir o envio mesmo com a aba
+        //     fechando (é exatamente pra isso que essa opção existe).
+        //  2) toda ação pendente é salva no localStorage ANTES de ser enviada (só o "contexto"
+        //     leve, sem nenhum "lin"), e só é removida de lá quando a confirmação do servidor
+        //     chega. Se a aba fechar no meio do caminho, ela fica registrada e é reenviada
+        //     automaticamente na próxima vez que o site abrir — resolvendo o "lin" de novo,
+        //     fresco, contra o DB_srv carregado nessa nova sessão.
+        //  3) um aviso do navegador ("tem certeza que quer sair?") enquanto há algo pendente.
 
-        // Script do Rafael 
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzkicXkp2YFZubl5MqRQCFUh7d42YVs8TZbshypuR3yU92owy2whRHZVLmVDsUmhNjT/exec";
+        let DB_srv = null; // espelho do DB, atualizado SÓ com respostas confirmadas do servidor
+
+        function _atualizarDBSrv(novoDB) {
+            try { DB_srv = structuredClone(novoDB); }
+            catch (e) { DB_srv = JSON.parse(JSON.stringify(novoDB)); }
+        }
+        function _clienteSrv(id) { return DB_srv && (DB_srv.clients || []).find(c => c.id === id); }
+        function _loanSrv(id) { return DB_srv && (DB_srv.loans || []).find(l => l.id === id); }
+
+        // Cada "tipo" sabe qual função do Apps Script chamar e como montar o payload final
+        // (ctx = só os dados já estáveis/conhecidos; os "lin" são resolvidos aqui, na hora).
+        // Atualiza (ou remove) UM item de uma lista (clients/loans) dentro de "db" com base
+        // no que veio do servidor em "novoDB" — sem trocar a lista inteira. Isso é o que
+        // permite que outras ações ainda pendentes na fila (que otimisticamente alteraram
+        // OUTROS itens) não sejam apagadas quando esta ação confirma.
+        function _mergeEntidadeLista(db, novoDB, lista, id, campoId) {
+            if (!db[lista]) db[lista] = [];
+            const listaServidor = novoDB[lista] || [];
+            const novoItem = listaServidor.find(x => x[campoId] === id);
+            const idx = db[lista].findIndex(x => x[campoId] === id);
+            if (!novoItem) {
+                // Não existe mais no servidor (foi apagado) — remove local também, se ainda tiver
+                if (idx !== -1) db[lista].splice(idx, 1);
+            } else if (idx !== -1) {
+                // Atualiza os campos com os valores confirmados (lin incluso), sem trocar o
+                // objeto (mantém a mesma referência, útil pra quem já guardou um ponteiro pra ele)
+                Object.assign(db[lista][idx], novoItem);
+            } else {
+                db[lista].push(novoItem);
+            }
+        }
+
+        // Remove de um campo (recursivamente) as chaves que sempre variam/são preenchidas
+        // só depois de confirmar (lin/lins_*/time) — usado pra comparar "o que eu esperava"
+        // com "o que a planilha confirmou" sem essas gerarem falso-positivo de divergência.
+        const _CAMPOS_IGNORADOS_DIVERGENCIA = ['lin', 'lins_pags', 'lins_emps', 'time'];
+        // Arrays cuja ORDEM não é garantida ser a mesma entre o que foi montado
+        // otimisticamente no cliente e o que a planilha devolve (ex: "pagamentos" pode
+        // voltar em ordem de linha da planilha, não na ordem em que foi montado
+        // localmente) — pra essas, ordena por um campo estável antes de comparar, senão
+        // uma simples troca de ordem gera falso-positivo de divergência.
+        const _CHAVES_ORDENAVEIS = { pagamentos: 'id', anexo_pag: 'anexo_id', anexo_envio: 'anexo_id' };
+        function _ordenarEstavel(arr, chave) {
+            return [...arr].sort((a, b) => {
+                const va = a && a[chave], vb = b && b[chave];
+                if (va === vb) return 0;
+                return va > vb ? 1 : -1;
+            });
+        }
+        function _semCamposVolateis(obj, chaveArrayPai) {
+            if (Array.isArray(obj)) {
+                const chave = chaveArrayPai && _CHAVES_ORDENAVEIS[chaveArrayPai];
+                const base = chave ? _ordenarEstavel(obj, chave) : obj;
+                return base.map(item => _semCamposVolateis(item));
+            }
+            if (obj && typeof obj === 'object') {
+                const out = {};
+                for (const k in obj) {
+                    if (_CAMPOS_IGNORADOS_DIVERGENCIA.includes(k)) continue;
+                    out[k] = _semCamposVolateis(obj[k], k);
+                }
+                return out;
+            }
+            // Números monetários/calculados podem vir com diferenças de ponto flutuante
+            // insignificantes (ex: 150 vs 149.99999999997) entre o cálculo local e o que
+            // a planilha retorna — arredonda pra 2 casas antes de comparar, pra essas
+            // diferenças de centavo-fantasma não dispararem divergência à toa.
+            if (typeof obj === 'number' && !Number.isInteger(obj)) {
+                return Math.round(obj * 100) / 100;
+            }
+            return obj;
+        }
+
+        const SYNC_ACOES = {
+            cliente_novo: {
+                funcao: 'add_cliente',
+                build: (ctx) => ({ ...ctx }),
+                entidade: (db, ctx) => (db.clients || []).find(c => c.id === ctx.id) || null,
+                merge: (db, novoDB, ctx) => {
+                    _mergeEntidadeLista(db, novoDB, 'clients', ctx.id, 'id');
+                    db.ids_total_c = novoDB.ids_total_c;
+                }
+            },
+            cliente_editar: {
+                funcao: 'add_cliente',
+                build: (ctx) => {
+                    const c = _clienteSrv(ctx.id);
+                    return { ...ctx, lin: c ? c.lin : undefined };
+                },
+                entidade: (db, ctx) => (db.clients || []).find(c => c.id === ctx.id) || null,
+                merge: (db, novoDB, ctx) => _mergeEntidadeLista(db, novoDB, 'clients', ctx.id, 'id')
+            },
+            cliente_apagar: {
+                funcao: 'del_cliente',
+                build: (ctx) => {
+                    const c = _clienteSrv(ctx.id);
+                    return {
+                        id: ctx.id,
+                        completo_x: ctx.completo_x,
+                        lin: c ? c.lin : undefined,
+                        lins_emps: c ? (c.lins_emps || []) : [],
+                        lins_pags: c ? (c.lins_pags || []) : []
+                    };
+                },
+                entidade: (db, ctx) => (db.clients || []).find(c => c.id === ctx.id) || null,
+                merge: (db, novoDB, ctx) => {
+                    _mergeEntidadeLista(db, novoDB, 'clients', ctx.id, 'id');
+                    // Os empréstimos do cliente também podem ter sido removidos no servidor —
+                    // sincroniza cada um que ainda restar localmente com o que o servidor confirma.
+                    const idsLoansServidor = new Set((novoDB.loans || []).map(l => l.id));
+                    (db.loans || []).filter(l => l.clientId === ctx.id).forEach(l => {
+                        if (!idsLoansServidor.has(l.id)) {
+                            db.loans = db.loans.filter(x => x.id !== l.id);
+                        } else {
+                            _mergeEntidadeLista(db, novoDB, 'loans', l.id, 'id');
+                        }
+                    });
+                }
+            },
+            emprestimo_novo: {
+                funcao: 'add_emprestimo',
+                build: (ctx) => {
+                    const c = _clienteSrv(ctx.clientId);
+                    return { ...ctx, lin_cliente: c ? c.lin : undefined };
+                },
+                entidade: (db, ctx) => (db.loans || []).find(l => l.id === ctx.id) || null,
+                merge: (db, novoDB, ctx) => {
+                    _mergeEntidadeLista(db, novoDB, 'loans', ctx.id, 'id');
+                    _mergeEntidadeLista(db, novoDB, 'clients', ctx.clientId, 'id');
+                }
+            },
+            emprestimo_editar: {
+                funcao: 'add_emprestimo',
+                build: (ctx) => {
+                    const l = _loanSrv(ctx.id);
+                    const out = { ...ctx, lin: l ? l.lin : undefined };
+                    if (l && l.lins_pags && l.lins_pags.length > 0) out.lins_pags = l.lins_pags;
+                    return out;
+                },
+                entidade: (db, ctx) => (db.loans || []).find(l => l.id === ctx.id) || null,
+                merge: (db, novoDB, ctx) => _mergeEntidadeLista(db, novoDB, 'loans', ctx.id, 'id')
+            },
+            emprestimo_pago: {
+                funcao: 'edit_pago',
+                build: (ctx) => {
+                    const l = _loanSrv(ctx.id);
+                    return { id: ctx.id, novo_pago: ctx.novo_pago, lin: l ? l.lin : undefined };
+                },
+                entidade: (db, ctx) => (db.loans || []).find(l => l.id === ctx.id) || null,
+                merge: (db, novoDB, ctx) => _mergeEntidadeLista(db, novoDB, 'loans', ctx.id, 'id')
+            },
+            emprestimo_notif: {
+                funcao: 'edit_not',
+                build: (ctx) => {
+                    const l = _loanSrv(ctx.id);
+                    return { id: ctx.id, novo_not: ctx.novo_not, lin: l ? l.lin : undefined };
+                },
+                entidade: (db, ctx) => (db.loans || []).find(l => l.id === ctx.id) || null,
+                merge: (db, novoDB, ctx) => _mergeEntidadeLista(db, novoDB, 'loans', ctx.id, 'id')
+            },
+            emprestimo_apagar: {
+                funcao: 'del_emprestimo',
+                build: (ctx) => {
+                    const l = _loanSrv(ctx.id);
+                    const out = { id: ctx.id, lin: l ? l.lin : undefined };
+                    if (l && l.lins_pags && l.lins_pags.length > 0) out.lins_pags = l.lins_pags;
+                    return out;
+                },
+                entidade: (db, ctx) => (db.loans || []).find(l => l.id === ctx.id) || null,
+                merge: (db, novoDB, ctx) => _mergeEntidadeLista(db, novoDB, 'loans', ctx.id, 'id')
+            },
+            pagamento_apagar: {
+                funcao: 'del_pagamento',
+                build: (ctx) => {
+                    const l = _loanSrv(ctx.loanId);
+                    const pagamentos = (l && l.pagamentos) || [];
+                    const removidos = pagamentos.filter(p => p.data >= ctx.dataRef);
+                    const lins_pags = removidos.length > 0 ? removidos.map(p => p.lin) : (ctx.linFallback != null ? [ctx.linFallback] : []);
+                    return { id: ctx.id, lins_pags, data_busca: ctx.dataRef };
+                },
+                entidade: (db, ctx) => (db.loans || []).find(l => l.id === ctx.loanId) || null,
+                merge: (db, novoDB, ctx) => _mergeEntidadeLista(db, novoDB, 'loans', ctx.loanId, 'id')
+            },
+            pagamento_novo: {
+                funcao: 'add_pagamento',
+                build: (ctx) => {
+                    const l = _loanSrv(ctx.loanId);
+                    const pagamentos = (l && l.pagamentos) || [];
+                    let removidos_lins;
+                    if (ctx.pid_old) {
+                        removidos_lins = pagamentos.filter(p => p.data > ctx.dtPag || p.data > ctx.pagDataOriginal || p.id === ctx.pid_old).map(p => p.lin);
+                    } else {
+                        removidos_lins = pagamentos.filter(p => p.data > ctx.dtPag).map(p => p.lin);
+                    }
+                    const out = {
+                        id: ctx.id, data: ctx.dtPag, valor: ctx.valor, status: ctx.status, anexo_pag: [],
+                        totalPagoAntes: ctx.totalPagoAntes, geradoEm: ctx.geradoEm, removidos_lins
+                    };
+                    if (!ctx.pid_old) {
+                        out.lin_loan = l ? l.lin : undefined;
+                        out.novo_qtd_pags = ctx.novo_qtd_pags;
+                    }
+                    return out;
+                },
+                entidade: (db, ctx) => (db.loans || []).find(l => l.id === ctx.loanId) || null,
+                merge: (db, novoDB, ctx) => _mergeEntidadeLista(db, novoDB, 'loans', ctx.loanId, 'id')
+            },
+            padroes_atualizar: {
+                funcao: 'att_padroes',
+                build: (ctx) => ({ ...ctx }),
+                entidade: (db) => db.defaults || null,
+                merge: (db, novoDB) => { db.defaults = novoDB.defaults; }
+            }
+        };
+
+        const PENDENTES_KEY = 'sync_pendentes_v2';
+
+        function _lerPendentes() {
+            try { return JSON.parse(localStorage.getItem(PENDENTES_KEY)) || []; }
+            catch (e) { return []; }
+        }
+        function _salvarListaPendentes(lista) {
+            try { localStorage.setItem(PENDENTES_KEY, JSON.stringify(lista)); } catch (e) { }
+        }
+        function _addPendente(uid, tipo, ctx) {
+            const lista = _lerPendentes();
+            // Guarda a URL do script vigente no momento em que a ação foi criada — é contra
+            // ela que a ação será validada antes de qualquer envio (agora ou num reenvio
+            // futuro), pra nunca mandar uma ação pendente pra uma URL diferente da que ela
+            // foi pensada (ex: você trocou de planilha/deploy entre uma sessão e outra).
+            lista.push({ uid, tipo, ctx, criadoEm: Date.now(), tentativas: 0, url: URL_SCRIPT });
+            _salvarListaPendentes(lista);
+        }
+        function _removerPendente(uid) {
+            _salvarListaPendentes(_lerPendentes().filter(p => p.uid !== uid));
+        }
+        // Incrementa o contador de tentativas de um pendente e retorna o novo valor
+        // (usado pra não ficar recarregando a página pra sempre se uma ação continuar
+        // falhando mesmo depois de já ter pego o "time" certo da planilha)
+        function _incrementarTentativa(uid) {
+            const lista = _lerPendentes();
+            const item = lista.find(p => p.uid === uid);
+            if (!item) return 0;
+            item.tentativas = (item.tentativas || 0) + 1;
+            _salvarListaPendentes(lista);
+            return item.tentativas;
+        }
+
+        let _syncQueue = Promise.resolve();
+        let _syncPendentes = 0;
+
+        // estado: 'ativo' (sincronizando), 'sucesso' (confirmado pela planilha, some sozinho
+        // depois de um instante) ou false/undefined (esconde na hora)
+        // Faixa fixa no topo da tela, difícil de passar despercebido: azul + spinner
+        // enquanto sincroniza, verde sólido com ✓ quando a planilha confirma.
+        let _syncIndicadorTimeout = null;
+        function _syncIndicador(estado) {
+            let el = document.getElementById('sync-indicator');
+            if (!el) {
+                if (!document.getElementById('sync-indicator-style')) {
+                    const style = document.createElement('style');
+                    style.id = 'sync-indicator-style';
+                    style.textContent = '@keyframes sync-spin { to { transform: rotate(360deg); } }';
+                    document.head.appendChild(style);
+                }
+                el = document.createElement('div');
+                el.id = 'sync-indicator';
+                el.style.cssText = 'position:fixed; top:0; left:0; right:0; z-index:10500; display:flex; align-items:center; justify-content:center; gap:9px; padding:12px 16px; font-size:13.5px; font-weight:700; letter-spacing:.2px; text-align:center; transform:translateY(-100%); transition:transform .3s cubic-bezier(.22,.68,0,1.2), background-color .2s; pointer-events:none; box-shadow:0 3px 16px rgba(0,0,0,.35);';
+                document.body.appendChild(el);
+            }
+            clearTimeout(_syncIndicadorTimeout);
+            el.style.pointerEvents = 'none';
+            el.style.cursor = 'default';
+            el.onclick = null;
+
+            if (estado === 'ativo') {
+                el.style.background = 'var(--acc2, #3d7fff)';
+                el.style.color = '#fff';
+                el.innerHTML = '<span style="width:15px;height:15px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;display:inline-block;animation:sync-spin .7s linear infinite"></span> Sincronizando com a planilha...';
+                el.style.transform = 'translateY(0)';
+            } else if (estado === 'sucesso') {
+                el.style.background = 'var(--acc, #00e8a2)';
+                el.style.color = '#04231a';
+                el.innerHTML = '<span style="font-size:16px;line-height:1">✓</span> Dados salvos na planilha';
+                el.style.transform = 'translateY(0)';
+                _syncIndicadorTimeout = setTimeout(() => { el.style.transform = 'translateY(-100%)'; }, 2400);
+            } else if (estado === 'erro') {
+                // Erro persistente (já tentou várias vezes) — fica visível até o usuário agir,
+                // não some sozinho.
+                el.style.background = 'var(--danger, #ff4d6d)';
+                el.style.color = '#fff';
+                el.style.pointerEvents = 'auto';
+                el.style.cursor = 'pointer';
+                el.innerHTML = '⚠ Falha ao salvar na planilha — toque para recarregar';
+                el.onclick = () => window.location.reload(true);
+                el.style.transform = 'translateY(0)';
+            } else if (estado === 'erro-url') {
+                // Ação(ões) pendente(s) presa(s) numa URL de script diferente da atual —
+                // NUNCA enviadas automaticamente. Fica visível até o usuário decidir.
+                el.style.background = 'var(--danger, #ff4d6d)';
+                el.style.color = '#fff';
+                el.style.pointerEvents = 'auto';
+                el.style.cursor = 'pointer';
+                el.innerHTML = '⚠ Há ação(ões) pendente(s) de uma URL de script antiga — toque para revisar';
+                el.onclick = () => _revisarPendentesUrlDiferente();
+                el.style.transform = 'translateY(0)';
+            } else {
+                el.style.transform = 'translateY(-100%)';
+            }
+        }
+
+        // Mostra quantas ações estão presas numa URL antiga e deixa escolher entre
+        // descartá-las (elas NUNCA serão enviadas, então descartar é seguro nesse sentido)
+        // ou manter esperando (ex: se a URL_SCRIPT for revertida de volta depois).
+        function _revisarPendentesUrlDiferente() {
+            const presas = _lerPendentes().filter(p => p.url && p.url !== URL_SCRIPT);
+            if (presas.length === 0) { _syncIndicador(false); return; }
+
+            const urls = [...new Set(presas.map(p => p.url))];
+            const msg = presas.length + ' ação(ões) pendente(s) foram criadas com a URL do script:\n' +
+                urls.join('\n') + '\n\nA URL atual é diferente:\n' + URL_SCRIPT +
+                '\n\nElas NÃO serão enviadas automaticamente (pra não ir pra planilha errada).\n\n' +
+                'Descartar essas ações pendentes agora?';
+
+            if (window.confirm(msg)) {
+                const uidsPresos = new Set(presas.map(p => p.uid));
+                _salvarListaPendentes(_lerPendentes().filter(p => !uidsPresos.has(p.uid)));
+                showToast('Ações pendentes descartadas', 'ok');
+                _syncIndicador(false);
+            }
+        }
+
+        // Avisa o navegador pra confirmar antes de sair enquanto há algo não confirmado
+        window.addEventListener('beforeunload', (e) => {
+            if (_syncPendentes > 0) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        });
+
+        // Serializa um valor de forma "canônica": chaves de objeto sempre em ordem
+        // alfabética, recursivamente. Isso torna a comparação abaixo imune a diferenças
+        // de ORDEM de chaves entre o objeto montado no navegador (esperado) e o que a
+        // planilha devolve (atual) — só o conteúdo importa, não a ordem em que cada lado
+        // decidiu escrever as propriedades.
+        function _stringifyOrdenado(obj) {
+            if (Array.isArray(obj)) return '[' + obj.map(_stringifyOrdenado).join(',') + ']';
+            if (obj && typeof obj === 'object') {
+                const keys = Object.keys(obj).sort();
+                return '{' + keys.map(k => JSON.stringify(k) + ':' + _stringifyOrdenado(obj[k])).join(',') + '}';
+            }
+            return JSON.stringify(obj);
+        }
+
+        // Envia uma ação para o Apps Script sem travar a UI. As ações são
+        // encadeadas (uma de cada vez, na ordem em que foram disparadas) para
+        // evitar que duas respostas do servidor se sobrescrevam fora de ordem, e o
+        // payload de cada uma só é montado (com o "lin" mais atual) quando chega a
+        // vez dela na fila — nunca no momento do clique.
+        // uidExistente / urlOrigem: usados internamente ao reenviar pendências salvas do
+        // localStorage — urlOrigem é a URL_SCRIPT que estava valendo quando a ação foi
+        // criada, pra garantir que ela NUNCA seja enviada pra uma URL diferente (ex: você
+        // trocou o script/planilha entre uma sessão e outra).
+        function syncBackground(tipo, ctx, uidExistente, urlOrigem) {
+            const acao = SYNC_ACOES[tipo];
+            if (!acao) { console.error("Tipo de sincronização desconhecido: " + tipo); return; }
+
+            const urlAlvo = urlOrigem || URL_SCRIPT;
+            const uid = uidExistente || (Date.now() + '_' + gerarHashAleatorio(8));
+            if (!uidExistente) _addPendente(uid, tipo, ctx);
+
+            // Guarda uma "foto" do que o usuário já está vendo na tela AGORA (logo após a
+            // atualização otimista), pra comparar depois com o que a planilha realmente
+            // confirmar — ignorando lin/lins/time, que naturalmente só existem/mudam após
+            // a confirmação.
+            const esperado = acao.entidade ? _semCamposVolateis(acao.entidade(DB, ctx)) : null;
+
+            _syncPendentes++;
+            _syncIndicador('ativo');
+
+            _syncQueue = _syncQueue.then(async () => {
+                let erroOcorreu = false;
+                let erroPersistente = false;
+                try {
+                    // Garantia final, bem na hora do envio: se a URL do script mudou desde
+                    // que esta ação foi criada, NUNCA envia — trava aqui, mesmo que alguém
+                    // tenha reenviado por engano.
+                    if (urlAlvo !== URL_SCRIPT) {
+                        throw new Error("URL_BLOQUEADA");
+                    }
+
+                    // Monta o payload agora (não no clique), lendo os "lin" mais atuais do
+                    // DB_srv — que já reflete o resultado de qualquer ação anterior da fila.
+                    const data = acao.build(ctx);
+                    data.time = DB.time;
+
+                    const data_fetch = { data, funcao: acao.funcao, id_usuario: ID_USUARIO };
+                    const res = await fetch(URL_SCRIPT,
+                        { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" }, keepalive: true }
+                    );
+
+                    if (!res.ok) { throw new Error("Erro ao realizar fetch - " + acao.funcao) };
+
+                    const novoDBBruto = await res.json();
+
+                    // Confere TODOS os formatos possíveis de resposta do script de uma vez:
+                    // não-autorizado, erro tratado, ou formato inesperado (célula corrompida).
+                    _validarRespostaScript(novoDBBruto);
+
+                    if (novoDBBruto.time && DB.time && novoDBBruto.time <= DB.time) {
+                        throw new Error("Resposta desatualizada do servidor");
+                    }
+
+                    const novoDB = _normalizarNumerosDB(novoDBBruto);
+
+                    // Mescla só a entidade que ESTA ação afeta (cliente/empréstimo específico)
+                    // com o que veio confirmado do servidor — sem trocar o DB inteiro, pra não
+                    // apagar atualizações otimistas de OUTRAS ações que ainda estejam
+                    // esperando na fila. O "time" sempre precisa propagar (senão a próxima
+                    // ação da fila é rejeitada pelo servidor por timestamp desatualizado).
+                    if (acao.merge) {
+                        acao.merge(DB, novoDB, ctx);
+                        DB.time = novoDB.time;
+                    } else {
+                        DB = novoDB;
+                    }
+                    _atualizarDBSrv(novoDB);
+                    backup_local();
+                    _removerPendente(uid);
+
+                    // Só re-renderiza a tela se o que a planilha confirmou for DIFERENTE do
+                    // que o usuário já estava vendo (ignorando lin/lins/time, que só existem
+                    // depois da confirmação). Se bateu tudo — o caso normal — não tem porquê
+                    // atualizar de novo, isso só causaria um "piscar" desnecessário na tela.
+                    if (acao.entidade) {
+                        const atual = _semCamposVolateis(acao.entidade(DB, ctx));
+                        if (_stringifyOrdenado(esperado) !== _stringifyOrdenado(atual)) {
+                            console.warn("Divergência detectada em '" + tipo + "':", { esperado, atual });
+                            showNotif('A planilha confirmou valores diferentes do esperado — tela atualizada com os dados corretos', 'warn', 8000);
+                            refreshCurrentScreen();
+                        }
+                    } else {
+                        // Ações sem "entidade" definida (não deveria acontecer, mas por
+                        // segurança) sempre atualizam a tela.
+                        refreshCurrentScreen();
+                    }
+
+                    console.log("Sincronizado com sucesso: " + tipo);
+                }
+                catch (err) {
+                    erroOcorreu = true;
+                    console.log("Erro ao sincronizar (" + tipo + ")");
+                    console.log(err);
+
+                    if (err && err.message === "URL_BLOQUEADA") {
+                        // Nunca adianta recarregar (a URL mudou de verdade, não é falha de
+                        // rede) — trava aqui, sem loop de reload, e avisa bem visível.
+                        console.error("Ação '" + tipo + "' pertence a uma URL de script diferente da atual (" + urlAlvo + " ≠ " + URL_SCRIPT + ") — bloqueada, não enviada.");
+                        erroPersistente = true;
+                        _syncIndicador('erro-url');
+                        showNotif('Ação pendente de uma URL de script antiga — não enviada por segurança', 'err', 15000);
+                    } else if (err && err.naoAutorizado) {
+                        // Acesso revogado pro ID_USUARIO deste navegador — recarregar não
+                        // resolve (o ID continua o mesmo), então não entra no loop de retry.
+                        // Fica registrado como pendente (não descarta), caso o acesso seja
+                        // reautorizado depois.
+                        console.error("Ação '" + tipo + "' não pôde ser sincronizada: acesso não autorizado para este navegador.");
+                        erroPersistente = true;
+                        _syncIndicador('erro');
+                        showNotif('Acesso não autorizado pela planilha — a ação não foi salva', 'err', 15000);
+                    } else {
+                        // Não remove de _lerPendentes: fica registrado pra tentar de novo. Mas
+                        // conta as tentativas — se o "time" já estiver correto (loadDB força
+                        // fetch fresco quando há pendência) e mesmo assim continuar falhando,
+                        // recarregar pra sempre só entra em loop. Depois de algumas tentativas,
+                        // para de recarregar sozinho e avisa de um jeito que exige ação manual.
+                        const tentativas = _incrementarTentativa(uid);
+                        const LIMITE_TENTATIVAS = 3;
+
+                        if (tentativas < LIMITE_TENTATIVAS) {
+                            showToast("Erro ao sincronizar com a planilha", 'err');
+                            showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
+                            setTimeout(() => {
+                                return window.location.reload(true);
+                            }, 5000);
+                        } else {
+                            console.error("Ação '" + tipo + "' falhou " + tentativas + " vezes seguidas — parando de recarregar sozinho.");
+                            erroPersistente = true;
+                            _syncIndicador('erro');
+                            showNotif('Não foi possível salvar na planilha após várias tentativas', 'err', 15000);
+                        }
+                    }
+                }
+                finally {
+                    _syncPendentes = Math.max(0, _syncPendentes - 1);
+                    // Só mostra o "salvo ✓" quando a fila inteira esvaziou sem erro — se ainda
+                    // tem outra ação pendente, o indicador continua em "sincronizando...".
+                    // Se foi erro persistente, o aviso 'erro' já foi deixado fixo na tela —
+                    // não mexe nele aqui.
+                    if (_syncPendentes === 0 && !erroPersistente) {
+                        _syncIndicador(erroOcorreu ? false : 'sucesso');
+                    }
+                }
+            });
+
+            return _syncQueue;
+        }
+
+        // Reenvia, na ordem em que foram criadas, quaisquer ações que ficaram
+        // pendentes de uma sessão anterior (ex: o usuário fechou a aba antes do
+        // fetch terminar). Chamado uma vez ao iniciar o site, depois do DB_srv
+        // já estar carregado — então o "lin" é resolvido fresco, contra a
+        // planilha como ela está agora.
+        function _reenviarPendentesSalvos() {
+            const pendentes = _lerPendentes();
+            if (pendentes.length === 0) return;
+
+            // Itens sem "url" salva são de antes dessa proteção existir — tratados como
+            // compatíveis (não bloqueia retroativamente). Itens com "url" diferente da
+            // atual NUNCA são reenviados automaticamente.
+            const compativeis = pendentes.filter(p => !p.url || p.url === URL_SCRIPT);
+            const urlDiferente = pendentes.filter(p => p.url && p.url !== URL_SCRIPT);
+
+            if (compativeis.length > 0) {
+                console.log(compativeis.length + " ação(ões) pendente(s) de uma sessão anterior, reenviando...");
+                showToast('Sincronizando ações pendentes...', 'ok');
+                compativeis
+                    .sort((a, b) => a.criadoEm - b.criadoEm)
+                    .forEach(p => syncBackground(p.tipo, p.ctx, p.uid, p.url));
+            }
+
+            if (urlDiferente.length > 0) {
+                console.warn(urlDiferente.length + " ação(ões) pendente(s) presas numa URL de script diferente da atual — não serão enviadas automaticamente.");
+                _syncIndicador('erro-url');
+            }
+        }
 
 
         // Função para iniciar o site
@@ -13956,6 +14482,9 @@
             // Seed initial history state
             history.replaceState({ scr: 'dash' }, '', '');
             _navStack.push({ scr: 'dash' });
+
+            // Reenvia em segundo plano qualquer ação que ficou pendente de uma sessão anterior
+            _reenviarPendentesSalvos();
         }
 
         // Mostra a tela de bloqueio de acesso (navegador não autorizado) e garante
@@ -13965,6 +14494,13 @@
             const el = document.getElementById('unauthorized-screen');
             if (el) el.classList.add('us-visible');
         }
+
+        // ===================== URL DO SCRIPT (GOOGLE APPS SCRIPT) =====================
+        // Pra trocar de URL, comenta a linha ativa e descomenta a outra.
+        // Script do Rafael
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzkicXkp2YFZubl5MqRQCFUh7d42YVs8TZbshypuR3yU92owy2whRHZVLmVDsUmhNjT/exec";
+        // Meu Script
+        //const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbzsnRqEtGX4JOTsMFKnnbnO6SFPWIwNsENnnROhgFNFE6vq9pBLH1wFA6o1Emg-1RXESA/exec";
 
         iniciar_site();
         setupKeyboardAutoClose();
