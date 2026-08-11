@@ -4646,10 +4646,10 @@
                             </div>
                         </div>
                         <div class="sh" style="margin-top:4px; margin-left: 10px; margin-right: 10px;">
-                            <div class="sh-t">Clientes cadastrados</div>
+                            <div class="sh-t" id="novo-cli-sh-title">Clientes cadastrados</div>
                             <div class="sh-l" onclick="showNovoClienteForm()">+ Novo cliente</div>
                         </div>
-                        <div class="srch-wrap">
+                        <div class="srch-wrap" id="novo-cli-search-wrap">
                             <svg class="srch-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-linecap="round">
                                 <circle cx="11" cy="11" r="8" />
@@ -4867,9 +4867,12 @@
             <!-- ========== TELA 4: CLIENTES ========== -->
             <div id="scr-clientes" class="scr">
                 <div
-                    style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top: 20px; margin-left: 10px; margin-right: 10px;">
+                    style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-top: 20px; margin-left: 10px; margin-right: 10px;">
                     <div class="ptitle">Clientes</div>
-                    <div class="psub" id="cli-subtitle" style="text-align:right;">—</div>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+                        <div class="psub" id="cli-subtitle" style="text-align:right; margin-bottom:0;">—</div>
+                        <div class="sh-l" onclick="openNovoClienteClientesSheet()">+ Novo cliente</div>
+                    </div>
                 </div>
 
                 <div
@@ -5911,6 +5914,46 @@
                 <div class="sh-title">Apagar Dados</div>
                 <div class="confirm-btns mt8" style="padding-bottom: 20px;">
                     <button class="cbtn-r" onclick="preConfirmarDelCliente()">Continuar →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Novo cliente (a partir da aba Clientes) -->
+    <div class="overlay" id="new-client-sheet" data-backdrop="new-client-sheet">
+        <div class="sheet" style="height:60vh" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title">Novo Cliente</div>
+                <div class="sh-close" onclick="closeSheet(document.getElementById('new-client-sheet'))"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></div>
+            </div>
+            <div class="sh-body">
+                <div class="fg">
+                    <div class="fl">Nome completo *</div><input class="fi" id="ncc-nome" type="text"
+                        placeholder="Ex: João da Silva"
+                        oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, ''); att_cliente('ncc-nome'); ">
+                </div>
+                <div class="fg">
+                    <div class="fl">Telefone *</div><input class="fi" id="ncc-tel" type="tel"
+                        placeholder="Ex: 12912345678"
+                        oninput="this.value=this.value.replace(/[^0-9]/g,''); att_cliente('ncc-tel'); ">
+                </div>
+                <div class="fg">
+                    <div class="fl">E-mail</div><input class="fi" id="ncc-email" type="email"
+                        placeholder="Ex: joao@email.com">
+                </div>
+                <div class="fg">
+                    <div class="fl">Descrição (opcional)</div><textarea class="fi fi-ta" id="ncc-desc"
+                        placeholder="Observações sobre o cliente…"></textarea>
+                </div>
+                <div class="confirm-btns mt8" style="padding-bottom: 40px;">
+                    <button class="cbtn-n"
+                        onclick="closeSheet(document.getElementById('new-client-sheet'))">Cancelar</button>
+                    <button class="cbtn-y" onclick="add_cliente_from_clientes()">Salvar</button>
                 </div>
             </div>
         </div>
@@ -8806,7 +8849,14 @@
         // ==================== NOVO ====================
         let _novoSelectedClientId = null;
         let _novoCliSearchVal = '';
+        let _novoSkipReset = false;
         function renderNovo() {
+            // Se acabamos de criar/selecionar um cliente e estamos prestes a ir pro
+            // step 2 (setTimeout já agendado), não reseta o estado por baixo do pano.
+            if (_novoSkipReset) {
+                _novoSkipReset = false;
+                return;
+            }
             _novoSelectedClientId = null;
             _novoCliSearchVal = '';
             const novoSearchInput = document.getElementById('novo-cli-search-input');
@@ -8862,12 +8912,16 @@
         function showNovoClienteForm() {
             document.getElementById('novo-client-form').style.display = '';
             document.getElementById('novo-client-list').style.display = 'none';
+            document.getElementById('novo-cli-sh-title').textContent = 'Adicionar';
+            document.getElementById('novo-cli-search-wrap').style.display = 'none';
             // Push a sub-state so the back button cancels the form instead of leaving the screen
             history.pushState({ scr: 'novo', subState: 'novo-cliente-form' }, '', '');
         }
         function cancelNovoCliente() {
             document.getElementById('novo-client-form').style.display = 'none';
             document.getElementById('novo-client-list').style.display = '';
+            document.getElementById('novo-cli-sh-title').textContent = 'Clientes cadastrados';
+            document.getElementById('novo-cli-search-wrap').style.display = '';
             renderNovoClientList();
         }
 
@@ -8929,7 +8983,70 @@
             showToast('Cliente salvo!', 'ok');
 
             // Sincroniza com a planilha em segundo plano
+            // (evita que o refresh abaixo reset o cliente recém-selecionado antes do goToStep2 rodar)
+            _novoSkipReset = true;
             refreshCurrentScreen();
+            syncBackground('cliente_novo', { ids_total_c, id, nome, tel, email, desc, initials, color, qtd_emps });
+        }
+
+        // FUNÇÕES PARA ADICIONAR NOVO CLIENTE A PARTIR DA ABA "CLIENTES"
+        function openNovoClienteClientesSheet() {
+            document.getElementById('ncc-nome').value = '';
+            document.getElementById('ncc-tel').value = '';
+            document.getElementById('ncc-email').value = '';
+            document.getElementById('ncc-desc').value = '';
+            document.getElementById('ncc-nome').style.borderColor = '';
+            document.getElementById('ncc-tel').style.borderColor = '';
+            openSheet('new-client-sheet');
+        }
+
+        async function add_cliente_from_clientes() {
+            const inputNome = document.getElementById('ncc-nome');
+            const inputTel = document.getElementById('ncc-tel');
+            const inputEmail = document.getElementById('ncc-email');
+            const inputDesc = document.getElementById('ncc-desc');
+
+            const nome = inputNome.value.trim();
+            const tel = inputTel.value.trim();
+            const email = inputEmail.value.trim();
+            const desc = inputDesc.value.trim();
+
+            !nome ? inputNome.style.borderColor = "var(--err, #ff4d4d)" : inputNome.style.borderColor = "";
+            !tel ? inputTel.style.borderColor = "var(--err, #ff4d4d)" : inputTel.style.borderColor = "";
+
+            if (!nome || !tel) {
+                showToast('Nome e telefone são obrigatórios', 'err');
+                return;
+            }
+
+            const initials = nome.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase();
+            const colors = ['av-g', 'av-b', 'av-a', 'av-r', 'av-p'];
+            const color = colors[DB.clients.length % colors.length];
+            const qtd_emps = 0;
+
+            // Criar o novo id do Cliente atual
+            let novo_id = 'C00';
+            const ids_total_c = DB.ids_total_c + 1;
+            if (ids_total_c <= 99) {
+                novo_id = "C" + String(ids_total_c).padStart(2, '0');
+            } else {
+                novo_id = String(ids_total_c);
+            }
+
+            const id = novo_id;
+
+            showLoadingFor(1000, ['Salvando cliente…']);
+            // Atualização otimista: aplica local e já reflete na tela, sem esperar o script.
+            DB.clients.push({ id, nome, tel, email, desc, initials, color, qtd_emps, lins_emps: [], lins_pags: [], anexos: [] });
+            DB.ids_total_c = ids_total_c;
+            backup_local();
+
+            closeSheet(document.getElementById('new-client-sheet'));
+            renderClientes();
+            showToast('Cliente salvo!', 'ok');
+            openClienteDetalhe(id);
+
+            // Sincroniza com a planilha em segundo plano
             syncBackground('cliente_novo', { ids_total_c, id, nome, tel, email, desc, initials, color, qtd_emps });
         }
 
