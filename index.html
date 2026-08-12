@@ -6427,6 +6427,51 @@
             erro, entre em contato com o responsável pelo sistema.</div>
     </div>
 
+    <!-- Pendências de sincronização com erro -->
+    <div class="overlay" id="sync-pendentes-sheet" data-backdrop="sync-pendentes-sheet">
+        <div class="sheet" style="height:70vh" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title">Pendências com erro</div>
+                <div class="sh-close" onclick="closeSheet(document.getElementById('sync-pendentes-sheet'))"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></div>
+            </div>
+            <div class="sh-body">
+                <div class="fs12 tc2 mb12">Essas ações não conseguiram ser salvas na planilha após várias
+                    tentativas. Você pode ver os detalhes de cada erro ou remover a pendência (ela deixa de ser
+                    reenviada, mas os dados já aplicados localmente continuam na tela).</div>
+                <div id="sync-pendentes-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalhe completo de um erro de sincronização -->
+    <div class="overlay" id="sync-erro-detalhe-sheet" data-backdrop="sync-erro-detalhe-sheet" style="z-index:300">
+        <div class="sheet" style="height:75vh" onclick="event.stopPropagation()">
+            <div class="sh-handle"></div>
+            <div class="sh-hdr">
+                <div class="sh-title">Detalhes do erro</div>
+                <div class="sh-close" onclick="closeSheet(document.getElementById('sync-erro-detalhe-sheet'))"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></div>
+            </div>
+            <div class="sh-body">
+                <textarea id="sync-erro-detalhe-text" readonly
+                    style="width:100%; min-height:48vh; resize:vertical; font-family:monospace; font-size:11px; line-height:1.5; background:var(--bg2, #1a1c22); color:var(--txt1); border:1px solid var(--brd); border-radius:10px; padding:10px; white-space:pre-wrap;"></textarea>
+                <div class="confirm-btns mt12" style="padding-bottom:20px;">
+                    <button class="cbtn-n"
+                        onclick="closeSheet(document.getElementById('sync-erro-detalhe-sheet'))">Fechar</button>
+                    <button class="cbtn-y" onclick="_copiarLogErroSync()">Copiar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ==================== DATA ====================
         // TODAY agora armazena o timestamp do início do dia de hoje
@@ -14279,11 +14324,71 @@
 
         let _syncQueue = Promise.resolve();
         let _syncPendentes = 0;
+        const LIMITE_TENTATIVAS_SYNC = 3;
 
-        // estado: 'ativo' (sincronizando), 'sucesso' (confirmado pela planilha, some sozinho
-        // depois de um instante) ou false/undefined (esconde na hora)
-        // Faixa fixa no topo da tela, difícil de passar despercebido: azul + spinner
-        // enquanto sincroniza, verde sólido com ✓ quando a planilha confirma.
+        const SYNC_TIPO_LABEL = {
+            cliente_novo: 'Novo cliente', cliente_editar: 'Editar cliente', cliente_apagar: 'Apagar cliente',
+            emprestimo_novo: 'Novo empréstimo', emprestimo_editar: 'Editar empréstimo', emprestimo_pago: 'Marcar empréstimo pago',
+            emprestimo_notif: 'Notificação de empréstimo', emprestimo_apagar: 'Apagar empréstimo',
+            pagamento_apagar: 'Apagar pagamento', pagamento_novo: 'Novo pagamento', padroes_atualizar: 'Atualizar padrões'
+        };
+
+        // Pendentes que já falharam tempo/tentativas suficiente pra serem consideradas
+        // "com problema": ou já bateram o limite de tentativas, ou estão presas numa URL
+        // de script diferente da atual (nunca serão enviadas automaticamente).
+        function _pendentesComProblema() {
+            return _lerPendentes().filter(p => (p.tentativas || 0) >= LIMITE_TENTATIVAS_SYNC || (p.url && p.url !== URL_SCRIPT));
+        }
+
+        // Monta um log de texto completo (pra copiar/inspecionar) com tudo que se sabe
+        // sobre uma falha de sincronização: mensagem, stack, status HTTP, a resposta
+        // BRUTA do script (antes de qualquer parse) e os dados que a ação tentou enviar.
+        function _montarLogErroSync(tipo, uid, err, statusHttp, respostaBruta, ctx, tentativas) {
+            const linhas = [];
+            linhas.push('=== LOG DE ERRO DE SINCRONIZAÇÃO ===');
+            linhas.push('Data/hora: ' + new Date().toLocaleString('pt-BR'));
+            linhas.push('Ação: ' + (SYNC_TIPO_LABEL[tipo] || tipo) + ' (' + tipo + ')');
+            linhas.push('UID interno: ' + uid);
+            linhas.push('Tentativas até agora: ' + tentativas);
+            linhas.push('URL do script usada: ' + URL_SCRIPT);
+            linhas.push('');
+            linhas.push('--- Mensagem do erro ---');
+            linhas.push((err && err.message) || String(err));
+            if (err && err.stack) {
+                linhas.push('');
+                linhas.push('--- Stack ---');
+                linhas.push(err.stack);
+            }
+            if (statusHttp !== null && statusHttp !== undefined) {
+                linhas.push('');
+                linhas.push('--- Status HTTP ---');
+                linhas.push(String(statusHttp));
+            }
+            linhas.push('');
+            linhas.push('--- Resposta bruta do script ---');
+            linhas.push(respostaBruta || '(sem resposta — provável falha de rede antes de qualquer resposta chegar)');
+            linhas.push('');
+            linhas.push('--- Dados que a ação tentou enviar (ctx) ---');
+            try { linhas.push(JSON.stringify(ctx, null, 2)); } catch (e) { linhas.push('(não foi possível serializar os dados)'); }
+            return linhas.join('\n');
+        }
+
+        // Salva o log de erro mais recente dentro do próprio item pendente no
+        // localStorage, pra ficar disponível depois (mesmo após recarregar a página).
+        function _registrarErroPendente(uid, logTexto) {
+            const lista = _lerPendentes();
+            const item = lista.find(p => p.uid === uid);
+            if (!item) return;
+            item.ultimoErro = logTexto;
+            item.ultimoErroEm = Date.now();
+            _salvarListaPendentes(lista);
+        }
+
+        // Indicador de sincronização: um badge pequeno e discreto, flutuando acima da
+        // navegação inferior — não cobre título nem conteúdo da tela como a faixa
+        // anterior no topo. Mostra quantas ações estão sendo sincronizadas; some sozinho
+        // ao confirmar; e vira um aviso clicável (cor de erro) quando há pendência(s)
+        // com falha persistente.
         let _syncIndicadorTimeout = null;
         function _syncIndicador(estado) {
             let el = document.getElementById('sync-indicator');
@@ -14296,7 +14401,7 @@
                 }
                 el = document.createElement('div');
                 el.id = 'sync-indicator';
-                el.style.cssText = 'position:fixed; top:0; left:0; right:0; z-index:10500; display:flex; align-items:center; justify-content:center; gap:9px; padding:12px 16px; font-size:13.5px; font-weight:700; letter-spacing:.2px; text-align:center; transform:translateY(-100%); transition:transform .3s cubic-bezier(.22,.68,0,1.2), background-color .2s; pointer-events:none; box-shadow:0 3px 16px rgba(0,0,0,.35);';
+                el.style.cssText = 'position:fixed; bottom:86px; right:12px; z-index:900; display:inline-flex; align-items:center; gap:6px; padding:7px 12px; font-size:11.5px; font-weight:600; letter-spacing:.2px; border-radius:20px; opacity:0; transform:translateY(6px) scale(.92); transition:opacity .2s, transform .2s, background-color .2s; pointer-events:none; box-shadow:0 2px 10px rgba(0,0,0,.25);';
                 document.body.appendChild(el);
             }
             clearTimeout(_syncIndicadorTimeout);
@@ -14305,60 +14410,94 @@
             el.onclick = null;
 
             if (estado === 'ativo') {
+                const qtd = Math.max(1, _syncPendentes);
                 el.style.background = 'var(--acc2, #3d7fff)';
                 el.style.color = '#fff';
-                el.innerHTML = '<span style="width:15px;height:15px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;display:inline-block;animation:sync-spin .7s linear infinite"></span> Sincronizando com a planilha...';
-                el.style.transform = 'translateY(0)';
+                el.innerHTML = '<span style="width:10px;height:10px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;display:inline-block;animation:sync-spin .7s linear infinite; flex-shrink:0"></span> Sincronizando' + (qtd > 1 ? ' (' + qtd + ')' : '') + '…';
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0) scale(1)';
             } else if (estado === 'sucesso') {
                 el.style.background = 'var(--acc, #00e8a2)';
                 el.style.color = '#04231a';
-                el.innerHTML = '<span style="font-size:16px;line-height:1">✓</span> Dados salvos na planilha';
-                el.style.transform = 'translateY(0)';
-                _syncIndicadorTimeout = setTimeout(() => { el.style.transform = 'translateY(-100%)'; }, 2400);
+                el.innerHTML = '<span style="font-size:12px; line-height:1">✓</span> Salvo';
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0) scale(1)';
+                _syncIndicadorTimeout = setTimeout(() => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(6px) scale(.92)';
+                }, 1600);
             } else if (estado === 'erro') {
-                // Erro persistente (já tentou várias vezes) — fica visível até o usuário agir,
-                // não some sozinho.
+                const problemas = _pendentesComProblema().length;
+                if (problemas === 0) { el.style.opacity = '0'; el.style.transform = 'translateY(6px) scale(.92)'; return; }
                 el.style.background = 'var(--danger, #ff4d6d)';
                 el.style.color = '#fff';
                 el.style.pointerEvents = 'auto';
                 el.style.cursor = 'pointer';
-                el.innerHTML = '⚠ Falha ao salvar na planilha — toque para recarregar';
-                el.onclick = () => window.location.reload(true);
-                el.style.transform = 'translateY(0)';
-            } else if (estado === 'erro-url') {
-                // Ação(ões) pendente(s) presa(s) numa URL de script diferente da atual —
-                // NUNCA enviadas automaticamente. Fica visível até o usuário decidir.
-                el.style.background = 'var(--danger, #ff4d6d)';
-                el.style.color = '#fff';
-                el.style.pointerEvents = 'auto';
-                el.style.cursor = 'pointer';
-                el.innerHTML = '⚠ Há ação(ões) pendente(s) de uma URL de script antiga — toque para revisar';
-                el.onclick = () => _revisarPendentesUrlDiferente();
-                el.style.transform = 'translateY(0)';
+                el.innerHTML = '⚠ ' + problemas + (problemas === 1 ? ' pendência com erro' : ' pendências com erro');
+                el.onclick = () => openSyncPendentesSheet();
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0) scale(1)';
             } else {
-                el.style.transform = 'translateY(-100%)';
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(6px) scale(.92)';
             }
         }
 
-        // Mostra quantas ações estão presas numa URL antiga e deixa escolher entre
-        // descartá-las (elas NUNCA serão enviadas, então descartar é seguro nesse sentido)
-        // ou manter esperando (ex: se a URL_SCRIPT for revertida de volta depois).
-        function _revisarPendentesUrlDiferente() {
-            const presas = _lerPendentes().filter(p => p.url && p.url !== URL_SCRIPT);
-            if (presas.length === 0) { _syncIndicador(false); return; }
+        // Abre a sheet listando todas as pendências com erro persistente, cada uma com
+        // opção de ver o log completo ou remover a pendência.
+        function openSyncPendentesSheet() {
+            _renderSyncPendentesList();
+            openSheet('sync-pendentes-sheet');
+        }
 
-            const urls = [...new Set(presas.map(p => p.url))];
-            const msg = presas.length + ' ação(ões) pendente(s) foram criadas com a URL do script:\n' +
-                urls.join('\n') + '\n\nA URL atual é diferente:\n' + URL_SCRIPT +
-                '\n\nElas NÃO serão enviadas automaticamente (pra não ir pra planilha errada).\n\n' +
-                'Descartar essas ações pendentes agora?';
-
-            if (window.confirm(msg)) {
-                const uidsPresos = new Set(presas.map(p => p.uid));
-                _salvarListaPendentes(_lerPendentes().filter(p => !uidsPresos.has(p.uid)));
-                showToast('Ações pendentes descartadas', 'ok');
+        function _renderSyncPendentesList() {
+            const el = document.getElementById('sync-pendentes-list');
+            const itens = _pendentesComProblema();
+            if (!itens.length) {
+                el.innerHTML = '<div class="empty"><p>Nenhuma pendência com erro no momento</p></div>';
                 _syncIndicador(false);
+                return;
             }
+            el.innerHTML = itens.map(p => {
+                const label = SYNC_TIPO_LABEL[p.tipo] || p.tipo;
+                const dataStr = p.criadoEm ? new Date(p.criadoEm).toLocaleString('pt-BR') : '—';
+                const motivo = (p.url && p.url !== URL_SCRIPT) ? 'URL de script diferente da atual' : ((p.tentativas || 0) + ' tentativa(s) sem sucesso');
+                return `
+                <div class="card-sm mb12">
+                    <div class="dr"><div class="dk">Ação</div><div class="dv2">${label}</div></div>
+                    <div class="dr"><div class="dk">Criada em</div><div class="dv2">${dataStr}</div></div>
+                    <div class="dr" style="border:none;"><div class="dk">Motivo</div><div class="dv2 c-r">${motivo}</div></div>
+                    <div class="confirm-btns mt8">
+                        <button class="cbtn-n" onclick="_verDetalheErroSync('${p.uid}')">Ver detalhes</button>
+                        <button class="cbtn-r" onclick="_removerPendenteComConfirmacao('${p.uid}')">Remover</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function _verDetalheErroSync(uid) {
+            const item = _lerPendentes().find(p => p.uid === uid);
+            const texto = item && item.ultimoErro ? item.ultimoErro :
+                'Ainda não há um log de erro detalhado registrado para esta pendência.';
+            document.getElementById('sync-erro-detalhe-text').value = texto;
+            openSheet('sync-erro-detalhe-sheet');
+        }
+
+        function _copiarLogErroSync() {
+            const texto = document.getElementById('sync-erro-detalhe-text').value;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(texto).then(() => showToast('Log copiado', 'ok')).catch(() => showToast('Não foi possível copiar', 'err'));
+            } else {
+                showToast('Não foi possível copiar', 'err');
+            }
+        }
+
+        function _removerPendenteComConfirmacao(uid) {
+            if (!window.confirm('Remover essa ação pendente? Ela para de ser reenviada — os dados já aplicados localmente continuam na tela normalmente.')) return;
+            _removerPendente(uid);
+            showToast('Pendência removida', 'ok');
+            _renderSyncPendentesList();
+            _syncIndicador(_pendentesComProblema().length ? 'erro' : false);
         }
 
         // Avisa o navegador pra confirmar antes de sair enquanto há algo não confirmado
@@ -14413,6 +14552,8 @@
             _syncQueue = _syncQueue.then(async () => {
                 let erroOcorreu = false;
                 let erroPersistente = false;
+                let statusHttp = null;
+                let respostaBrutaTxt = null;
                 try {
                     // Garantia final, bem na hora do envio: se a URL do script mudou desde
                     // que esta ação foi criada, NUNCA envia — trava aqui, mesmo que alguém
@@ -14431,9 +14572,19 @@
                         { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" }, keepalive: true }
                     );
 
-                    if (!res.ok) { throw new Error("Erro ao realizar fetch - " + acao.funcao) };
+                    statusHttp = res.status;
+                    // Lê o corpo como texto primeiro (sempre disponível pro log de erro,
+                    // mesmo que não seja um JSON válido) e só então tenta interpretar.
+                    respostaBrutaTxt = await res.text();
 
-                    const novoDBBruto = await res.json();
+                    if (!res.ok) { throw new Error("Erro ao realizar fetch - " + acao.funcao + " (HTTP " + res.status + ")") };
+
+                    let novoDBBruto;
+                    try {
+                        novoDBBruto = JSON.parse(respostaBrutaTxt);
+                    } catch (parseErr) {
+                        throw new Error("Resposta do script não é um JSON válido");
+                    }
 
                     // Confere TODOS os formatos possíveis de resposta do script de uma vez:
                     // não-autorizado, erro tratado, ou formato inesperado (célula corrompida).
@@ -14484,12 +14635,19 @@
                     console.log("Erro ao sincronizar (" + tipo + ")");
                     console.log(err);
 
+                    // Conta a tentativa e já deixa o log completo (mensagem, stack, status
+                    // HTTP e a resposta bruta do script) salvo junto do pendente, disponível
+                    // pra consulta a qualquer momento em "Ver detalhes".
+                    const tentativas = _incrementarTentativa(uid);
+                    const logTexto = _montarLogErroSync(tipo, uid, err, statusHttp, respostaBrutaTxt, ctx, tentativas);
+                    _registrarErroPendente(uid, logTexto);
+
                     if (err && err.message === "URL_BLOQUEADA") {
                         // Nunca adianta recarregar (a URL mudou de verdade, não é falha de
                         // rede) — trava aqui, sem loop de reload, e avisa bem visível.
                         console.error("Ação '" + tipo + "' pertence a uma URL de script diferente da atual (" + urlAlvo + " ≠ " + URL_SCRIPT + ") — bloqueada, não enviada.");
                         erroPersistente = true;
-                        _syncIndicador('erro-url');
+                        _syncIndicador('erro');
                         showNotif('Ação pendente de uma URL de script antiga — não enviada por segurança', 'err', 15000);
                     } else if (err && err.naoAutorizado) {
                         // Acesso revogado pro ID_USUARIO deste navegador — recarregar não
@@ -14506,10 +14664,7 @@
                         // fetch fresco quando há pendência) e mesmo assim continuar falhando,
                         // recarregar pra sempre só entra em loop. Depois de algumas tentativas,
                         // para de recarregar sozinho e avisa de um jeito que exige ação manual.
-                        const tentativas = _incrementarTentativa(uid);
-                        const LIMITE_TENTATIVAS = 3;
-
-                        if (tentativas < LIMITE_TENTATIVAS) {
+                        if (tentativas < LIMITE_TENTATIVAS_SYNC) {
                             showToast("Erro ao sincronizar com a planilha", 'err');
                             showNotif('Reiniciando Para Sincronizar...', 'err', 5000);
                             setTimeout(() => {
@@ -14525,12 +14680,18 @@
                 }
                 finally {
                     _syncPendentes = Math.max(0, _syncPendentes - 1);
+                    // Se a sheet de pendências estiver aberta, mantém a lista atualizada.
+                    if (document.getElementById('sync-pendentes-sheet')?.classList.contains('open')) {
+                        _renderSyncPendentesList();
+                    }
                     // Só mostra o "salvo ✓" quando a fila inteira esvaziou sem erro — se ainda
                     // tem outra ação pendente, o indicador continua em "sincronizando...".
                     // Se foi erro persistente, o aviso 'erro' já foi deixado fixo na tela —
                     // não mexe nele aqui.
                     if (_syncPendentes === 0 && !erroPersistente) {
                         _syncIndicador(erroOcorreu ? false : 'sucesso');
+                    } else if (_syncPendentes > 0 && !erroPersistente) {
+                        _syncIndicador('ativo');
                     }
                 }
             });
@@ -14563,7 +14724,7 @@
 
             if (urlDiferente.length > 0) {
                 console.warn(urlDiferente.length + " ação(ões) pendente(s) presas numa URL de script diferente da atual — não serão enviadas automaticamente.");
-                _syncIndicador('erro-url');
+                _syncIndicador('erro');
             }
         }
 
