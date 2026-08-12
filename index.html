@@ -13016,7 +13016,7 @@
 
                 try {
                     console.log("Enviando anexo para planilha...");
-                    const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexo', id_usuario: ID_USUARIO };
+                    const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexo', id_usuario: ID_USUARIO, id_requisicao: Date.now() + '_' + gerarHashAleatorio(8) };
                     const res = await fetch(URL_SCRIPT,
                         { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                     );
@@ -13087,7 +13087,7 @@
 
             try {
                 console.log("Apagando anexo...");
-                const data_fetch = { data: dadosParaEnvio, funcao: 'del_anexo', id_usuario: ID_USUARIO };
+                const data_fetch = { data: dadosParaEnvio, funcao: 'del_anexo', id_usuario: ID_USUARIO, id_requisicao: Date.now() + '_' + gerarHashAleatorio(8) };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -13486,7 +13486,7 @@
                 const dadosParaEnvio = { anexos, time: DB.time };
 
                 console.log("Enviando anexos para planilha...");
-                const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexos_cliente', id_usuario: ID_USUARIO };
+                const data_fetch = { data: dadosParaEnvio, funcao: 'add_anexos_cliente', id_usuario: ID_USUARIO, id_requisicao: Date.now() + '_' + gerarHashAleatorio(8) };
                 const res = await fetch(URL_SCRIPT,
                     { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" } }
                 );
@@ -14298,24 +14298,28 @@
         function _salvarListaPendentes(lista) {
             try { localStorage.setItem(PENDENTES_KEY, JSON.stringify(lista)); } catch (e) { }
         }
-        function _addPendente(uid, tipo, ctx) {
+        // "criadoEm" É o identificador da pendência (não existe mais um "uid" à parte) —
+        // já é único o suficiente (é o instante em que a ação foi enfileirada) e é o
+        // MESMO valor usado como "time_novo" enviado ao script, então não faz sentido
+        // gerar mais um identificador redundante só pra isso.
+        function _addPendente(criadoEm, tipo, ctx) {
             const lista = _lerPendentes();
             // Guarda a URL do script vigente no momento em que a ação foi criada — é contra
             // ela que a ação será validada antes de qualquer envio (agora ou num reenvio
             // futuro), pra nunca mandar uma ação pendente pra uma URL diferente da que ela
             // foi pensada (ex: você trocou de planilha/deploy entre uma sessão e outra).
-            lista.push({ uid, tipo, ctx, criadoEm: Date.now(), tentativas: 0, url: URL_SCRIPT });
+            lista.push({ criadoEm, tipo, ctx, tentativas: 0, url: URL_SCRIPT });
             _salvarListaPendentes(lista);
         }
-        function _removerPendente(uid) {
-            _salvarListaPendentes(_lerPendentes().filter(p => p.uid !== uid));
+        function _removerPendente(criadoEm) {
+            _salvarListaPendentes(_lerPendentes().filter(p => p.criadoEm !== criadoEm));
         }
         // Incrementa o contador de tentativas de um pendente e retorna o novo valor
         // (usado pra não ficar recarregando a página pra sempre se uma ação continuar
         // falhando mesmo depois de já ter pego o "time" certo da planilha)
-        function _incrementarTentativa(uid) {
+        function _incrementarTentativa(criadoEm) {
             const lista = _lerPendentes();
-            const item = lista.find(p => p.uid === uid);
+            const item = lista.find(p => p.criadoEm === criadoEm);
             if (!item) return 0;
             item.tentativas = (item.tentativas || 0) + 1;
             _salvarListaPendentes(lista);
@@ -14343,12 +14347,12 @@
         // Monta um log de texto completo (pra copiar/inspecionar) com tudo que se sabe
         // sobre uma falha de sincronização: mensagem, stack, status HTTP, a resposta
         // BRUTA do script (antes de qualquer parse) e os dados que a ação tentou enviar.
-        function _montarLogErroSync(tipo, uid, err, statusHttp, respostaBruta, ctx, tentativas) {
+        function _montarLogErroSync(tipo, criadoEm, err, statusHttp, respostaBruta, ctx, tentativas) {
             const linhas = [];
             linhas.push('=== LOG DE ERRO DE SINCRONIZAÇÃO ===');
             linhas.push('Data/hora: ' + new Date().toLocaleString('pt-BR'));
             linhas.push('Ação: ' + (SYNC_TIPO_LABEL[tipo] || tipo) + ' (' + tipo + ')');
-            linhas.push('UID interno: ' + uid);
+            linhas.push('Criada em: ' + new Date(criadoEm).toLocaleString('pt-BR') + ' (' + criadoEm + ')');
             linhas.push('Tentativas até agora: ' + tentativas);
             linhas.push('URL do script usada: ' + URL_SCRIPT);
             linhas.push('');
@@ -14375,9 +14379,9 @@
 
         // Salva o log de erro mais recente dentro do próprio item pendente no
         // localStorage, pra ficar disponível depois (mesmo após recarregar a página).
-        function _registrarErroPendente(uid, logTexto) {
+        function _registrarErroPendente(criadoEm, logTexto) {
             const lista = _lerPendentes();
-            const item = lista.find(p => p.uid === uid);
+            const item = lista.find(p => p.criadoEm === criadoEm);
             if (!item) return;
             item.ultimoErro = logTexto;
             item.ultimoErroEm = Date.now();
@@ -14468,15 +14472,15 @@
                     <div class="dr"><div class="dk">Criada em</div><div class="dv2">${dataStr}</div></div>
                     <div class="dr" style="border:none;"><div class="dk">Motivo</div><div class="dv2 c-r">${motivo}</div></div>
                     <div class="confirm-btns mt8">
-                        <button class="cbtn-n" onclick="_verDetalheErroSync('${p.uid}')">Ver detalhes</button>
-                        <button class="cbtn-r" onclick="_removerPendenteComConfirmacao('${p.uid}')">Remover</button>
+                        <button class="cbtn-n" onclick="_verDetalheErroSync(${p.criadoEm})">Ver detalhes</button>
+                        <button class="cbtn-r" onclick="_removerPendenteComConfirmacao(${p.criadoEm})">Remover</button>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        function _verDetalheErroSync(uid) {
-            const item = _lerPendentes().find(p => p.uid === uid);
+        function _verDetalheErroSync(criadoEm) {
+            const item = _lerPendentes().find(p => p.criadoEm === criadoEm);
             const texto = item && item.ultimoErro ? item.ultimoErro :
                 'Ainda não há um log de erro detalhado registrado para esta pendência.';
             document.getElementById('sync-erro-detalhe-text').value = texto;
@@ -14492,9 +14496,9 @@
             }
         }
 
-        function _removerPendenteComConfirmacao(uid) {
+        function _removerPendenteComConfirmacao(criadoEm) {
             if (!window.confirm('Remover essa ação pendente? Ela para de ser reenviada — os dados já aplicados localmente continuam na tela normalmente.')) return;
-            _removerPendente(uid);
+            _removerPendente(criadoEm);
             showToast('Pendência removida', 'ok');
             _renderSyncPendentesList();
             _syncIndicador(_pendentesComProblema().length ? 'erro' : false);
@@ -14528,17 +14532,22 @@
         // evitar que duas respostas do servidor se sobrescrevam fora de ordem, e o
         // payload de cada uma só é montado (com o "lin" mais atual) quando chega a
         // vez dela na fila — nunca no momento do clique.
-        // uidExistente / urlOrigem: usados internamente ao reenviar pendências salvas do
+        // criadoExistente / urlOrigem: usados internamente ao reenviar pendências salvas do
         // localStorage — urlOrigem é a URL_SCRIPT que estava valendo quando a ação foi
         // criada, pra garantir que ela NUNCA seja enviada pra uma URL diferente (ex: você
         // trocou o script/planilha entre uma sessão e outra).
-        function syncBackground(tipo, ctx, uidExistente, urlOrigem) {
+        function syncBackground(tipo, ctx, criadoExistente, urlOrigem) {
             const acao = SYNC_ACOES[tipo];
             if (!acao) { console.error("Tipo de sincronização desconhecido: " + tipo); return; }
 
             const urlAlvo = urlOrigem || URL_SCRIPT;
-            const uid = uidExistente || (Date.now() + '_' + gerarHashAleatorio(8));
-            if (!uidExistente) _addPendente(uid, tipo, ctx);
+            // "criadoEm" é, ao mesmo tempo: o identificador único da pendência, o
+            // identificador da requisição (id_requisicao) mandado ao script pra detectar
+            // duplicata, e o "time_novo" que o script deve gravar na planilha depois que
+            // a ação rodar. Um valor só, sem gerar nenhum uid/hash à parte — permanece o
+            // MESMO em qualquer reenvio, porque nunca é recalculado (só reaproveitado).
+            const criadoEm = criadoExistente || Date.now();
+            if (!criadoExistente) _addPendente(criadoEm, tipo, ctx);
 
             // Guarda uma "foto" do que o usuário já está vendo na tela AGORA (logo após a
             // atualização otimista), pra comparar depois com o que a planilha realmente
@@ -14566,8 +14575,9 @@
                     // DB_srv — que já reflete o resultado de qualquer ação anterior da fila.
                     const data = acao.build(ctx);
                     data.time = DB.time;
+                    data.time_novo = criadoEm;
 
-                    const data_fetch = { data, funcao: acao.funcao, id_usuario: ID_USUARIO };
+                    const data_fetch = { data, funcao: acao.funcao, id_usuario: ID_USUARIO, id_requisicao: criadoEm };
                     const res = await fetch(URL_SCRIPT,
                         { method: "POST", body: JSON.stringify(data_fetch), headers: { "Content-Type": "text/plain" }, keepalive: true }
                     );
@@ -14609,7 +14619,7 @@
                     }
                     _atualizarDBSrv(novoDB);
                     backup_local();
-                    _removerPendente(uid);
+                    _removerPendente(criadoEm);
 
                     // Só re-renderiza a tela se o que a planilha confirmou for DIFERENTE do
                     // que o usuário já estava vendo (ignorando lin/lins/time, que só existem
@@ -14638,9 +14648,9 @@
                     // Conta a tentativa e já deixa o log completo (mensagem, stack, status
                     // HTTP e a resposta bruta do script) salvo junto do pendente, disponível
                     // pra consulta a qualquer momento em "Ver detalhes".
-                    const tentativas = _incrementarTentativa(uid);
-                    const logTexto = _montarLogErroSync(tipo, uid, err, statusHttp, respostaBrutaTxt, ctx, tentativas);
-                    _registrarErroPendente(uid, logTexto);
+                    const tentativas = _incrementarTentativa(criadoEm);
+                    const logTexto = _montarLogErroSync(tipo, criadoEm, err, statusHttp, respostaBrutaTxt, ctx, tentativas);
+                    _registrarErroPendente(criadoEm, logTexto);
 
                     if (err && err.message === "URL_BLOQUEADA") {
                         // Nunca adianta recarregar (a URL mudou de verdade, não é falha de
@@ -14704,6 +14714,12 @@
         // fetch terminar). Chamado uma vez ao iniciar o site, depois do DB_srv
         // já estar carregado — então o "lin" é resolvido fresco, contra a
         // planilha como ela está agora.
+        //
+        // ANTES de reenviar, compara o "criadoEm" de cada pendência com o "time"
+        // atual da planilha (DB.time — o loadDB() já busca esse valor fresco do
+        // servidor sempre que existem pendências, exatamente pra essa comparação
+        // valer). Se "criadoEm" <= DB.time, essa ação já rodou (foi ela mesma quem
+        // deixou o "time" da planilha nesse valor ou mais adiante) — não reenvia.
         function _reenviarPendentesSalvos() {
             const pendentes = _lerPendentes();
             if (pendentes.length === 0) return;
@@ -14715,11 +14731,21 @@
             const urlDiferente = pendentes.filter(p => p.url && p.url !== URL_SCRIPT);
 
             if (compativeis.length > 0) {
-                console.log(compativeis.length + " ação(ões) pendente(s) de uma sessão anterior, reenviando...");
-                showToast('Sincronizando ações pendentes...', 'ok');
-                compativeis
-                    .sort((a, b) => a.criadoEm - b.criadoEm)
-                    .forEach(p => syncBackground(p.tipo, p.ctx, p.uid, p.url));
+                const jaExecutadas = compativeis.filter(p => DB.time && p.criadoEm <= DB.time);
+                const aReenviar = compativeis.filter(p => !(DB.time && p.criadoEm <= DB.time));
+
+                if (jaExecutadas.length > 0) {
+                    console.log(jaExecutadas.length + " ação(ões) pendente(s) já tinham sido executadas na planilha antes da resposta chegar — removendo sem reenviar.");
+                    jaExecutadas.forEach(p => _removerPendente(p.criadoEm));
+                }
+
+                if (aReenviar.length > 0) {
+                    console.log(aReenviar.length + " ação(ões) pendente(s) de uma sessão anterior, reenviando...");
+                    showToast('Sincronizando ações pendentes...', 'ok');
+                    aReenviar
+                        .sort((a, b) => a.criadoEm - b.criadoEm)
+                        .forEach(p => syncBackground(p.tipo, p.ctx, p.criadoEm, p.url));
+                }
             }
 
             if (urlDiferente.length > 0) {
