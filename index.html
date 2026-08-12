@@ -13884,6 +13884,12 @@
             }
         }
 
+        // Sinaliza se o carregamento inicial teve algum problema de sincronização
+        // (fetch falhou e caiu no DB_Local, ou não foi possível confirmar contra a
+        // planilha) — usado só pra decidir se mostra a confirmação de "tudo em dia"
+        // ao iniciar o site (não faz sentido mostrar isso junto de um aviso de erro).
+        let _erroNoCarregamentoInicial = false;
+
         async function loadDB() {
             // Se já existe um DB_Local salvo e ele é um JSON válido pra estrutura do site,
             // usa ele direto e nem faz o fetch inicial — só busca no servidor se não
@@ -13968,6 +13974,7 @@
                 console.log("Fetch inicial - Erro");
                 console.log("Usando DB local");
 
+                _erroNoCarregamentoInicial = true;
                 DB = _normalizarNumerosDB(pegarJsonDoLocalStorage("DB_Local"));
                 _atualizarDBSrv(DB);
 
@@ -14787,8 +14794,17 @@
             history.replaceState({ scr: 'dash' }, '', '');
             _navStack.push({ scr: 'dash' });
 
-            // Reenvia em segundo plano qualquer ação que ficou pendente de uma sessão anterior
-            _reenviarPendentesSalvos();
+            // Reenvia em segundo plano qualquer ação que ficou pendente de uma sessão
+            // anterior. Se não sobrou nenhuma pendência (e o carregamento inicial não
+            // teve nenhum problema de conexão), os dados locais já estão totalmente em
+            // dia com a planilha — mostra uma confirmação visual disso.
+            if (_lerPendentes().length === 0) {
+                if (!_erroNoCarregamentoInicial) {
+                    showNotif('Tudo sincronizado com a planilha ✓', 'ok');
+                }
+            } else {
+                _reenviarPendentesSalvos();
+            }
         }
 
         // Mostra a tela de bloqueio de acesso (navegador não autorizado) e garante
