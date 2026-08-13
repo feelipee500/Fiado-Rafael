@@ -2034,7 +2034,8 @@
             padding: 12px 14px;
             margin-bottom: 10px;
             cursor: pointer;
-            transition: border-color .15s;
+            transition: border-color .15s, padding .2s ease;
+            position: relative;
         }
 
         .cc:active {
@@ -2188,6 +2189,48 @@
         .cc.expanded .cc-bar {
             margin-top: 12px;
             height: 5px;
+        }
+
+        /* Card recolhido: bem mais compacto — padding e fontes reduzidos, e a
+           barra de progresso vira a própria borda inferior do card (posicionada
+           absoluta, coladinha nas bordas, sem espaço de margem acima dela) */
+        .cc:not(.expanded) {
+            padding: 6px 12px 5px;
+            overflow: hidden;
+        }
+
+        .cc:not(.expanded) .cc-top {
+            gap: 8px;
+        }
+
+        .cc:not(.expanded) .av {
+            width: 26px;
+            height: 26px;
+            font-size: 11px;
+        }
+
+        .cc:not(.expanded) .cc-name {
+            font-size: 13px;
+        }
+
+        .cc:not(.expanded) .cc-sub {
+            font-size: 10px;
+            margin-top: 0;
+        }
+
+        .cc:not(.expanded) .cc-pill-wrap {
+            gap: 6px;
+        }
+
+        .cc:not(.expanded) .cc-bar {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin-top: 0;
+            height: 2px;
+            border-radius: 0;
+            opacity: .6;
         }
 
         /* COMPROVANTE / RECEIPT */
@@ -4442,21 +4485,6 @@
                                         —
                                     </div>
                                 </div>
-                                <!-- done -->
-                                <div class="ds-item ds-done" style="font-weight: 800;" id="card-done"
-                                    onclick="navTo('emprestimos','all'); renderEmprestimos('done', false)">
-                                    <div class="ds-lbl">
-                                        <div class="ds-lbl-dot" style="background:var(--acc)">
-                                        </div>
-                                        Pagos
-                                    </div>
-                                    <div class="ds-num c-g" id="ds-cnt-done">
-                                        0
-                                    </div>
-                                    <div class="ds-detail" id="ds-done-detail">
-                                        —
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -4494,16 +4522,6 @@
                                 todos</div>
                         </div>
                         <div id="dash-ok"></div>
-                    </div>
-
-                    <!-- Pagos -->
-                    <div id="dash-done-wrap" class="mt8">
-                        <div class="sh">
-                            <div class="sh-t">Pagos</div>
-                            <div class="sh-l" onclick="navTo('emprestimos','all'); renderEmprestimos('done', false)">Ver
-                                todos</div>
-                        </div>
-                        <div id="dash-done"></div>
                     </div>
                 </div>
             </div>
@@ -5169,13 +5187,21 @@
                     <!-- client + id -->
                     <div style="margin-bottom:-10px">
                         <div style="display:flex; align-items:center; justify-content:space-between">
-                            <div
-                                style="flex: 1; display: flex; flex-direction: column; align-items: start; text-align: center;">
-                                <span
-                                    style="font-family:var(--font-d); font-size:20px; font-weight:800; letter-spacing:-.5px; line-height:1.1"
-                                    id="ed-client-name"></span>
-                                <span class="fs11 tc2 mt4" id="ed-desc"></span>
-                                <span class="fs11 tc2 mt4" id="ed-id"></span>
+                            <div id="ed-client-info-btn" onclick="openClienteDetalhe(_currentClientId)"
+                                style="flex: 1; display: flex; align-items: center; gap:10px; cursor:pointer">
+                                <div id="ed-client-av" class="av" style="width:36px; height:36px; font-size:14px"></div>
+                                <div style="display: flex; flex-direction: column; align-items: start; text-align: center;">
+                                    <span
+                                        style="font-family:var(--font-d); font-size:20px; font-weight:800; letter-spacing:-.5px; line-height:1.1"
+                                        id="ed-client-name"></span>
+                                    <span class="fs11 tc2 mt4" id="ed-desc"></span>
+                                    <span class="fs11 tc2 mt4" id="ed-id"></span>
+                                </div>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                    style="color:var(--txt2); flex-shrink:0; opacity:.6">
+                                    <polyline points="9 18 15 12 9 6" />
+                                </svg>
                             </div>
 
                             <div id="ed-whatsapp-btn" onclick="openSheet('open-whatsapp')"
@@ -8009,22 +8035,19 @@
             const d = new Date(TODAY).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
             document.getElementById('dash-date').textContent = d.charAt(0).toUpperCase() + d.slice(1);
 
-            const loansPeriodo = DB.loans;
+            // Tela inicial mostra só o que está em andamento — empréstimos já
+            // quitados ('done') ficam de fora de todos os cálculos e listas daqui.
+            const loansPeriodo = DB.loans.filter(l => getLoanCalc(l).status !== 'done');
 
-            let totalRecv = 0, totalEmp = 0, totalpagos = 0, totaldivida = 0, lucrorelativo = 0;
-            let cntLate = 0, cntWarn = 0, cntOk = 0, cntDone = 0;
+            let totaldivida = 0, totalpagos = 0;
+            let cntLate = 0, cntWarn = 0, cntOk = 0;
             let valLate = 0, valWarn = 0, valOk = 0;
 
             loansPeriodo.forEach(l => {
                 const c = getLoanCalc(l);
-                if (!c.isPago) {
-                    totalRecv += c.valorHoje;
-                }
 
-                totalEmp += l.valor;
                 totaldivida += c.dividaTotal;
                 totalpagos += c.totalPago;
-                lucrorelativo += c.totalPago >= l.valor ? c.totalPago - l.valor : 0;
 
                 if (c.status === 'late') {
                     cntLate++;
@@ -8035,8 +8058,6 @@
                 } else if (c.status === 'ok') {
                     cntOk++;
                     valOk += c.valorBase;
-                } else if (c.status === 'done') {
-                    cntDone++;
                 }
             });
 
@@ -8045,7 +8066,7 @@
 
             // Hero
             document.getElementById('ds-total-recv').textContent = fmtMoney(restante);
-            document.getElementById('ds-hero-sub').textContent = `${total - cntDone} em aberto · ${cntDone} quitado${cntDone !== 1 ? 's' : ''}`;
+            document.getElementById('ds-hero-sub').textContent = `${total} empréstimo${total !== 1 ? 's' : ''} em aberto`;
 
             renderProximosEventos();
             // O calendário só é calculado/renderizado quando o box está aberto — evita
@@ -8057,20 +8078,17 @@
             document.getElementById('ds-cnt-late').textContent = cntLate;
             document.getElementById('ds-cnt-warn').textContent = cntWarn;
             document.getElementById('ds-cnt-ok').textContent = cntOk;
-            document.getElementById('ds-cnt-done').textContent = cntDone;
 
             document.getElementById('ds-late-detail').innerHTML = cntLate ? `${fmtMoney(valLate)}` : '—';
             document.getElementById('ds-warn-detail').innerHTML = cntWarn ? `${fmtMoney(valWarn)}` : '—';
             document.getElementById('ds-ok-detail').innerHTML = cntOk ? `${fmtMoney(valOk)}` : '—';
-            document.getElementById('ds-done-detail').textContent = cntDone ? `${cntDone} quitado${cntDone !== 1 ? 's' : ''}` : '—';
 
             document.getElementById('card-late').style.display = cntLate ? '' : 'none';
             document.getElementById('card-warn').style.display = cntWarn ? '' : 'none';
             document.getElementById('card-ok').style.display = cntOk ? '' : 'none';
-            document.getElementById('card-done').style.display = cntDone ? '' : 'none';
 
             // Donut chart
-            renderDonut(total, cntLate, cntWarn, cntOk, cntDone);
+            renderDonut(total, cntLate, cntWarn, cntOk);
 
             // 1. Mapeia os empréstimos calculando os dados uma única vez
             const computedLoans = loansPeriodo.map(loan => ({
@@ -8080,7 +8098,6 @@
 
             // Helper para ordenar por 'diasParaVencer' de forma crescente (menor para o maior)
             const sortByDiasParaVencer = (a, b) => a.calc.diasParaVencer - b.calc.diasParaVencer;
-            const sortByPago = (a, b) => b.calc.pago - a.calc.pago; // Decrescente (maior primeiro)
 
             // 2. Filtra, ordena e extrai o objeto original para cada categoria
             const lateLoans = computedLoans
@@ -8098,14 +8115,6 @@
                 .sort(sortByDiasParaVencer)
                 .map(item => item.original);
 
-            // Filtra os 'done', ordena pelo maior 'pago' e limita aos 2 primeiros
-            const doneLoans = computedLoans
-                .filter(item => item.calc.status === 'done')
-                .sort(sortByPago)
-                .slice(0, 2) // Pega apenas os 2 primeiros elementos do array ordenado
-                .map(item => item.original);
-
-
             const atenEl = document.getElementById('dash-atencao');
             const atenWrap = document.getElementById('dash-atencao-wrap');
             atenWrap.style.display = lateLoans.length ? '' : 'none';
@@ -8120,15 +8129,10 @@
             const okWrap = document.getElementById('dash-ok-wrap');
             okWrap.style.display = okLoans.length ? '' : 'none';
             okEl.innerHTML = renderLoanCards(okLoans, true, false);
-
-            const doneEl = document.getElementById('dash-done');
-            const doneWrap = document.getElementById('dash-done-wrap');
-            doneWrap.style.display = doneLoans.length ? '' : 'none';
-            doneEl.innerHTML = renderLoanCards(doneLoans, true, false);
             syncLoanModeToggles();
         }
 
-        function renderDonut(total, late, warn, ok, done) {
+        function renderDonut(total, late, warn, ok) {
             document.getElementById('donut-total').textContent = total;
 
             const cx = 55, cy = 55, r = 38, stroke = 20;
@@ -8136,7 +8140,6 @@
                 { count: late, color: '#ff4d6d', label: 'Em Atraso', filter: 'late' },
                 { count: warn, color: '#ffb547', label: 'Em Alerta', filter: 'warn' },
                 { count: ok, color: '#3d7fff', label: 'Em Dia', filter: 'ok' },
-                { count: done, color: '#00e8a2', label: 'Pago', filter: 'done' },
             ];
 
             function polar(cx, cy, r, angleDeg) {
@@ -10757,7 +10760,13 @@
         }
 
         function backFromClienteDetalhe() {
-            navTo(_prevScreen === 'clientes' ? 'clientes' : 'clientes');
+            // Se veio da tela de detalhe de um empréstimo, volta pra esse
+            // empréstimo em vez de sempre cair na lista de clientes.
+            if (_prevScreen === 'emp-detalhe' && _currentLoanId) {
+                openEmpDetalhe(_currentLoanId);
+            } else {
+                navTo(_prevScreen === 'clientes' ? 'clientes' : 'clientes');
+            }
         }
 
         function novoEmprestimoParaCliente() {
@@ -10793,6 +10802,9 @@
             document.getElementById('ed-id').textContent = l.id;
             document.getElementById('ed-desc').textContent = c.desc;
             document.getElementById('ed-client-name').textContent = c.nome;
+            document.getElementById('ed-client-av').className = `av ${c.color}`;
+            document.getElementById('ed-client-av').style.cssText = 'width:36px; height:36px; font-size:14px';
+            document.getElementById('ed-client-av').textContent = c.initials;
             document.getElementById('ed-status-pill').innerHTML = statusPill(calc.status);
             document.getElementById('ed-notif-off').style.display = (Number(l.not) === 0) ? '' : 'none';
             document.getElementById('ed-parcela-alert').style.display = (calc.status === 'warn' && calc.parcelaAnteriorAtrasada) ? '' : 'none';
@@ -12907,6 +12919,14 @@
                 } else {
                     _goTo(_prevScreen || 'emprestimos', null, false);
                 }
+                return;
+            }
+            // 5c. Cliente-detalhe aberto a partir do detalhe de um empréstimo —
+            // volta pra esse mesmo empréstimo (_currentLoanId), em vez de seguir
+            // a pilha genérica, que cairia na lista de clientes.
+            if (_currentScreen === 'cliente-detalhe' && _prevScreen === 'emp-detalhe' && _currentLoanId) {
+                _navStack.pop();
+                openEmpDetalhe(_currentLoanId);
                 return;
             }
             // 6. Navigate back in our stack
